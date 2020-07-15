@@ -5,58 +5,65 @@
 
 class Cqfs_Roles {
 
-        public function __construct() {
+    public static $customCaps = array(
+        [ 'singular' => 'cqfs_question', 'plural' => 'cqfs_questions' ],
+        [ 'singular' => 'cqfs_build', 'plural' => 'cqfs_builds' ],
+    );
 
-            $this->add_caps_admin();
-            $this->remove_caps_admin();
+    public static function add_caps_admin() {
+
+        $role = get_role( 'administrator' );
+
+        foreach( self::$customCaps as $cap ){
+            
+            $singular = $cap['singular'];
+            $plural = $cap['plural'];
+
+            $role->add_cap( "edit_{$singular}" ); 
+            $role->add_cap( "edit_{$plural}" ); 
+            $role->add_cap( "edit_others_{$plural}" ); 
+            $role->add_cap( "publish_{$plural}" ); 
+            $role->add_cap( "read_{$singular}" ); 
+            $role->add_cap( "read_private_{$plural}" ); 
+            $role->add_cap( "delete_{$singular}" ); 
+            $role->add_cap( "delete_{$plural}" );
+            $role->add_cap( "delete_private_{$plural}" );
+            $role->add_cap( "delete_others_{$plural}" );
+            $role->add_cap( "edit_published_{$plural}" );
+            $role->add_cap( "edit_private_{$plural}" );
+            $role->add_cap( "delete_published_{$plural}" );
+            
         }
 
-        private function add_caps_admin() {
-            $role = get_role( 'administrator' );
+    }
 
-            /**
-             * CPT - cqsf_quiz
-             */
-            $role->add_cap( 'edit_cqsf_quiz' ); 
-            $role->add_cap( 'edit_cqsf_quizes' ); 
-            $role->add_cap( 'edit_others_cqsf_quizes' ); 
-            $role->add_cap( 'publish_cqsf_quizes' ); 
-            $role->add_cap( 'read_cqsf_quiz' ); 
-            $role->add_cap( 'read_private_cqsf_quizes' ); 
-            $role->add_cap( 'delete_cqsf_quiz' ); 
-            $role->add_cap( 'delete_cqsf_quizes' );
-            $role->add_cap( 'delete_private_cqsf_quizes' );
-            $role->add_cap( 'delete_others_cqsf_quizes' );
-            $role->add_cap( 'edit_published_cqsf_quizes' );
-            $role->add_cap( 'edit_private_cqsf_quizes' );
-            $role->add_cap( 'delete_published_cqsf_quizes' );
+    public static function remove_caps_admin() {
 
+        $role = get_role( 'administrator' );
+
+        foreach( self::$customCaps as $cap ){
+            
+            $singular = $cap['singular'];
+            $plural = $cap['plural'];
+
+            $role->remove_cap( "edit_{$singular}" ); 
+            $role->remove_cap( "edit_{$plural}" ); 
+            $role->remove_cap( "edit_others_{$plural}" ); 
+            $role->remove_cap( "publish_{$plural}" ); 
+            $role->remove_cap( "read_{$singular}" ); 
+            $role->remove_cap( "read_private_{$plural}" ); 
+            $role->remove_cap( "delete_{$singular}" ); 
+            $role->remove_cap( "delete_{$plural}" );
+            $role->remove_cap( "delete_private_{$plural}" );
+            $role->remove_cap( "delete_others_{$plural}" );
+            $role->remove_cap( "edit_published_{$plural}" );
+            $role->remove_cap( "edit_private_{$plural}" );
+            $role->remove_cap( "delete_published_{$plural}" );
+            
         }
 
-        private function remove_caps_admin() {
-            $role = get_role( 'administrator' );
-
-            /**
-             * CPT - cqsf_quiz
-             */
-            $role->remove_cap( 'edit_cqsf_quiz' ); 
-            $role->remove_cap( 'edit_cqsf_quizes' ); 
-            $role->remove_cap( 'edit_others_cqsf_quizes' ); 
-            $role->remove_cap( 'publish_cqsf_quizes' ); 
-            $role->remove_cap( 'read_cqsf_quiz' ); 
-            $role->remove_cap( 'read_private_cqsf_quizes' ); 
-            $role->remove_cap( 'delete_cqsf_quiz' ); 
-            $role->remove_cap( 'delete_cqsf_quizes' );
-            $role->remove_cap( 'delete_private_cqsf_quizes' );
-            $role->remove_cap( 'delete_others_cqsf_quizes' );
-            $role->remove_cap( 'edit_published_cqsf_quizes' );
-            $role->remove_cap( 'edit_private_cqsf_quizes' );
-            $role->remove_cap( 'delete_published_cqsf_quizes' );
-
-        }
+    }
 
 }
-
-new Cqfs_Roles();
 
 ?>

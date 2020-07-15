@@ -95,8 +95,11 @@ class CQFS {
 
 		add_action( 'init', [ $this, 'i18n' ] );
 		add_action( 'plugins_loaded', [ $this, 'init' ] );
-		//$this->required_files();
-
+		require __DIR__ . '/inc/cpt.php';
+		require __DIR__ . '/inc/roles.php';
+        register_activation_hook( __FILE__, array( 'Cqfs_Roles', 'add_caps_admin' ) );
+		register_deactivation_hook( __FILE__, array( 'Cqfs_Roles', 'remove_caps_admin' ) );
+		
 	}
 
 	/**
@@ -149,9 +152,12 @@ class CQFS {
 			return;
 		}
 
-		require __DIR__ . '/inc/cpt.php';
-		require __DIR__ . '/inc/roles.php';
-		register_activation_hook( __FILE__, [ $this, 'rewrite_flush' ] );
+		//ACF save point
+		//must be removed in distribution
+		add_filter('acf/settings/save_json', [ $this, 'acf_save_point' ] );
+
+		//ACF load point
+		add_filter('acf/settings/load_json', [ $this, 'acf_load_point' ] );
 
 	}
 
@@ -235,26 +241,28 @@ class CQFS {
 
 	}
 
-
-	/**
-	 * Init Styles
-	 *
-	 * Register style files
-	 *
-	 * @since 1.0.0
-	 *
-	 * @access public
-	 */
-	private function rewrite_flush() {
-		// First, we "add" the custom post types via the create_cpt.php.
+	public function acf_save_point( $path ) {
+    
+		// update path
+		$path = plugin_dir_path( __FILE__ ) . 'assets/acf-fields';
 		
-		cqsf_quiz();
-
-		// ATTENTION: This is *only* done during plugin activation hook!
-		// You should *NEVER EVER* do this on every page load!!
-		flush_rewrite_rules();
+		// return
+		return $path;
+		
 	}
-//register_activation_hook( __FILE__, 'xgenie__rewrite_flush' );
+
+	public function acf_load_point( $paths ) {
+    
+		// remove original path (optional)
+		unset($paths[0]);
+		
+		// append path
+		$paths[] = plugin_dir_path( __FILE__ ) . 'assets/acf-fields';
+		
+		// return
+		return $paths;
+		
+	}
 
 }
 
