@@ -165,6 +165,9 @@ class CQFS {
 		//admin columns
 		require __DIR__ . '/inc/admin-columns.php';
 
+		//build shortcode
+		require __DIR__ . '/inc/shortcode.php';
+
 	}
 
 	/**
