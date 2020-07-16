@@ -64,6 +64,25 @@
             "prepend": "",
             "append": "",
             "maxlength": ""
+        },
+        {
+            "key": "field_5f0ffb25704ad",
+            "label": "Additional Note",
+            "name": "cqfs_additional_note",
+            "type": "textarea",
+            "instructions": "This is hidden in questionnaire and showed in the result page for build type \"quiz\".",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": 500,
+            "rows": 4,
+            "new_lines": ""
         }
     ],
     "location": [
@@ -83,5 +102,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "CPT: cqfs_question",
-    "modified": 1594839575
+    "modified": 1594886429
 }
