@@ -12,11 +12,11 @@ add_shortcode( 'cqfs', array( 'CqfsShortcode', 'cqfs_shortcode' ) );
 class CqfsShortcode {
 
     //prepare the clean slug for use
-    public static function cqfs_slug($z){
-        $z = strtolower($z);
-        $z = preg_replace('/[^a-z0-9 -]+/', '', $z);
-        $z = str_replace(' ', '-', $z);
-        return trim($z, '-');
+    public static function cqfs_slug( $text ){
+        $text = strtolower( $text );
+        $text = preg_replace( '/[^a-z0-9 -]+/', '', $text );
+        $text = str_replace( ' ', '-', $text );
+        return trim( $text, '-' );
     }
 
     //main shortcode function

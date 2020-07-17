@@ -28,7 +28,6 @@ function cqfs_columns_head_only_cqfs_build($defaults) {
     }
     
 	return $new;
-	return $defaults;
 	
 }
 function cqfs_columns_content_only_cqfs_build($column, $post_ID) {
@@ -56,6 +55,45 @@ function cqfs_columns_content_only_cqfs_build($column, $post_ID) {
 
         break;
         
+			
+    }
+}
+
+/*-------------------------------------------------------------------------------
+	Custom Columns [cqfs_question]
+-------------------------------------------------------------------------------*/
+
+// ONLY cqfs_question CUSTOM TYPE POSTS
+add_filter('manage_cqfs_question_posts_columns', 'cqfs_columns_head_only_cqfs_question', 10);
+add_action('manage_cqfs_question_posts_custom_column', 'cqfs_columns_content_only_cqfs_question', 10, 2);
+ 
+// CREATE TWO FUNCTIONS TO HANDLE THE COLUMN
+function cqfs_columns_head_only_cqfs_question($defaults) {
+
+	$new = array();
+	foreach($defaults as $key => $title) {
+
+        if ($key == 'author') {// Put the Name column before the Tags column
+            $new['answer_type'] = __('Answer Type', 'cqfs');
+        }
+
+        $new[$key] = $title;
+    }
+    
+	return $new;
+	
+}
+function cqfs_columns_content_only_cqfs_question($column, $post_ID) {
+	
+    // you could expand the switch to take care of other custom columns
+    switch($column)
+    {
+        case 'answer_type':
+			
+            $answer_type = get_field('cqfs_answer_type'); // radio, checkbox
+            echo esc_html( ucfirst($answer_type) );
+
+        break;
 			
     }
 }
