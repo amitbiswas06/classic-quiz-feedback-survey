@@ -47,18 +47,22 @@ class CqfsShortcode {
             )
         );
 
+        $class = esc_attr($type);
+        $class .= ' ' . esc_attr($layout);
+
         ob_start(); ?>
         <!-- cqfs start -->
-        <div id="cqfs-<?php echo esc_attr($atts['id']); ?>" class="cqfs <?php echo esc_attr($type); ?>">
+        <div id="cqfs-<?php echo esc_attr($atts['id']); ?>" class="cqfs <?php echo $class; ?>">
             <?php 
             if( $atts['title'] === 'true' ){
                 printf(
-                    '<h2 class="cqfs-title">%s</h2>',
+                    '<h2 class="cqfs--title">%s</h2>',
                     esc_html( get_the_title($atts['id']) )
                 );
             }
             ?>
-            <div class="cqfs--questions <?php echo esc_attr($layout); ?>" >
+            <form>
+            <div class="cqfs--questions" >
                 <?php 
                 // var_dump($questions); 
                     if($questions){
@@ -70,10 +74,9 @@ class CqfsShortcode {
                             $ansArr = explode("\n", $answers); //converted to array
 
                             $ans_type = get_field('cqfs_answer_type', $post->ID);//select. radio, checkbox.
-                            //use when type is radio
+                            
                             $correct_ans = get_field('cqfs_correct_answer', $post->ID);//comma separated number.
-                            //use when type is checkbox
-                            $ansCorrect = explode(",", str_replace(' ', '', $correct_ans));//array
+                            $ansCorrect = explode(",", str_replace(' ', '', $correct_ans));//converted to array
 
                             $note = get_field('cqfs_additional_note', $post->ID);//textarea. show only for quiz.
                             
@@ -99,9 +102,29 @@ class CqfsShortcode {
                         $i++;
                         endforeach;
                         wp_reset_postdata();
+
+                        //nonce
+                        wp_nonce_field();
                     }
                 ?>
+            </div><?php //var_dump(plugin_dir_url(__FILE__)); ?>
+            
+            <?php
+            //do action `cqfs_before_nav`
+            do_action('cqfs_before_nav');
+            ?>
+            <div class="cqfs--navigation">
+                <button class="cqfs--next disabled" disabled><?php echo apply_filters( 'cqfs_next', esc_html__('Next','cqfs') ); ?></button>
+                <button class="cqfs--prev disabled" disabled><?php echo apply_filters( 'cqfs_prev', esc_html__('Prev','cqfs') ); ?></button>
+                <button class="cqfs--submit disabled" disabled><?php echo apply_filters( 'cqfs_submit', esc_html__('Submit','cqfs') ); ?></button>
             </div>
+            </form>
+
+            <?php
+            //do action `cqfs_after_nav`
+            do_action('cqfs_after_nav');
+            ?>
+            <div class="cqfs--processing hide"><?php esc_html_e('Processing...','cqfs'); ?></div>
         </div>
         <!-- cqfs end -->
         <?php

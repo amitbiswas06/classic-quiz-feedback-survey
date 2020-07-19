@@ -168,6 +168,9 @@ class CQFS {
 		//build shortcode
 		require __DIR__ . '/inc/shortcode.php';
 
+		//enqueue scripts
+		add_action('wp_enqueue_scripts', [$this, 'cqfs_enqueue_scripts']);
+
 	}
 
 	/**
@@ -293,6 +296,28 @@ class CQFS {
 			esc_attr( $post->ID )
 		);
 	}
+
+	public function cqfs_enqueue_scripts(){
+		
+		//for multi page question
+		wp_enqueue_script(
+			'cqfs-multi', 
+			esc_url( plugin_dir_url(__FILE__) . 'assets/js/cqfs-multi.js'),
+			NULL,
+			'1.0.0',
+			true
+		);
+
+		//style css
+		wp_enqueue_style(
+			'cqfs-style',
+			esc_url( plugin_dir_url(__FILE__) . 'assets/css/cqfs-styles.css'),
+			NULL,
+			'1.0.0'
+		);
+
+	}
+
 
 }
 
