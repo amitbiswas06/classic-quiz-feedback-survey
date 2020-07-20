@@ -171,6 +171,12 @@ class CQFS {
 		//enqueue scripts
 		add_action('wp_enqueue_scripts', [$this, 'cqfs_enqueue_scripts']);
 
+		//Non authenticated action for CQFS form
+		add_action( 'admin_post_nopriv_cqfs_response', [$this, 'cqfs_form_submission'] );
+
+		//Authenticated action for the CQFS form
+		add_action( 'admin_post_cqfs_response', [$this, 'cqfs_form_submission'] );
+
 	}
 
 	/**
@@ -315,6 +321,69 @@ class CQFS {
 			NULL,
 			'1.0.0'
 		);
+
+	}
+
+	/**
+	 * CQFS form handle
+	 */
+	public function cqfs_form_submission(){
+
+		//sanitize the global POST var. XSS ok.
+		//hidden keys (_cqfs_id, action, _cqfs_nonce, _wp_http_referer)
+		$values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+		//get the nonce
+		$nonce = $values['_cqfs_nonce'];
+
+		//bail early if found suspecious with nonce verification.
+		if ( ! wp_verify_nonce( $nonce, 'cqfs_post' ) ) {
+			die( __( 'Security check', 'cqfs' ) ); 
+		}
+
+		//check and authenticate
+		if( !empty( $values ) ){
+			
+			$count = count($values);
+			// var_dump($values);
+
+			$userAnswers = array_slice($values, 0, ($count - 4), true );
+			var_dump($userAnswers);
+
+			//get ACF values for checking cqfs object
+			$category = get_field('cqfs_select_questions', $values['_cqfs_id']);//taxonomy, returns ID
+			$question_order = get_field('cqfs_question_order', $values['_cqfs_id']);//ASC, DSC
+			$questions = get_posts(
+				array(
+					'numberposts'   => -1,
+					'post_type'     => 'cqfs_question',
+					'category'      => esc_attr($category),
+					'order'         => esc_attr($question_order)
+				)
+			);
+
+			if($questions){
+				foreach($questions as $post) :
+					setup_postdata( $post );
+					
+					$correct_ans = get_field('cqfs_correct_answer', $post->ID);//comma separated number.
+					$ansCorrect = explode(",", str_replace(' ', '', $correct_ans));//converted to array
+					$note = get_field('cqfs_additional_note', $post->ID);//textarea. show only for quiz.
+
+					var_dump($ansCorrect);
+					
+				endforeach;
+				wp_reset_postdata();
+			
+			}
+
+			set_transient( "cqfs_{$values['_cqfs_id']}", [$values['_cqfs_id'] => 'Success!'], 120 );
+
+		}
+
+		wp_redirect( $_POST['_wp_http_referer'] );
+
+		die();
 
 	}
 

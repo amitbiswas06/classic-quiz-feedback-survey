@@ -36,6 +36,7 @@ class CqfsShortcode {
 
         $type = get_field('cqfs_build_type', $atts['id']);//select
         $category = get_field('cqfs_select_questions', $atts['id']);//taxonomy, returns ID
+        $question_order = get_field('cqfs_question_order', $atts['id']);//ASC, DSC
         $layout = get_field('cqfs_layout_type', $atts['id']);//select
            
         $questions = get_posts(
@@ -43,7 +44,7 @@ class CqfsShortcode {
                 'numberposts'   => -1,
                 'post_type'     => 'cqfs_question',
                 'category'      => esc_attr($category),
-                'order'         => 'ASC'
+                'order'         => esc_attr($question_order)
             )
         );
 
@@ -61,7 +62,7 @@ class CqfsShortcode {
                 );
             }
             ?>
-            <form>
+            <form id="cqfs-form-<?php echo esc_attr($atts['id']); ?>" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
             <div class="cqfs--questions" >
                 <?php 
                 // var_dump($questions); 
@@ -91,7 +92,7 @@ class CqfsShortcode {
                                         
                                     ?>
                                 <div class="input-wrap">
-                                    <input name="option<?php echo $i; ?>" type="<?php echo esc_attr($ans_type); ?>" id="<?php echo self::cqfs_slug($ans); ?>" value="<?php echo $j; ?>">
+                                    <input name="option<?php echo $i; ?>[]" type="<?php echo esc_attr($ans_type); ?>" id="<?php echo self::cqfs_slug($ans); ?>" value="<?php echo $j; ?>">
                                     <label for="<?php echo self::cqfs_slug($ans); ?>"><?php echo esc_html($ans); ?></label>
                                 </div>
                                 <?php $j++; }} ?>
@@ -103,8 +104,17 @@ class CqfsShortcode {
                         endforeach;
                         wp_reset_postdata();
 
-                        //nonce
-                        wp_nonce_field();
+                        //form ID
+                        printf(
+                            '<input type="hidden" name="_cqfs_id" value="%s">',
+                            esc_attr( $atts['id'] )
+                        );
+
+                        //action input
+                        printf('<input type="hidden" name="action" value="cqfs_response">');
+                        
+                        //create nonce
+                        wp_nonce_field('cqfs_post', '_cqfs_nonce');
                     }
                 ?>
             </div><?php //var_dump(plugin_dir_url(__FILE__)); ?>
@@ -128,6 +138,8 @@ class CqfsShortcode {
         </div>
         <!-- cqfs end -->
         <?php
+        $trans = get_transient( "cqfs_{$atts['id']}" );
+        var_dump($trans);
         return ob_get_clean();
         
     }

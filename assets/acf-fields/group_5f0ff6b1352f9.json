@@ -51,6 +51,31 @@
             "multiple": 0
         },
         {
+            "key": "field_5f15a869d1e4e",
+            "label": "Question Order",
+            "name": "cqfs_question_order",
+            "type": "select",
+            "instructions": "Select the order of the questions.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "ASC": "Ascending",
+                "DSC": "Descending"
+            },
+            "default_value": false,
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 1,
+            "ajax": 0,
+            "return_format": "value",
+            "placeholder": ""
+        },
+        {
             "key": "field_5f117a84d86c3",
             "label": "Layout Type",
             "name": "cqfs_layout_type",
@@ -93,5 +118,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "CPT: cqfs_build",
-    "modified": 1594981264
+    "modified": 1595255046
 }

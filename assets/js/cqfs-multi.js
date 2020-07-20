@@ -210,7 +210,7 @@ let initialize_CqfsMulti = function( cqfs ){
 
 }
 
-//initialize the cqfs block
+//initialize the cqfs multi page block
 cqfs_MultiPage.forEach( cqfs => {
     initialize_CqfsMulti( cqfs );
 })
