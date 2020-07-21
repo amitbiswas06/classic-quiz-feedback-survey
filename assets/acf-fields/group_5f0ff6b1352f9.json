@@ -99,6 +99,35 @@
             "ajax": 0,
             "return_format": "value",
             "placeholder": ""
+        },
+        {
+            "key": "field_5f17203ebebaf",
+            "label": "Pass Percentage",
+            "name": "cqfs_pass_percentage",
+            "type": "number",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5f0ff742f6215",
+                        "operator": "==",
+                        "value": "quiz"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 80,
+            "placeholder": "",
+            "prepend": "",
+            "append": "%",
+            "min": 1,
+            "max": 100,
+            "step": ""
         }
     ],
     "location": [
@@ -118,5 +147,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "CPT: cqfs_build",
-    "modified": 1595255046
+    "modified": 1595351238
 }
