@@ -43,7 +43,7 @@ class Cqfs_Cpts{
         $args = array(
             'label'                 => esc_html__( 'Questions', 'cqfs' ),
             'labels'                => $labels,
-            'supports'              => array( 'title', 'author', 'revisions' ),
+            'supports'              => array( 'title', 'thumbnail', 'author', 'revisions' ),
             'taxonomies'            => array( 'category' ),
             'show_ui'               => true,
             'show_in_menu'          => true,

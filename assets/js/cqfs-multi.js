@@ -65,147 +65,155 @@ const cqfs_MultiPage = document.querySelectorAll('.cqfs.multi');
 let initialize_CqfsMulti = function( cqfs ){
     //code start for the cqfs instance
 
-    //container div for questions
-    const questionsContainer = cqfs.querySelector('.cqfs--questions');
+    //check the layout type
+    const layoutType = cqfs.getAttribute("data-cqfs-layout");
 
-    //processing overlay div
-    const processingDiv = cqfs.querySelector('.cqfs--processing');
+    if( layoutType === 'multi' ){
 
-    //next button
-    const nxt = cqfs.querySelector('.cqfs--next');
+        //run if layout is a multi page
 
-    //previous button
-    const prv = cqfs.querySelector('.cqfs--prev');
+        //container div for questions
+        const questionsContainer = cqfs.querySelector('.cqfs--questions');
 
-    //submit button
-    const submit = cqfs.querySelector('.cqfs--submit');
+        //processing overlay div
+        const processingDiv = cqfs.querySelector('.cqfs--processing');
 
-    //Question Object
-    const questions = Array.from( cqfs.querySelectorAll('.question') );
-    
-    //Select and store answer sets for each question
-    const allOptions = questions.map( q => Array.from(q.querySelectorAll('input')));
+        //next button
+        const nxt = cqfs.querySelector('.cqfs--next');
 
-    console.log(allOptions);
+        //previous button
+        const prv = cqfs.querySelector('.cqfs--prev');
 
-    //event listner for each answer option
-    questions.forEach( (q, i, arr) => {
+        //submit button
+        const submit = cqfs.querySelector('.cqfs--submit');
 
-        //for each sets of answer options except the last set
-        //enable next button
-        if( i != arr.length -1 ){
-            q.addEventListener('click', (e) => {
-                let checked = allOptions[i].map( v => v.checked );
-                if( checked.includes(true) ){
-                    enableMe(nxt);
-                }else{
-                    disableMe(nxt);
-                }
-            } );
-        }
+        //Question Object
+        const questions = Array.from( cqfs.querySelectorAll('.question') );
+        
+        //Select and store answer sets for each question
+        const allOptions = questions.map( q => Array.from(q.querySelectorAll('input')));
 
-        //for the last set of answers option
-        //disable the next button and enable the submit button
-        if( i == arr.length -1 ){
-            q.addEventListener('click', (e) => {
-                let checked = allOptions[i].map( v => v.checked );
-                if( checked.includes(true) ){
-                    enableMe(submit);
-                }else{
-                    disableMe(submit);
-                }
-            } );
-        }
+        console.log(allOptions);
 
-    });
+        //event listner for each answer option
+        questions.forEach( (q, i, arr) => {
 
-    /**
-     * Add event listners to the following buttons
-     * 1. Next button
-     * 2. Previous button
-     * 3. Submit button
-     */
-    nxt.addEventListener('click', next)
-    prv.addEventListener('click', prev)
-    // submit.addEventListener('click', submission)
+            //for each sets of answer options except the last set
+            //enable next button
+            if( i != arr.length -1 ){
+                q.addEventListener('click', (e) => {
+                    let checked = allOptions[i].map( v => v.checked );
+                    if( checked.includes(true) ){
+                        enableMe(nxt);
+                    }else{
+                        disableMe(nxt);
+                    }
+                } );
+            }
 
-    //Add a counter variable for navigation
-    let count = 0
+            //for the last set of answers option
+            //disable the next button and enable the submit button
+            if( i == arr.length -1 ){
+                q.addEventListener('click', (e) => {
+                    let checked = allOptions[i].map( v => v.checked );
+                    if( checked.includes(true) ){
+                        enableMe(submit);
+                    }else{
+                        disableMe(submit);
+                    }
+                } );
+            }
 
-    /**
-     * @callback function `next`
-     * @param {event} e 
-     */
-    function next(e){
+        });
 
-        //prevent default
-        e.preventDefault()
+        /**
+         * Add event listners to the following buttons
+         * 1. Next button
+         * 2. Previous button
+         * 3. Submit button
+         */
+        nxt.addEventListener('click', next)
+        prv.addEventListener('click', prev)
+        // submit.addEventListener('click', submission)
 
-        //disble target
-        disableMe(e.target)
+        //Add a counter variable for navigation
+        let count = 0
 
-        //enable previous button
-        enableMe(prv)
+        /**
+         * @callback function `next`
+         * @param {event} e 
+         */
+        function next(e){
 
-        //hide previous question-answer set
-        hideMe( questions[count] )
+            //prevent default
+            e.preventDefault()
 
-        //show next question-answer set
-        showMe( questions[count].nextElementSibling )
-
-        //increament counter
-        count++
-
-        //check if count is last element
-        if( count == questions.length -1 ){
-            //disable target which is next button
+            //disble target
             disableMe(e.target)
 
             //enable previous button
             enableMe(prv)
+
+            //hide previous question-answer set
+            hideMe( questions[count] )
+
+            //show next question-answer set
+            showMe( questions[count].nextElementSibling )
+
+            //increament counter
+            count++
+
+            //check if count is last element
+            if( count == questions.length -1 ){
+                //disable target which is next button
+                disableMe(e.target)
+
+                //enable previous button
+                enableMe(prv)
+            }
+
+            //console.log(count)
+
         }
 
-        //console.log(count)
+        /**
+         * @callback function `prev`
+         * @param {event} e 
+         */
+        function prev(e){
 
-    }
-
-    /**
-     * @callback function `prev`
-     * @param {event} e 
-     */
-    function prev(e){
-
-        //prevent default
-        e.preventDefault()
-
-        //enable next button
-        enableMe(nxt)
-
-        //disable submit button
-        disableMe(submit)
-
-        //hide next question-answer set
-        hideMe( questions[count] )
-
-        //show previous question-answe set
-        showMe( questions[count].previousElementSibling )
-
-        //decrement counter
-        count--
-
-        //check if count is first element
-        if( count == 0 ){
-            //disable target which is previous button
-            disableMe(e.target)
+            //prevent default
+            e.preventDefault()
 
             //enable next button
             enableMe(nxt)
+
+            //disable submit button
+            disableMe(submit)
+
+            //hide next question-answer set
+            hideMe( questions[count] )
+
+            //show previous question-answe set
+            showMe( questions[count].previousElementSibling )
+
+            //decrement counter
+            count--
+
+            //check if count is first element
+            if( count == 0 ){
+                //disable target which is previous button
+                disableMe(e.target)
+
+                //enable next button
+                enableMe(nxt)
+            }
+
+            //console.log(count)
+            
         }
 
-        //console.log(count)
-        
-    }
-    
+    }//layout check
 
 
 }

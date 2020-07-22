@@ -47,7 +47,10 @@ class CqfsShortcode {
         $type = get_field('cqfs_build_type', $atts['id']);//select
         $category = get_field('cqfs_select_questions', $atts['id']);//taxonomy, returns ID
         $question_order = get_field('cqfs_question_order', $atts['id']);//ASC, DSC
-        $layout = get_field('cqfs_layout_type', $atts['id']);//select
+        $layout = get_field('cqfs_layout_type', $atts['id']);//select, multi/single
+        $pass_percent = get_field('cqfs_pass_percentage', $atts['id']);//pass percentage
+        $pass_msg = get_field('cqfs_pass_message', $atts['id']);//pass message
+        $fail_msg = get_field('cqfs_fail_message', $atts['id']);//fail message
            
         $questions = get_posts(
             array(
@@ -71,7 +74,7 @@ class CqfsShortcode {
             //display the form
         ?>
         <!-- cqfs start -->
-        <div id="cqfs-<?php echo esc_attr($atts['id']); ?>" class="cqfs <?php echo $class; ?>">
+        <div id="cqfs-<?php echo esc_attr($atts['id']); ?>" class="cqfs <?php echo $class; ?>" data-cqfs-layout = <?php echo esc_attr($layout); ?>>
             <?php 
             if( $atts['title'] !== 'false' ){
                 printf(
@@ -98,15 +101,23 @@ class CqfsShortcode {
                             $ansCorrect = explode(",", str_replace(' ', '', $correct_ans));//converted to array
 
                             $note = get_field('cqfs_additional_note', $post->ID);//textarea. show only for quiz.
+
+                            $show_first = $i == 1 ? 'show' : 'hide';
                             
                         ?>
-                        <div class="question <?php echo $i == 1 ? 'show' : 'hide'; ?>">
+                        <div class="question <?php echo $layout === 'multi' ? esc_attr($show_first) : ''; ?>">
                             <?php
                                 printf(
                                     '<h3 class="question--title">%s %s</h3>',
                                     esc_html($i) . '&#46; ',
                                     esc_html( get_the_title($post->ID) )
                                 );
+
+                                //display featured image if there is any
+                                if( has_post_thumbnail( $post->ID )){
+                                    echo wp_kses( get_the_post_thumbnail($post->ID, 'medium_large'), 'post');
+                                }
+                                
                             ?>
                             <div class="options">
                         
@@ -148,9 +159,15 @@ class CqfsShortcode {
             do_action('cqfs_before_nav');
             ?>
             <div class="cqfs--navigation">
-                <button class="cqfs--next disabled" disabled><?php echo apply_filters( 'cqfs_next', esc_html__('Next','cqfs') ); ?></button>
-                <button class="cqfs--prev disabled" disabled><?php echo apply_filters( 'cqfs_prev', esc_html__('Prev','cqfs') ); ?></button>
-                <button class="cqfs--submit disabled" disabled><?php echo apply_filters( 'cqfs_submit', esc_html__('Submit','cqfs') ); ?></button>
+                <?php 
+                //show nex-prev nav if multi page layout
+                if($layout === 'multi') { ?>
+                    <button class="cqfs--next disabled" disabled><?php echo apply_filters( 'cqfs_next', esc_html__('Next','cqfs') ); ?></button>
+                    <button class="cqfs--prev disabled" disabled><?php echo apply_filters( 'cqfs_prev', esc_html__('Prev','cqfs') ); ?></button>
+                    <button class="cqfs--submit disabled" type="submit" disabled><?php echo apply_filters( 'cqfs_submit', esc_html__('Submit','cqfs') ); ?></button>
+                <?php }else{ ?>
+                    <button class="cqfs--submit" type="submit"><?php echo apply_filters( 'cqfs_submit', esc_html__('Submit','cqfs') ); ?></button>
+                <?php } ?>
             </div>
             </form>
 
@@ -162,16 +179,16 @@ class CqfsShortcode {
         </div>
         <!-- cqfs end -->
         <?php } elseif( $type === 'quiz' && isset($param['cqfs_status']) && isset($param['cqfs_id']) && $param['cqfs_status'] === 'success' && $param['cqfs_id'] === $atts['id'] ) {
-            //display the response
-            // echo 'success';
+            
             $count = count($param);
             $userAnswers = array_values( array_slice($param, 0, ($count - 2), true ) );
-            var_dump($userAnswers);
+            // var_dump($userAnswers);
+            //empty array for correct ans
+            $numCorrects = [];
 
-            // var_dump( array_values($userAnswers) );
             if($questions){
 
-                echo '<div class="cqfs-results">';
+                echo '<!-- cqfs result start --><div class="cqfs-results">';
 
                 $i = 0;
                 foreach($questions as $post) :
@@ -179,7 +196,6 @@ class CqfsShortcode {
                     
                     $answers = get_field('cqfs_answers', $post->ID);//textarea, create each line.
                     $ansArr = explode("\n", $answers); //converted to array
-                    $pass = get_field('cqfs_pass_percentage', $post->ID);//pass percentage
                     $correct_ans = get_field('cqfs_correct_answer', $post->ID);//comma separated number.
                     $ansCorrect = explode(",", str_replace(' ', '', $correct_ans));//converted to array
                     $note = get_field('cqfs_additional_note', $post->ID);//textarea. show only for quiz.
@@ -190,6 +206,11 @@ class CqfsShortcode {
 
                     //check answers and return boolean
                     $compare = self::cqfs_array_equality_check( $ansCorrect, $user_ans );
+                    
+                    //push to empty array for correct answers
+                    if($compare){
+                        $numCorrects[] = $compare;
+                    }
 
                     ?>
                     <div class="cqfs-results--each">
@@ -213,11 +234,14 @@ class CqfsShortcode {
                                 $compare ? esc_html__('Correct Answer', 'cqfs') : esc_html__('Wrong Answer', 'cqfs')
                             );
 
-                            printf(
-                                '<p><b>%s</b>%s</p>',
-                                apply_filters('cqfs_additional_notes', esc_html__('Additional Notes: ', 'cqfs')),
-                                $note[$i] ? esc_html($note) : ''
-                            );
+                            if( !empty($note[$i] )){
+                                printf(
+                                    '<p><b>%s</b>%s</p>',
+                                    apply_filters('cqfs_additional_notes', esc_html__('Additional Notes: ', 'cqfs')),
+                                    esc_html($note)
+                                );
+                            }
+                            
                         ?>       
                         
                     </div>
@@ -226,9 +250,15 @@ class CqfsShortcode {
                 
                 $i++;
                 endforeach;
+
                 wp_reset_postdata();
 
-                echo '</div>';
+                //display the pass/fail
+                self::cqfs_quiz_result( count($questions), count($numCorrects), $pass_percent, $pass_msg, $fail_msg );
+
+                //close the result div
+                echo '</div><!-- cqfs result end -->';
+
             }
 
 
@@ -250,21 +280,34 @@ class CqfsShortcode {
      * Evaluate quiz result
      * @param {number} totalQuestions, number of questions
      * @param {number} correctAnswers, number of correct answer
-     * @param {number} passPercentage, pass percentage
+     * @param {number} passPercentage, pass percentage (default 50)
+     * @param {text} passMsg, message if pass (optional)
+     * @param {text} failMsg, message if failed (optional)
      */
-    public static function cqfs_quiz_result( $totalQuestions, $correctAnswers, $passPercentage = 50 ){
+    public static function cqfs_quiz_result( $totalQuestions, $correctAnswers, $passPercentage = 50, $passMsg = "", $failMsg = "" ){
 
         //percentage var
-        $percent = 0;
+        $percentage = 0;
 
         if( $totalQuestions >= $correctAnswers ){
-            $percent = round($correctAnswers * 100 / $totalQuestions);
+            $percentage = round($correctAnswers * 100 / $totalQuestions);
         }
 
-        if( $percent < $passPercentage ){
+        if( $percentage >= $passPercentage ){
+            //pass message
+            printf(
+                __('<div class="cqfs-pass-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>'),
+                esc_html($percentage) . "&#37;",
+                $passMsg != '' ? esc_html( $passMsg ) : apply_filters( 'cqfs_pass_msg', esc_html__('Congratulations! You have passed.'))
+            );
 
         }else{
-            
+            //fail message
+            printf(
+                __('<div class="cqfs-fail-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>'),
+                esc_html($percentage) . "&#37;",
+                $failMsg != '' ? esc_html( $failMsg ) : apply_filters( 'cqfs_fail_msg', esc_html__('Sorry! You have failed.'))
+            );
         }
 
     }

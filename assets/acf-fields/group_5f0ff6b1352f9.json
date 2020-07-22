@@ -128,6 +128,60 @@
             "min": 1,
             "max": 100,
             "step": ""
+        },
+        {
+            "key": "field_5f1803b932a1d",
+            "label": "Pass Message (optional)",
+            "name": "cqfs_pass_message",
+            "type": "textarea",
+            "instructions": "Leave empty for default.",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5f0ff742f6215",
+                        "operator": "==",
+                        "value": "quiz"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": 300,
+            "rows": 4,
+            "new_lines": ""
+        },
+        {
+            "key": "field_5f18044432a1e",
+            "label": "Fail Message (optional)",
+            "name": "cqfs_fail_message",
+            "type": "textarea",
+            "instructions": "Leave empty for default.",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5f0ff742f6215",
+                        "operator": "==",
+                        "value": "quiz"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": 300,
+            "rows": 4,
+            "new_lines": ""
         }
     ],
     "location": [
@@ -147,5 +201,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "CPT: cqfs_build",
-    "modified": 1595351238
+    "modified": 1595415041
 }
