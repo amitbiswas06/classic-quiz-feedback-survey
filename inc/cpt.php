@@ -10,6 +10,7 @@ class Cqfs_Cpts{
 
         add_action( 'init', array( $this, 'cpt_cqfs_question'), 5 );
         add_action( 'init', array( $this, 'cpt_cqfs_build'), 5 );
+        add_action( 'init', array( $this, 'cpt_cqfs_entries'), 5 );
 
     }
 
@@ -100,6 +101,52 @@ class Cqfs_Cpts{
             'show_in_rest'          => true,
             'rewrite'               => $rewrite,
             'capability_type'       => array('cqfs_build','cqfs_builds'),
+            'map_meta_cap'          => true
+        );
+
+        register_post_type( $cpt_id, $args );
+
+    }
+
+    /**
+     * Custom Post Type Name/ID: "cqfs_entries"
+     */
+    public function cpt_cqfs_entries() {
+            
+        $cpt_id = 'cqfs_entries';
+
+        $labels = array(
+            'name'                  => esc_html__( 'CQFS Entries', 'cqfs' ),
+            'singular_name'         => esc_html__( 'CQFS Entries', 'cqfs' ),
+            'menu_name'             => esc_html__( 'CQFS Entries', 'cqfs' ),
+            'parent_item_colon'     => esc_html__( 'CQFS Entries&#58;', 'cqfs' ),
+            'all_items'             => esc_html__( 'All CQFS Entries', 'cqfs' ),
+            'view_item'             => esc_html__( 'View CQFS Entries', 'cqfs' ),
+            'add_new_item'          => esc_html__( 'Add New CQFS Entries', 'cqfs' ),
+            'add_new'               => esc_html__( 'Add New', 'cqfs' ),
+            'edit_item'             => esc_html__( 'Edit CQFS Entries', 'cqfs' ),
+            'update_item'           => esc_html__( 'Update CQFS Entries', 'cqfs' ),
+            'search_items'          => esc_html__( 'Search CQFS Entries', 'cqfs' ),
+            'not_found'             => esc_html__( 'CQFS Entries Not found', 'cqfs' ),
+            'not_found_in_trash'    => esc_html__( 'Not found in Trash', 'cqfs' ),
+        );
+        $rewrite = array(
+            'slug'                  => 'cqfs-entries',
+            'pages'                 => false,
+            'feeds'                 => false,
+        );
+        $args = array(
+            'label'                 => esc_html__( 'CQFS Entries', 'cqfs' ),
+            'labels'                => $labels,
+            'supports'              => array( 'title', 'author', 'revisions' ),
+            'show_ui'               => true,
+            'show_in_menu'          => true,
+            'show_in_nav_menus'     => true,
+            'show_in_admin_bar'     => true,
+            'can_export'            => true,
+            'show_in_rest'          => true,
+            'rewrite'               => $rewrite,
+            'capability_type'       => array('cqfs_entry','cqfs_entries'),
             'map_meta_cap'          => true
         );
 

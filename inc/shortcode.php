@@ -21,7 +21,12 @@ class CqfsShortcode {
 		add_action( 'admin_post_cqfs_response', [$this, 'cqfs_form_submission'] );
     }
 
-    //prepare the clean slug for use
+    /**
+     * prepare the clean slug for use
+     * 
+     * @param string $text any text
+     * @return slug
+     */
     public static function cqfs_slug( $text ){
         $text = strtolower( $text );
         $text = preg_replace( '/[^a-z0-9 -]+/', '', $text );
@@ -29,7 +34,12 @@ class CqfsShortcode {
         return trim( $text, '-' );
     }
 
-    //main shortcode function
+    /**
+     * CQFS shortcode function
+     * 
+     * @param string
+     * @return CQFS shortcode
+     */
     public function cqfs_shortcode( $atts ) {
         
         $atts = shortcode_atts(
@@ -70,7 +80,7 @@ class CqfsShortcode {
         ob_start(); 
         
         //check parameters
-        if ( !isset($param['cqfs_status']) || !isset($param['cqfs_id']) || $param['cqfs_status'] !== 'success' || $param['cqfs_id'] !== $atts['id'] ) { 
+        if ( !isset($param['_cqfs_status']) || !isset($param['_cqfs_id']) || $param['_cqfs_status'] !== 'success' || $param['_cqfs_id'] !== $atts['id'] ) { 
             //display the form
         ?>
         <!-- cqfs start -->
@@ -139,6 +149,8 @@ class CqfsShortcode {
                         endforeach;
                         wp_reset_postdata();
 
+                        self::cqfs_user_info_form($atts['id'], '', $layout);
+
                         //form ID
                         printf(
                             '<input type="hidden" name="_cqfs_id" value="%s">',
@@ -162,11 +174,11 @@ class CqfsShortcode {
                 <?php 
                 //show nex-prev nav if multi page layout
                 if($layout === 'multi') { ?>
-                    <button class="cqfs--next disabled" disabled><?php echo apply_filters( 'cqfs_next', esc_html__('Next','cqfs') ); ?></button>
-                    <button class="cqfs--prev disabled" disabled><?php echo apply_filters( 'cqfs_prev', esc_html__('Prev','cqfs') ); ?></button>
-                    <button class="cqfs--submit disabled" type="submit" disabled><?php echo apply_filters( 'cqfs_submit', esc_html__('Submit','cqfs') ); ?></button>
+                    <button class="cqfs--next disabled" disabled><?php echo apply_filters( 'cqfs_next_text', esc_html__('Next','cqfs') ); ?></button>
+                    <button class="cqfs--prev disabled" disabled><?php echo apply_filters( 'cqfs_prev_text', esc_html__('Prev','cqfs') ); ?></button>
+                    <button class="cqfs--submit disabled" type="submit" disabled><?php echo apply_filters( 'cqfs_submit_text', esc_html__('Submit','cqfs') ); ?></button>
                 <?php }else{ ?>
-                    <button class="cqfs--submit" type="submit"><?php echo apply_filters( 'cqfs_submit', esc_html__('Submit','cqfs') ); ?></button>
+                    <button class="cqfs--submit" type="submit"><?php echo apply_filters( 'cqfs_submit_text', esc_html__('Submit','cqfs') ); ?></button>
                 <?php } ?>
             </div>
             </form>
@@ -178,7 +190,7 @@ class CqfsShortcode {
             <div class="cqfs--processing hide"><?php esc_html_e('Processing...','cqfs'); ?></div>
         </div>
         <!-- cqfs end -->
-        <?php } elseif( $type === 'quiz' && isset($param['cqfs_status']) && isset($param['cqfs_id']) && $param['cqfs_status'] === 'success' && $param['cqfs_id'] === $atts['id'] ) {
+        <?php } elseif( $type === 'quiz' && isset($param['_cqfs_status']) && isset($param['_cqfs_id']) && $param['_cqfs_status'] === 'success' && $param['_cqfs_id'] === $atts['id'] ) {
             
             $count = count($param);
             $userAnswers = array_values( array_slice($param, 0, ($count - 2), true ) );
@@ -206,6 +218,7 @@ class CqfsShortcode {
 
                     //check answers and return boolean
                     $compare = self::cqfs_array_equality_check( $ansCorrect, $user_ans );
+                    var_dump($compare);
                     
                     //push to empty array for correct answers
                     if($compare){
@@ -217,7 +230,7 @@ class CqfsShortcode {
                         <?php
                             printf(
                                 '<h3 class="question--title">%s %s</h3>',
-                                esc_html($i+1) . '&#46; ',
+                                esc_html($i+1) . esc_html__('&#46; ','cqfs'),
                                 esc_html( get_the_title($post->ID) )
                             );
                         ?>
@@ -262,7 +275,7 @@ class CqfsShortcode {
             }
 
 
-        }elseif( isset($param['cqfs_status']) && isset($param['cqfs_id']) && $param['cqfs_status'] === 'success' && $param['cqfs_id'] === $atts['id'] ){
+        }elseif( isset($param['_cqfs_status']) && isset($param['_cqfs_id']) && $param['_cqfs_status'] === 'success' && $param['_cqfs_id'] === $atts['id'] ){
                 
             printf(
                 '<div class="cqfs-results"><h4>%s</h4></div>',
@@ -278,11 +291,13 @@ class CqfsShortcode {
 
     /**
      * Evaluate quiz result
-     * @param {number} totalQuestions, number of questions
-     * @param {number} correctAnswers, number of correct answer
-     * @param {number} passPercentage, pass percentage (default 50)
-     * @param {text} passMsg, message if pass (optional)
-     * @param {text} failMsg, message if failed (optional)
+     * 
+     * @param int     $totalQuestions     number of questions
+     * @param int     $correctAnswers     number of correct answer
+     * @param int     $passPercentage     pass percentage (default 50)
+     * @param string  $passMsg            message if pass (optional)
+     * @param string  $failMsg            message if failed (optional)
+     * @return string printed
      */
     public static function cqfs_quiz_result( $totalQuestions, $correctAnswers, $passPercentage = 50, $passMsg = "", $failMsg = "" ){
 
@@ -296,22 +311,29 @@ class CqfsShortcode {
         if( $percentage >= $passPercentage ){
             //pass message
             printf(
-                __('<div class="cqfs-pass-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>'),
-                esc_html($percentage) . "&#37;",
-                $passMsg != '' ? esc_html( $passMsg ) : apply_filters( 'cqfs_pass_msg', esc_html__('Congratulations! You have passed.'))
+                __('<div class="cqfs-pass-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>', 'cqfs'),
+                esc_html($percentage) . esc_html__("&#37;", 'cqfs'),
+                $passMsg != '' ? esc_html( $passMsg ) : apply_filters( 'cqfs_pass_msg', esc_html__('Congratulations! You have passed.', 'cqfs'))
             );
 
         }else{
             //fail message
             printf(
-                __('<div class="cqfs-fail-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>'),
-                esc_html($percentage) . "&#37;",
-                $failMsg != '' ? esc_html( $failMsg ) : apply_filters( 'cqfs_fail_msg', esc_html__('Sorry! You have failed.'))
+                __('<div class="cqfs-fail-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>', 'cqfs'),
+                esc_html($percentage) . esc_html__("&#37;", 'cqfs'),
+                $failMsg != '' ? esc_html( $failMsg ) : apply_filters( 'cqfs_fail_msg', esc_html__('Sorry! You have failed.', 'cqfs'))
             );
         }
 
     }
 
+    /**
+     * Check two normal or multidimentional arrays
+     * 
+     * @param array $array1 required array
+     * @param array $array2 required array
+     * @return boolean true if same values are there regardless of key positions.
+     */
     public static function cqfs_array_equality_check($array1, $array2){
 
         if( is_array($array1) && is_array($array2 ) ){
@@ -322,6 +344,49 @@ class CqfsShortcode {
             return false;
         }
             
+    }
+
+    public static function cqfs_user_info_form( $id, $legal = "", $layout_type = "multi" ){
+        if( !is_user_logged_in() ){
+
+            if( $layout_type === 'multi' ){
+                echo '<div class="cqfs-user-form hide">';
+            }else{
+                echo '<div class="cqfs-user-form">';
+            }
+
+            printf(
+                '<p class="cqfs-user-form--msg">%s</p>',
+                apply_filters( 'cqfs_user_form_msg', esc_html__('Please provide the following info.', 'cqfs'))
+            );
+            //display identity form
+            //name field
+            printf(
+                '<label for="%s">%s</label><input id="%s" name="_cqfs_uname" type="text" placeholder="%s" required>',
+                'uname_' . esc_attr( $id ),
+                esc_html__('Your Name &#42;', 'cqfs'),
+                'uname_' . esc_attr( $id ),
+                esc_html__('please type your name.', 'cqfs')
+            );
+
+            //email field
+            printf(
+                '<label for="%s">%s</label><input id="%s" name="_cqfs_email" type="email" placeholder="%s" required>',
+                'uemail_' . esc_attr( $id ),
+                esc_html__('Your Email &#42;', 'cqfs'),
+                'uemail_' . esc_attr( $id ),
+                esc_html__('please type email.', 'cqfs')
+            );
+
+            printf(
+                '<div class="cqfs-user-form--legal">%s</div>',
+                $legal ? wp_kses($legal, 'post') : ''
+            );
+
+            echo '</div>';
+
+        }
+
     }
 
     /**
@@ -339,7 +404,7 @@ class CqfsShortcode {
 
 		//bail early if found suspecious with nonce verification.
 		if ( ! wp_verify_nonce( $nonce, 'cqfs_post' ) ) {
-			$cqfs_status = ['cqfs_status' => urlencode(sanitize_text_field('failure'))];
+			$cqfs_status = ['_cqfs_status' => urlencode(sanitize_text_field('failure'))];
 			wp_safe_redirect(
 				esc_url_raw(
 					add_query_arg( $cqfs_status, wp_unslash(esc_url(strtok($values['_wp_http_referer'], '?')) ) )
@@ -350,19 +415,31 @@ class CqfsShortcode {
 		}else{
 			
 			$count = count($values);
-			// var_dump($values);
+			var_dump($values);
 
-			$userAnswers = array_slice($values, 0, ($count - 4), true );
+			$userAnswers = array_slice($values, 0, ($count - 3), true );
 			// var_dump($userAnswers);
 
-			$resultMap = function($val){
-				return urlencode(implode(",",$val));
+			$resultMap = function( $val ){
+                if( is_array( $val ) ){
+                    return urlencode(implode(",",$val));
+                }else{
+                    return urlencode( $val );
+                }
 			};
 
 			$resultsArray = array_map($resultMap, $userAnswers);
-			$resultsArray['cqfs_id'] = urlencode(sanitize_text_field($values['_cqfs_id']));
-			$resultsArray['cqfs_status'] = urlencode(sanitize_text_field('success'));
-			// var_dump($resultsArray);
+			$resultsArray['_cqfs_status'] = urlencode(sanitize_text_field('success'));
+            var_dump($resultsArray);
+            
+            $post_arr = array(
+                'post_title'   => 'Test post',
+                'post_content' => 'Test post content',
+                'post_status'  => 'publish',
+                'post_author'  => get_current_user_id(),
+            );
+            // Insert the post into the database
+            // wp_insert_post( $post_arr );
 	
 			wp_safe_redirect(
 				esc_url_raw(

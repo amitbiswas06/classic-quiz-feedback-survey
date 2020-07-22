@@ -8,6 +8,7 @@ class Cqfs_Roles {
     public static $customCaps = array(
         [ 'singular' => 'cqfs_question', 'plural' => 'cqfs_questions' ],
         [ 'singular' => 'cqfs_build', 'plural' => 'cqfs_builds' ],
+        [ 'singular' => 'cqfs_entry', 'plural' => 'cqfs_entries' ]
     );
 
     public static function add_caps_admin() {

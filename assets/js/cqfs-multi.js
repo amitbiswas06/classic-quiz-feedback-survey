@@ -75,6 +75,9 @@ let initialize_CqfsMulti = function( cqfs ){
         //container div for questions
         const questionsContainer = cqfs.querySelector('.cqfs--questions');
 
+        //container div for questions
+        const userForm = cqfs.querySelector('.cqfs-user-form');
+
         //processing overlay div
         const processingDiv = cqfs.querySelector('.cqfs--processing');
 
@@ -84,11 +87,18 @@ let initialize_CqfsMulti = function( cqfs ){
         //previous button
         const prv = cqfs.querySelector('.cqfs--prev');
 
+        //form
+        //submit button
+        const form = cqfs.querySelector('form');
+
         //submit button
         const submit = cqfs.querySelector('.cqfs--submit');
 
         //Question Object
-        const questions = Array.from( cqfs.querySelectorAll('.question') );
+        let questions = Array.from( cqfs.querySelectorAll('.question') );
+        if(userForm){
+            questions.push(userForm);
+        }
         
         //Select and store answer sets for each question
         const allOptions = questions.map( q => Array.from(q.querySelectorAll('input')));
@@ -115,7 +125,8 @@ let initialize_CqfsMulti = function( cqfs ){
             //disable the next button and enable the submit button
             if( i == arr.length -1 ){
                 q.addEventListener('click', (e) => {
-                    let checked = allOptions[i].map( v => v.checked );
+                    let checked = allOptions[i].map( v => v.checked || v.type === 'text' || v.type === 'email' );
+                    console.log(checked)
                     if( checked.includes(true) ){
                         enableMe(submit);
                     }else{
@@ -134,7 +145,7 @@ let initialize_CqfsMulti = function( cqfs ){
          */
         nxt.addEventListener('click', next)
         prv.addEventListener('click', prev)
-        // submit.addEventListener('click', submission)
+        form.addEventListener('submit', submission)
 
         //Add a counter variable for navigation
         let count = 0
@@ -210,6 +221,16 @@ let initialize_CqfsMulti = function( cqfs ){
             }
 
             //console.log(count)
+            
+        }
+
+        function submission(e){
+            // e.preventDefault();
+            if( _cqfs.login_status ){
+                alert('You are logged in')
+            }else{
+                alert('You are not logged in')
+            }
             
         }
 

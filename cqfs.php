@@ -309,6 +309,14 @@ class CQFS {
 			true
 		);
 
+		//localize script
+		wp_localize_script( 'cqfs-multi', '_cqfs',
+			array( 
+				'ajaxurl'		=> esc_url( admin_url( 'admin-ajax.php' ) ),
+				'login_status'	=> is_user_logged_in(),
+			)
+		);
+
 		//style css
 		wp_enqueue_style(
 			'cqfs-style',
