@@ -1,0 +1,175 @@
+{
+    "key": "group_5f199c6859f4f",
+    "title": "Entries",
+    "fields": [
+        {
+            "key": "field_5f199df0eeac4",
+            "label": "Form ID",
+            "name": "cqfs_entry_form_id",
+            "type": "text",
+            "instructions": "The form ID which user have submitted.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_5f199e31eeac5",
+            "label": "Form Type",
+            "name": "cqfs_entry_form_type",
+            "type": "text",
+            "instructions": "The form type which user have submitted.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_5f199ed5ebc32",
+            "label": "Result",
+            "name": "cqfs_entry_result",
+            "type": "text",
+            "instructions": "The Quiz result",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_5f199f7aebc33",
+            "label": "Percentage",
+            "name": "cqfs_entry_percentage",
+            "type": "text",
+            "instructions": "Percentage obtained in quiz.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_5f199cbbeeac1",
+            "label": "Questions",
+            "name": "cqfs_entry_questions",
+            "type": "textarea",
+            "instructions": "The CQFS questions lists here for this entry. Each line break represents a question.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": "",
+            "rows": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_5f199d69eeac2",
+            "label": "Answers",
+            "name": "cqfs_entry_answers",
+            "type": "textarea",
+            "instructions": "The CQFS answers lists here for this entry. Each line break represents a answer.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": "",
+            "rows": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_5f199db5eeac3",
+            "label": "Status",
+            "name": "cqfs_entry_status",
+            "type": "textarea",
+            "instructions": "The CQFS answers status lists here for this entry. Each line break represents a status.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": "",
+            "rows": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_5f19a5795e490",
+            "label": "User Email",
+            "name": "cqfs_entry_user_email",
+            "type": "email",
+            "instructions": "Email ID of the user.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "cqfs_entries"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "acf_after_title",
+    "style": "seamless",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": 1,
+    "description": "CPT: cqfs_entries",
+    "modified": 1595516362
+}

@@ -34,6 +34,80 @@ class CqfsShortcode {
         return trim( $text, '-' );
     }
 
+    public static function cqfs_build_obj( $cqfs_build_id = '' ){
+
+        if( !$cqfs_build_id || is_null($cqfs_build_id) ){
+            return null;
+        }
+
+        //the main build array
+        $the_cqfs_build = [];
+
+        $type = get_field('cqfs_build_type', $cqfs_build_id);//select
+        $category = get_field('cqfs_select_questions', $cqfs_build_id);//taxonomy, returns ID
+        $question_order = get_field('cqfs_question_order', $cqfs_build_id);//ASC, DSC
+        $layout = get_field('cqfs_layout_type', $cqfs_build_id);//select, multi/single
+        $pass_percent = get_field('cqfs_pass_percentage', $cqfs_build_id);//pass percentage
+        $pass_msg = get_field('cqfs_pass_message', $cqfs_build_id);//pass message
+        $fail_msg = get_field('cqfs_fail_message', $cqfs_build_id);//fail message
+
+        $class = $type;
+        $class .= ' ' . $layout;
+
+        //insert build data
+        $the_cqfs_build['build_type'] = $type;
+        $the_cqfs_build['question_category'] = $category;
+        $the_cqfs_build['question_order'] = $question_order;
+        $the_cqfs_build['layput_type'] = $layout;
+        $the_cqfs_build['pass_percent'] = $pass_percent;
+        $the_cqfs_build['pass_msg'] = $pass_msg;
+        $the_cqfs_build['fail_msg'] = $fail_msg;
+        $the_cqfs_build['classname'] = $class;
+
+        //get questions by category
+        $questions = get_posts(
+            array(
+                'numberposts'   => -1,
+                'post_type'     => 'cqfs_question',
+                'category'      => esc_attr($category),
+                'order'         => esc_attr($question_order)
+            )
+        );
+
+        //insert question array now
+        if($questions){
+
+            foreach($questions as $post) :
+                setup_postdata( $post );
+
+                $options = get_field('cqfs_answers', $post->ID);//textarea, create each line.
+                $options_arr = explode("\n", $options); //converted to array
+
+                $option_type = get_field('cqfs_answer_type', $post->ID);//select. radio, checkbox.
+                
+                $correct_ans = get_field('cqfs_correct_answer', $post->ID);//comma separated number.
+                $correct_ans_arr = explode(",", str_replace(' ', '', $correct_ans));//converted to array
+
+                $note = get_field('cqfs_additional_note', $post->ID);//textarea. show only for quiz.
+
+                //prepare the question array
+                $the_cqfs_build['all_questions'][] = array(
+                    'question'      => get_the_title($post->ID),
+                    'options'       => $options_arr,
+                    'option_type'   => $option_type,
+                    'answers'       => $correct_ans_arr,
+                    'notes'         => $note,
+                );
+                
+            endforeach;
+            wp_reset_postdata();
+        }
+
+        //return final question array obj
+        return $the_cqfs_build;
+
+    }
+
     /**
      * CQFS shortcode function
      * 
@@ -53,6 +127,8 @@ class CqfsShortcode {
         if( ! $atts['id'] ){
             return;
         }
+
+        var_dump( self::cqfs_build_obj( $atts['id'] ) );
 
         $type = get_field('cqfs_build_type', $atts['id']);//select
         $category = get_field('cqfs_select_questions', $atts['id']);//taxonomy, returns ID
@@ -149,18 +225,28 @@ class CqfsShortcode {
                         endforeach;
                         wp_reset_postdata();
 
+                        //if not logged in, display user info form
                         self::cqfs_user_info_form($atts['id'], '', $layout);
 
-                        //form ID
+                        //if logged in, insert a hidden field with user display name
+                        if( is_user_logged_in() ){
+                            $current_user = wp_get_current_user();
+                            printf(
+                                '<input type="hidden" name="_cqfs_uname" value="%s">',
+                                esc_html( $current_user->display_name )
+                            );
+                        }
+
+                        //insert form ID in a hidden field
                         printf(
                             '<input type="hidden" name="_cqfs_id" value="%s">',
                             esc_attr( $atts['id'] )
                         );
 
-                        //action input
+                        //insert hidden action input
                         printf('<input type="hidden" name="action" value="cqfs_response">');
                         
-                        //create nonce
+                        //create nonce fields
                         wp_nonce_field('cqfs_post', '_cqfs_nonce');
                     }
                 ?>
@@ -192,6 +278,10 @@ class CqfsShortcode {
         <!-- cqfs end -->
         <?php } elseif( $type === 'quiz' && isset($param['_cqfs_status']) && isset($param['_cqfs_id']) && $param['_cqfs_status'] === 'success' && $param['_cqfs_id'] === $atts['id'] ) {
             
+            /**
+             * Result display
+             */
+
             $count = count($param);
             $userAnswers = array_values( array_slice($param, 0, ($count - 2), true ) );
             // var_dump($userAnswers);
@@ -218,7 +308,7 @@ class CqfsShortcode {
 
                     //check answers and return boolean
                     $compare = self::cqfs_array_equality_check( $ansCorrect, $user_ans );
-                    var_dump($compare);
+                    // var_dump($compare);
                     
                     //push to empty array for correct answers
                     if($compare){
@@ -266,7 +356,12 @@ class CqfsShortcode {
 
                 wp_reset_postdata();
 
-                //display the pass/fail
+                //display user display name
+                if( isset($param['_cqfs_uname']) ){
+                    self::cqfs_display_uname( $param['_cqfs_uname'] );
+                }
+
+                //display the pass/fail result
                 self::cqfs_quiz_result( count($questions), count($numCorrects), $pass_percent, $pass_msg, $fail_msg );
 
                 //close the result div
@@ -276,7 +371,9 @@ class CqfsShortcode {
 
 
         }elseif( isset($param['_cqfs_status']) && isset($param['_cqfs_id']) && $param['_cqfs_status'] === 'success' && $param['_cqfs_id'] === $atts['id'] ){
-                
+            /**
+             * Message for non quiz cqfs
+             */
             printf(
                 '<div class="cqfs-results"><h4>%s</h4></div>',
                 apply_filters('cqfs_thankyou_message', esc_html__('Thank you for participating.', 'cqfs'))
@@ -325,6 +422,13 @@ class CqfsShortcode {
             );
         }
 
+    }
+
+    public static function cqfs_display_uname( $username ){
+        printf(
+            '<h3 class="cqfs-uname">%s</h3>',
+            esc_html__('Hello ', 'cqfs') . esc_html($username)
+        );
     }
 
     /**
@@ -395,7 +499,8 @@ class CqfsShortcode {
 	 */
 	public function cqfs_form_submission(){
 
-		//sanitize the global POST var. XSS ok.
+        //sanitize the global POST var. XSS ok.
+        //all form inputs and security inputs
 		//hidden keys (_cqfs_id, action, _cqfs_nonce, _wp_http_referer)
 		$values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
@@ -413,14 +518,19 @@ class CqfsShortcode {
 			exit();
 
 		}else{
-			
-			$count = count($values);
-			var_dump($values);
+			/**
+             * Do the all validations and prepare data for new post creation
+             */
 
-			$userAnswers = array_slice($values, 0, ($count - 3), true );
+            //count total entries in POST arr
+            $count = count($values);
+            
+            //filter out the nonce, referer, action and keep the remaining items
+			$filter_out_nonce_action = array_slice($values, 0, ($count - 3), true );
 			// var_dump($userAnswers);
 
-			$resultMap = function( $val ){
+            //callback function for the array map
+            $arrayMapCallback = function( $val ){
                 if( is_array( $val ) ){
                     return urlencode(implode(",",$val));
                 }else{
@@ -428,26 +538,54 @@ class CqfsShortcode {
                 }
 			};
 
-			$resultsArray = array_map($resultMap, $userAnswers);
-			$resultsArray['_cqfs_status'] = urlencode(sanitize_text_field('success'));
-            var_dump($resultsArray);
+            //prepare the array for the redirection query
+            $redirect_args = array_map( $arrayMapCallback, $filter_out_nonce_action );
             
-            $post_arr = array(
-                'post_title'   => 'Test post',
-                'post_content' => 'Test post content',
-                'post_status'  => 'publish',
-                'post_author'  => get_current_user_id(),
+            //add a success field to the redirect args
+			$redirect_args['_cqfs_status'] = urlencode(sanitize_text_field('success'));
+            // var_dump($redirect_args);
+
+            /**
+             * Create the post
+             */
+            $post_array = array(
+                'post_title'    => sanitize_text_field('Cqfs Entry'),
+                'post_status'   => 'publish',
+                'post_type'     => 'cqfs_entries',
+                'meta_input'    => array(
+                    'cqfs_entry_form_id'    => sanitize_text_field($values['_cqfs_id']),
+                    'cqfs_entry_form_type'  => '',
+                    'cqfs_entry_result'     => '',
+                    'cqfs_entry_percentage' => '',
+                    'cqfs_entry_questions'  => '',
+                    'cqfs_entry_answers'    => '',
+                    'cqfs_entry_status'     => '',
+                    'cqfs_entry_user_email' => sanitize_email($values['_cqfs_email']),
+                ),
             );
+            
+            if( isset($values['_cqfs_uname']) && $values['_cqfs_uname'] != '' ){
+                $post_array['post_title'] = sanitize_text_field($values['_cqfs_uname']);
+            }
+            
+            if( is_user_logged_in() ){
+                
+            }
+            
             // Insert the post into the database
-            // wp_insert_post( $post_arr );
-	
-			wp_safe_redirect(
+            wp_insert_post( $post_array );
+    
+            /**
+             * Redirect the page and exit
+             */
+			/* wp_safe_redirect(
 				esc_url_raw(
-					add_query_arg( $resultsArray, wp_unslash(esc_url(strtok($values['_wp_http_referer'], '?') ) ) )
+					add_query_arg( $redirect_args, wp_unslash( esc_url( strtok( $values['_wp_http_referer'], '?' ) ) ) )
 				)
 			);
-	
-			exit();
+    
+            //exit immediately
+			exit(); */
 		}
 
     }
