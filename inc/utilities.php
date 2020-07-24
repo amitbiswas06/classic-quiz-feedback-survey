@@ -233,6 +233,7 @@ class Utilities{
             printf(
                 '<div class="cqfs-user-form--legal">%s</div>',
                 wp_kses( $consent, array(
+                    //permitted html tags 
                     'a' => array(
                         'href' => array(),
                         'data' => array(),

@@ -50,7 +50,7 @@ class CqfsShortcode {
         
         //main build object array
         $cqfs_build = Util::cqfs_build_obj( $atts['id'] );
-        // var_dump( $cqfs_build );
+        // var_dump( $cqfs_build['all_questions'] );
 
         //get parameters
         $param = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
@@ -286,7 +286,7 @@ class CqfsShortcode {
         var_dump($values);//main post
 
 		//get the nonce
-		$nonce = sanitize_text_field($values['_cqfs_nonce']);
+        $nonce = sanitize_text_field( $values['_cqfs_nonce'] );
 
 		//bail early if found suspecious with nonce verification.
 		if ( ! wp_verify_nonce( $nonce, 'cqfs_post' ) ) {
@@ -300,9 +300,10 @@ class CqfsShortcode {
 
 		}else{
 			/**
-             * Do the all validations and prepare data for new post creation
+             * sanitize and prepare data for new post creation
              */
-
+            $id = sanitize_text_field( $values['_cqfs_id'] );
+        
             //count total entries in POST arr
             $count = count($values);
             
@@ -310,7 +311,7 @@ class CqfsShortcode {
 			$filter_out_nonce_action = array_slice($values, 0, ($count - 3), true );
 			// var_dump($filter_out_nonce_action);
 
-            //callback function for the array map
+            //callback function for the array map url encoded
             $arrayMapCallback = function( $val ){
                 if( is_array( $val ) ){
                     return urlencode(implode(",",$val));
@@ -319,28 +320,94 @@ class CqfsShortcode {
                 }
 			};
 
-            //prepare the array for the redirection query
+            //prepare the array for the redirection query url encoded
             $redirect_args = array_map( $arrayMapCallback, $filter_out_nonce_action );
             
             //add a success field to the redirect args
 			$redirect_args['_cqfs_status'] = urlencode(sanitize_text_field('success'));
-            var_dump($redirect_args);//urlencode array
+            // var_dump($redirect_args);//urlencode array
+
+            /****************************************
+             * prepare post variables
+             ****************************************/
+
+            //main build object array
+            $cqfs_build = Util::cqfs_build_obj( $id );
+
+            $questionsArr = []; //prepare question entries as array
+            $numCorrects = []; //holds the ture only
+            $ansStatus = []; //holds all answers boolean as true false
+
+
+            //prepare answers
+            $remove_non_array_callback = function( $val ){
+                return is_array($val);
+            };
+            $userAnswers = array_values(array_filter($values, $remove_non_array_callback));
+            // var_dump($userAnswers);
+            $answersArr = [];
+
+            $i = 0;
+            foreach( $cqfs_build['all_questions'] as $question ){
+                //push questions
+                $questionsArr[] = $question['question'];
+
+                //check answers and return boolean
+                $compare = Util::cqfs_array_equality_check( $question['answers'], $userAnswers[$i] );
+                //push answer status
+                $ansStatus[] = $compare ? 'Correct Answer' : 'Wrong Answer';
+                //push true values
+                if($compare){
+                    $numCorrects[] = $compare;
+                }
+
+                // $user_ans = explode(",", $userAnswers[$i]);
+                //push answer string in array
+                $answers = [];
+                foreach($userAnswers[$i] as $ans){
+                    $answers[] = $question['options'][$ans-1];
+                }
+                //now implode to string and push
+                $answersArr[] = sanitize_text_field(implode(" | ", $answers));
+
+                $i++;
+            }
 
             /**
-             * Create the post
+             * Final preparation
              */
+
+            //1. convert `questionsArr` array to string
+            $questionsArr = implode("\n", $questionsArr);
+
+            //2. convert `answersArr` array to string
+            $answersArr = implode("\n", $answersArr);
+            
+            //3. percentage obtained
+            $percentage = round(count($numCorrects) * 100 / count($cqfs_build['all_questions']));
+            
+            //4. Result
+            $result = $percentage >= $cqfs_build['pass_percent'] ? 'Passed' : 'Failed';
+
+            //5. each answer status
+            $ansStatus = implode("\n", $ansStatus);
+            
+var_dump($ansStatus);
+
+
+
             $post_array = array(
                 'post_title'    => sanitize_text_field('Cqfs Entry'),
                 'post_status'   => 'publish',
                 'post_type'     => 'cqfs_entries',
                 'meta_input'    => array(
-                    'cqfs_entry_form_id'    => sanitize_text_field($values['_cqfs_id']),
-                    'cqfs_entry_form_type'  => '',
-                    'cqfs_entry_result'     => '',
-                    'cqfs_entry_percentage' => '',
-                    'cqfs_entry_questions'  => '',
-                    'cqfs_entry_answers'    => '',
-                    'cqfs_entry_status'     => '',
+                    'cqfs_entry_form_id'    => $id,
+                    'cqfs_entry_form_type'  => sanitize_text_field($cqfs_build['type']),
+                    'cqfs_entry_result'     => sanitize_text_field($result),
+                    'cqfs_entry_percentage' => sanitize_text_field($percentage),
+                    'cqfs_entry_questions'  => wp_kses($questionsArr, 'post'),
+                    'cqfs_entry_answers'    => wp_kses($answersArr, 'post'),
+                    'cqfs_entry_status'     => wp_kses($ansStatus, 'post'),
                     'cqfs_entry_user_email' => '',
                 ),
             );
@@ -357,7 +424,7 @@ class CqfsShortcode {
             }
             
             // Insert the post into the database
-            // wp_insert_post( $post_array );
+            wp_insert_post( $post_array );
     
             /**
              * Redirect the page and exit
