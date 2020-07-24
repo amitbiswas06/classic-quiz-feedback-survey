@@ -29,10 +29,10 @@ class Utilities{
     /**
      * Array of the main CQFS build post for shortcode
      * 
-     * @param int $cqfs_build_id The cqfs_build post ID
-     * @return array of the build post
+     * @param int $cqfs_build_id    The cqfs_build post ID
+     * @return array                Array of the build post
      */
-    public static function cqfs_build_obj( $cqfs_build_id = '' ){
+    public static function cqfs_build_obj( $cqfs_build_id ){
 
         if( !$cqfs_build_id || is_null($cqfs_build_id) ){
             return null;
@@ -53,14 +53,16 @@ class Utilities{
         $class .= ' ' . $layout;
 
         //insert build data
-        $the_cqfs_build['build_type'] = $type;
-        $the_cqfs_build['question_category'] = $category;
-        $the_cqfs_build['question_order'] = $question_order;
-        $the_cqfs_build['layput_type'] = $layout;
+        $the_cqfs_build['title'] = get_the_title($cqfs_build_id);
+        $the_cqfs_build['type'] = $type;
+        $the_cqfs_build['qst_category'] = $category;
+        $the_cqfs_build['qst_order'] = $question_order;
+        $the_cqfs_build['layout'] = $layout;
         $the_cqfs_build['pass_percent'] = $pass_percent;
         $the_cqfs_build['pass_msg'] = $pass_msg;
         $the_cqfs_build['fail_msg'] = $fail_msg;
         $the_cqfs_build['classname'] = $class;
+        $the_cqfs_build['id'] = $cqfs_build_id;
 
         //get questions by category
         $questions = get_posts(
@@ -90,11 +92,13 @@ class Utilities{
 
                 //prepare the question array
                 $the_cqfs_build['all_questions'][] = array(
-                    'question'      => get_the_title($post->ID),
+                    'question'      => get_the_title( $post->ID ),
+                    'id'            => $post->ID,
                     'options'       => $options_arr,
-                    'option_type'   => $option_type,
+                    'input_type'    => $option_type,
                     'answers'       => $correct_ans_arr,
-                    'notes'         => $note,
+                    'note'          => $note,
+                    'thumbnail'     => has_post_thumbnail( $post->ID ),
                 );
                 
             endforeach;
@@ -115,7 +119,7 @@ class Utilities{
      * @param int     $passPercentage     pass percentage (default 50)
      * @param string  $passMsg            message if pass (optional)
      * @param string  $failMsg            message if failed (optional)
-     * @return html string escaped.
+     * @return html                       string escaped.
      */
     public static function cqfs_quiz_result( $totalQuestions, $correctAnswers, $passPercentage = 50, $passMsg = "", $failMsg = "" ){
 
@@ -128,18 +132,20 @@ class Utilities{
 
         if( $percentage >= $passPercentage ){
             //pass message
+            $default_pass_msg = apply_filters( 'cqfs_default_pass_msg', esc_html__('Congratulations! You have passed.', 'cqfs'));
             printf(
                 __('<div class="cqfs-pass-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>', 'cqfs'),
                 esc_html($percentage) . esc_html__("&#37;", 'cqfs'),
-                $passMsg != '' ? esc_html( $passMsg ) : apply_filters( 'cqfs_pass_msg', esc_html__('Congratulations! You have passed.', 'cqfs'))
+                $passMsg != '' ? esc_html( $passMsg ) : esc_html( $default_pass_msg )
             );
 
         }else{
             //fail message
+            $default_fail_msg = apply_filters( 'cqfs_fail_msg', esc_html__('Sorry! You have failed.', 'cqfs'));
             printf(
                 __('<div class="cqfs-fail-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>', 'cqfs'),
                 esc_html($percentage) . esc_html__("&#37;", 'cqfs'),
-                $failMsg != '' ? esc_html( $failMsg ) : apply_filters( 'cqfs_fail_msg', esc_html__('Sorry! You have failed.', 'cqfs'))
+                $failMsg != '' ? esc_html( $failMsg ) : esc_html( $default_fail_msg )
             );
         }
 
@@ -149,8 +155,8 @@ class Utilities{
     /**
      * Displays the user name at result page
      * 
-     * @param string $username User name provided at the form submission
-     * @return html string of the title. Escaped.
+     * @param string $username  User name provided at the form submission
+     * @return html             string of the title. Escaped.
      */
     public static function cqfs_display_uname( $username ){
         printf(
@@ -184,11 +190,11 @@ class Utilities{
      * User info form for not logged in users as guest
      * 
      * @param int $id               The ID of the form shortcode
-     * @param string $legal         The custom text/html invoked. wp_kses filtered
      * @param string $layout_type   The form layout type
-     * @return html string escaped.
+     * @param string $legal         The custom text/html invoked. wp_kses filtered
+     * @return html                 string escaped.
      */
-    public static function cqfs_user_info_form( $id, $legal = "", $layout_type = "multi" ){
+    public static function cqfs_user_info_form( $id, $layout_type = "multi", $legal = "" ){
         if( !is_user_logged_in() ){
 
             if( $layout_type === 'multi' ){
@@ -197,9 +203,11 @@ class Utilities{
                 echo '<div class="cqfs-user-form">';
             }
 
+            //guest user message
+            $guest_user_form_msg = apply_filters( 'cqfs_guest_user_form_msg', esc_html__('Hello Guest&#33; please provide the following info&#46;', 'cqfs'));
             printf(
                 '<p class="cqfs-user-form--msg">%s</p>',
-                apply_filters( 'cqfs_user_form_msg', esc_html__('Please provide the following info.', 'cqfs'))
+                esc_html( $guest_user_form_msg )
             );
             //display identity form
             //name field
@@ -220,9 +228,23 @@ class Utilities{
                 esc_html__('please type email.', 'cqfs')
             );
 
+            //consent message html
+            $consent = apply_filters('cqfs_user_form_consent', $legal );
             printf(
                 '<div class="cqfs-user-form--legal">%s</div>',
-                $legal ? wp_kses($legal, 'post') : ''
+                wp_kses( $consent, array(
+                    'a' => array(
+                        'href' => array(),
+                        'data' => array(),
+                        'class'=> array(),
+                    ),
+                    'p' => array(
+                        'class' => array(),
+                    ),
+                    'div' => array(
+                        'class' => array()
+                    ),
+                ) )
             );
 
             echo '</div>';

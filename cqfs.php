@@ -12,7 +12,7 @@ Domain Path: /languages/
 */
 
 //define namespace
-namespace CQFS;
+namespace CQFS\ROOT;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
