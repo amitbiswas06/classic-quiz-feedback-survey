@@ -11,6 +11,9 @@ Text Domain: cqfs
 Domain Path: /languages/
 */
 
+//define namespace
+namespace CQFS;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -164,6 +167,9 @@ class CQFS {
 
 		//admin columns
 		require __DIR__ . '/inc/admin-columns.php';
+
+		// utility class object
+		require __DIR__ . '/inc/utilities.php';
 
 		//build shortcode
 		require __DIR__ . '/inc/shortcode.php';
