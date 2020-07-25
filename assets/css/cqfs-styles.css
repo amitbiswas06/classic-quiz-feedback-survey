@@ -32,18 +32,3 @@
     opacity: 0;
     transition: all linear 0.3s;
 }
-
-/* cqfs quiz results */
-.cqfs-results{
-    display: flex;
-    flex-direction: column;
-}
-.cqfs-pass-msg,
-.cqfs-fail-msg
-{
-    order: 1;
-}
-.cqfs-results--each{
-    flex: 1;
-    order: 2;
-}

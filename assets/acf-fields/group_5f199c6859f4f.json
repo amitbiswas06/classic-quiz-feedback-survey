@@ -1,6 +1,6 @@
 {
     "key": "group_5f199c6859f4f",
-    "title": "Entries",
+    "title": "Entry",
     "fields": [
         {
             "key": "field_5f199df0eeac4",
@@ -136,6 +136,44 @@
             "new_lines": ""
         },
         {
+            "key": "field_5f1bf7f35212e",
+            "label": "Notes",
+            "name": "cqfs_entry_notes",
+            "type": "textarea",
+            "instructions": "The additional notes for each question. Each line break represents a note.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": "",
+            "rows": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_5f1c3bd379993",
+            "label": "Remarks",
+            "name": "cqfs_entry_remarks",
+            "type": "textarea",
+            "instructions": "Pass or fail message.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": "",
+            "rows": "",
+            "new_lines": ""
+        },
+        {
             "key": "field_5f19a5795e490",
             "label": "User Email",
             "name": "cqfs_entry_user_email",
@@ -159,7 +197,7 @@
             {
                 "param": "post_type",
                 "operator": "==",
-                "value": "cqfs_entries"
+                "value": "cqfs_entry"
             }
         ]
     ],
@@ -170,6 +208,6 @@
     "instruction_placement": "label",
     "hide_on_screen": "",
     "active": 1,
-    "description": "CPT: cqfs_entries",
-    "modified": 1595516362
+    "description": "CPT: cqfs_entry",
+    "modified": 1595686130
 }

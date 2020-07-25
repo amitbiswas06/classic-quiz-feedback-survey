@@ -10,7 +10,7 @@ class Cqfs_Cpts{
 
         add_action( 'init', array( $this, 'cpt_cqfs_question'), 5 );
         add_action( 'init', array( $this, 'cpt_cqfs_build'), 5 );
-        add_action( 'init', array( $this, 'cpt_cqfs_entries'), 5 );
+        add_action( 'init', array( $this, 'cpt_cqfs_entry'), 5 );
 
     }
 
@@ -109,34 +109,34 @@ class Cqfs_Cpts{
     }
 
     /**
-     * Custom Post Type Name/ID: "cqfs_entries"
+     * Custom Post Type Name/ID: "cqfs_entry"
      */
-    public function cpt_cqfs_entries() {
+    public function cpt_cqfs_entry() {
             
-        $cpt_id = 'cqfs_entries';
+        $cpt_id = 'cqfs_entry';
 
         $labels = array(
-            'name'                  => esc_html__( 'CQFS Entries', 'cqfs' ),
-            'singular_name'         => esc_html__( 'CQFS Entries', 'cqfs' ),
-            'menu_name'             => esc_html__( 'CQFS Entries', 'cqfs' ),
-            'parent_item_colon'     => esc_html__( 'CQFS Entries&#58;', 'cqfs' ),
+            'name'                  => esc_html__( 'CQFS Entry', 'cqfs' ),
+            'singular_name'         => esc_html__( 'CQFS Entry', 'cqfs' ),
+            'menu_name'             => esc_html__( 'CQFS Entry', 'cqfs' ),
+            'parent_item_colon'     => esc_html__( 'CQFS Entry&#58;', 'cqfs' ),
             'all_items'             => esc_html__( 'All CQFS Entries', 'cqfs' ),
-            'view_item'             => esc_html__( 'View CQFS Entries', 'cqfs' ),
-            'add_new_item'          => esc_html__( 'Add New CQFS Entries', 'cqfs' ),
+            'view_item'             => esc_html__( 'View CQFS Entry', 'cqfs' ),
+            'add_new_item'          => esc_html__( 'Add New CQFS Entry', 'cqfs' ),
             'add_new'               => esc_html__( 'Add New', 'cqfs' ),
-            'edit_item'             => esc_html__( 'Edit CQFS Entries', 'cqfs' ),
-            'update_item'           => esc_html__( 'Update CQFS Entries', 'cqfs' ),
-            'search_items'          => esc_html__( 'Search CQFS Entries', 'cqfs' ),
-            'not_found'             => esc_html__( 'CQFS Entries Not found', 'cqfs' ),
+            'edit_item'             => esc_html__( 'Edit CQFS Entry', 'cqfs' ),
+            'update_item'           => esc_html__( 'Update CQFS Entry', 'cqfs' ),
+            'search_items'          => esc_html__( 'Search CQFS Entry', 'cqfs' ),
+            'not_found'             => esc_html__( 'CQFS Entry Not found', 'cqfs' ),
             'not_found_in_trash'    => esc_html__( 'Not found in Trash', 'cqfs' ),
         );
         $rewrite = array(
-            'slug'                  => 'cqfs-entries',
+            'slug'                  => 'cqfs-entry',
             'pages'                 => false,
             'feeds'                 => false,
         );
         $args = array(
-            'label'                 => esc_html__( 'CQFS Entries', 'cqfs' ),
+            'label'                 => esc_html__( 'CQFS Entry', 'cqfs' ),
             'labels'                => $labels,
             'supports'              => array( 'title', 'author', 'revisions' ),
             'show_ui'               => true,

@@ -27,7 +27,7 @@ class Utilities{
 
 
     /**
-     * Array of the main CQFS build post for shortcode
+     * Array of the main CQFS build post
      * 
      * @param int $cqfs_build_id    The cqfs_build post ID
      * @return array                Array of the build post
@@ -112,39 +112,104 @@ class Utilities{
 
 
     /**
+     * Array of the main CQFS entry post
+     * 
+     * @param int $cqfs_entry_id the ID of the cpt cqfs_entry
+     * @return array of the cqfs_entry post
+     */
+    public static function cqfs_entry_obj( $cqfs_entry_id ){
+
+        if( !$cqfs_entry_id || is_null($cqfs_entry_id) ){
+            return null;
+        }
+
+        //the main entry array
+        $the_cqfs_entry = [];
+
+        $email = get_field('cqfs_entry_user_email', $cqfs_entry_id );//email
+        $form_id = get_field('cqfs_entry_form_id', $cqfs_entry_id );//text
+        $form_type = get_field('cqfs_entry_form_type', $cqfs_entry_id );//text
+        $result = get_field('cqfs_entry_result', $cqfs_entry_id );//text
+        $percentage = get_field('cqfs_entry_percentage', $cqfs_entry_id );//text
+        $remarks = get_field('cqfs_entry_remarks', $cqfs_entry_id);//text message for pass fail
+
+        //handle arrays
+        $questions = get_field('cqfs_entry_questions', $cqfs_entry_id );//textarea with line break
+            //convert to array
+            $questions = preg_split('/\r\n|\r|\n/', $questions);
+
+        $answers = get_field('cqfs_entry_answers', $cqfs_entry_id );//textarea with line break
+            //convert to array
+            $answers = preg_split('/\r\n|\r|\n/', $answers);
+            
+        $status = get_field('cqfs_entry_status', $cqfs_entry_id );//textarea with line break
+            //convert to array
+            $status = preg_split('/\r\n|\r|\n/', $status);
+
+        $notes = get_field('cqfs_entry_notes', $cqfs_entry_id );//textarea with line break
+            //convert to array
+            $notes = preg_split('/\r\n|\r|\n/', $notes);
+        
+
+        //insert into blank array
+
+        $the_cqfs_entry['id'] = esc_attr( $cqfs_entry_id );//the id
+        $the_cqfs_entry['username'] = esc_html( get_the_title( $cqfs_entry_id ) );//title as username
+        $the_cqfs_entry['email'] = esc_html( $email );//email
+        $the_cqfs_entry['form_id'] = esc_attr( $form_id );//form id
+        $the_cqfs_entry['form_type'] = esc_html( $form_type );//form type
+        $the_cqfs_entry['result'] = esc_html( $result );//result
+        $the_cqfs_entry['percentage'] = esc_html( $percentage );//percentage
+        $the_cqfs_entry['remarks']  = esc_html( $remarks );//pass-fail message as remarks
+
+        //prepare and insert array items
+        $counter = 0;
+        foreach( $questions as $qst ){
+
+            $the_cqfs_entry['all_questions'][] = array(
+
+                'question'  => esc_html( $qst ),
+                'answer'    => esc_html( str_replace( ' |',',' , $answers[$counter]) ),
+                'status'    => esc_html( $status[$counter] ),
+                'note'      => esc_html( $notes[$counter] ),
+
+            );
+
+            $counter++;
+        }
+
+        //return the array
+        return $the_cqfs_entry;
+
+    }
+
+
+    /**
      * Evaluate quiz result
      * 
-     * @param int     $totalQuestions     number of questions
-     * @param int     $correctAnswers     number of correct answer
-     * @param int     $passPercentage     pass percentage (default 50)
+     * @param int     $passPercentage     pass percentage
+     * @param int     $accPercentage      accumulated percentage
      * @param string  $passMsg            message if pass (optional)
      * @param string  $failMsg            message if failed (optional)
      * @return html                       string escaped.
      */
-    public static function cqfs_quiz_result( $totalQuestions, $correctAnswers, $passPercentage = 50, $passMsg = "", $failMsg = "" ){
+    public static function cqfs_quiz_result( $passPercentage, $accPercentage, $passMsg = "", $failMsg = "" ){
 
-        //percentage var
-        $percentage = 0;
-
-        if( $totalQuestions >= $correctAnswers ){
-            $percentage = round($correctAnswers * 100 / $totalQuestions);
-        }
-
-        if( $percentage >= $passPercentage ){
+        if( $accPercentage >= $passPercentage ){
             //pass message
             $default_pass_msg = apply_filters( 'cqfs_default_pass_msg', esc_html__('Congratulations! You have passed.', 'cqfs'));
-            printf(
+            return sprintf(
                 __('<div class="cqfs-pass-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>', 'cqfs'),
-                esc_html($percentage) . esc_html__("&#37;", 'cqfs'),
+                esc_html($accPercentage) . esc_html__("&#37;", 'cqfs'),
                 $passMsg != '' ? esc_html( $passMsg ) : esc_html( $default_pass_msg )
             );
 
         }else{
             //fail message
             $default_fail_msg = apply_filters( 'cqfs_fail_msg', esc_html__('Sorry! You have failed.', 'cqfs'));
-            printf(
+            return sprintf(
                 __('<div class="cqfs-fail-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>', 'cqfs'),
-                esc_html($percentage) . esc_html__("&#37;", 'cqfs'),
+                esc_html($accPercentage) . esc_html__("&#37;", 'cqfs'),
                 $failMsg != '' ? esc_html( $failMsg ) : esc_html( $default_fail_msg )
             );
         }
@@ -159,7 +224,7 @@ class Utilities{
      * @return html             string of the title. Escaped.
      */
     public static function cqfs_display_uname( $username ){
-        printf(
+        return sprintf(
             '<h3 class="cqfs-uname">%s</h3>',
             esc_html__('Hello ', 'cqfs') . esc_html($username)
         );
