@@ -4,7 +4,7 @@
     "fields": [
         {
             "key": "field_5f199df0eeac4",
-            "label": "Form ID",
+            "label": "Form ID (cqfs build)",
             "name": "cqfs_entry_form_id",
             "type": "text",
             "instructions": "The form ID which user have submitted.",
@@ -23,7 +23,7 @@
         },
         {
             "key": "field_5f199e31eeac5",
-            "label": "Form Type",
+            "label": "Form Type (cqfs build)",
             "name": "cqfs_entry_form_type",
             "type": "text",
             "instructions": "The form type which user have submitted.",
@@ -44,7 +44,7 @@
             "key": "field_5f199ed5ebc32",
             "label": "Result",
             "name": "cqfs_entry_result",
-            "type": "text",
+            "type": "true_false",
             "instructions": "The Quiz result",
             "required": 0,
             "conditional_logic": 0,
@@ -53,11 +53,11 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
-            "maxlength": ""
+            "message": "Passed?",
+            "default_value": 0,
+            "ui": 0,
+            "ui_on_text": "",
+            "ui_off_text": ""
         },
         {
             "key": "field_5f199f7aebc33",
@@ -209,5 +209,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "CPT: cqfs_entry",
-    "modified": 1595686130
+    "modified": 1595791502
 }

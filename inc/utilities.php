@@ -129,7 +129,7 @@ class Utilities{
         $email = get_field('cqfs_entry_user_email', $cqfs_entry_id );//email
         $form_id = get_field('cqfs_entry_form_id', $cqfs_entry_id );//text
         $form_type = get_field('cqfs_entry_form_type', $cqfs_entry_id );//text
-        $result = get_field('cqfs_entry_result', $cqfs_entry_id );//text
+        $result = get_field('cqfs_entry_result', $cqfs_entry_id );//checkbox
         $percentage = get_field('cqfs_entry_percentage', $cqfs_entry_id );//text
         $remarks = get_field('cqfs_entry_remarks', $cqfs_entry_id);//text message for pass fail
 
@@ -158,7 +158,7 @@ class Utilities{
         $the_cqfs_entry['email'] = esc_html( $email );//email
         $the_cqfs_entry['form_id'] = esc_attr( $form_id );//form id
         $the_cqfs_entry['form_type'] = esc_html( $form_type );//form type
-        $the_cqfs_entry['result'] = esc_html( $result );//result
+        $the_cqfs_entry['result'] = rest_sanitize_boolean($result);//boolean
         $the_cqfs_entry['percentage'] = esc_html( $percentage );//percentage
         $the_cqfs_entry['remarks']  = esc_html( $remarks );//pass-fail message as remarks
 

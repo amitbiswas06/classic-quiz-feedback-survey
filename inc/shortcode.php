@@ -50,7 +50,7 @@ class CqfsShortcode {
         
         //main build object array
         $cqfs_build = Util::cqfs_build_obj( $atts['id'] );
-        var_dump( $cqfs_build );
+        // var_dump( $cqfs_build );
 
         //get parameters
         $param = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
@@ -73,6 +73,9 @@ class CqfsShortcode {
                     esc_html( $cqfs_build['title'] )
                 );
             }
+
+            //do action `cqfs_before_nav`
+            do_action('cqfs_after_title');
             ?>
             <form id="cqfs-form-<?php echo esc_attr($cqfs_build['id']); ?>" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
             <div class="cqfs--questions" >
@@ -135,10 +138,6 @@ class CqfsShortcode {
                 ?>
             </div><?php //var_dump(plugin_dir_url(__FILE__)); ?>
             
-            <?php
-            //do action `cqfs_before_nav`
-            do_action('cqfs_before_nav');
-            ?>
             <div class="cqfs--navigation">
                 <?php 
                 //show nex-prev nav if multi page layout
@@ -157,8 +156,8 @@ class CqfsShortcode {
             </form>
 
             <?php
-            //do action `cqfs_after_nav`
-            do_action('cqfs_after_nav');
+            //do action `cqfs_after_form`
+            do_action('cqfs_after_form');
             ?>
             <div class="cqfs--processing hide"><?php esc_html_e('Processing...','cqfs'); ?></div>
         </div>
@@ -177,8 +176,8 @@ class CqfsShortcode {
              * Result display
              */
             if(isset($param['_cqfs_entry_id']) && isset($param['_cqfs_email']) ){
-                //get the entry
-                
+
+                //get the entry array                
                 $entry = util::cqfs_entry_obj( $entry_id );
 
                 if( empty($entry) || is_null($entry) ){
@@ -249,9 +248,9 @@ class CqfsShortcode {
 
 
     /**
-	 * CQFS form handle
+     * CQFS form handle
      * via `admin-post.php`
-	 */
+     */
 	public function cqfs_form_submission(){
 
         //sanitize the global POST var. XSS ok.
@@ -339,7 +338,7 @@ class CqfsShortcode {
         //3. percentage obtained
         $percentage = round(count($numCorrects) * 100 / count($cqfs_build['all_questions']));
         //4. Result
-        $result = $percentage >= $cqfs_build['pass_percent'] ? esc_html__('Passed.','cqfs') : esc_html__('Failed.','cqfs');
+        $result = $percentage >= $cqfs_build['pass_percent'] ? true : false;
         //5. each answer status
         $ansStatus = implode("\n", $ansStatus);
         //6. note for each question
@@ -347,17 +346,17 @@ class CqfsShortcode {
         //7. pass-fail message as remarks
         $remarks = $percentage >= $cqfs_build['pass_percent'] ? $cqfs_build['pass_msg'] : $cqfs_build['fail_msg'];
         
-        var_dump($ansStatus);
+        // var_dump($ansStatus);
         //now insert into post array
         $post_array = array(
-            'ID' => 200,
+            // 'ID' => 200,
             'post_title'    => '',
             'post_status'   => 'publish',
             'post_type'     => 'cqfs_entry',
             'meta_input'    => array(
                 'cqfs_entry_form_id'    => $id,
                 'cqfs_entry_form_type'  => sanitize_text_field($cqfs_build['type']),
-                'cqfs_entry_result'     => sanitize_text_field($result),
+                'cqfs_entry_result'     => rest_sanitize_boolean($result),
                 'cqfs_entry_percentage' => sanitize_text_field($percentage),
                 'cqfs_entry_questions'  => wp_kses($questionsArr, 'post'),
                 'cqfs_entry_answers'    => wp_kses($answersArr, 'post'),
@@ -374,7 +373,7 @@ class CqfsShortcode {
             $post_array['post_title'] = sanitize_text_field( $current_user->display_name );
             $post_array['meta_input']['cqfs_entry_user_email'] = sanitize_email( $current_user->user_email );
         }else{
-            $post_array['post_title'] = sanitize_text_field($values['_cqfs_uname']);
+            $post_array['post_title'] = $values['_cqfs_uname'] ? sanitize_text_field($values['_cqfs_uname']) : esc_html__('Guest', 'cqfs');
             $post_array['meta_input']['cqfs_entry_user_email'] = sanitize_email($values['_cqfs_email']);
         }
         
@@ -415,7 +414,7 @@ class CqfsShortcode {
             $redirect_args['_cqfs_status'] = urlencode(sanitize_text_field('failure'));
         }
         
-        var_dump($redirect_args);//urlencode array
+        // var_dump($redirect_args);//urlencode array
 
         /**
          * Redirect the page and exit

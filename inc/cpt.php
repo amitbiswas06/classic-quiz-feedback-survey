@@ -1,4 +1,7 @@
 <?php
+//define namespaces
+namespace CQFS\INC\CPT;
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -11,6 +14,9 @@ class Cqfs_Cpts{
         add_action( 'init', array( $this, 'cpt_cqfs_question'), 5 );
         add_action( 'init', array( $this, 'cpt_cqfs_build'), 5 );
         add_action( 'init', array( $this, 'cpt_cqfs_entry'), 5 );
+
+        //pre get posts
+        add_action( 'pre_get_posts', [$this, 'cqfs_pre_get_posts'] );
 
     }
 
@@ -52,6 +58,7 @@ class Cqfs_Cpts{
             'show_in_admin_bar'     => true,
             'can_export'            => true,
             'show_in_rest'          => true,
+            'has_archive'           => true,
             'rewrite'               => $rewrite,
             'capability_type'       => array('cqfs_question','cqfs_questions'),
             'map_meta_cap'          => true
@@ -99,6 +106,7 @@ class Cqfs_Cpts{
             'show_in_admin_bar'     => true,
             'can_export'            => true,
             'show_in_rest'          => true,
+            'has_archive'           => true,
             'rewrite'               => $rewrite,
             'capability_type'       => array('cqfs_build','cqfs_builds'),
             'map_meta_cap'          => true
@@ -145,6 +153,7 @@ class Cqfs_Cpts{
             'show_in_admin_bar'     => true,
             'can_export'            => true,
             'show_in_rest'          => true,
+            'has_archive'           => true,
             'rewrite'               => $rewrite,
             'capability_type'       => array('cqfs_entry','cqfs_entries'),
             'map_meta_cap'          => true
@@ -154,6 +163,83 @@ class Cqfs_Cpts{
 
     }
 
+    public function cqfs_pre_get_posts( $query ){
+
+        // bail early
+        if( ! is_admin() || ! $query->is_main_query() ) {
+            return;
+        }
+
+        /**
+         * CPT cqfs_question
+         */
+        if ( isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'cqfs_question' ) {
+
+            $query->set( 'meta_key', 'cqfs_answer_type' );
+
+            if( $query->query_vars['orderby'] == 'cqfs_answer_type'){
+                $query->set( 'orderby', 'meta_value' );
+            }
+
+        }
+
+
+        /**
+         * CPT cqfs_build
+         */
+        if ( isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'cqfs_build' ) {
+
+            $build_type = filter_input(INPUT_GET, 'cqfs_build_type', FILTER_SANITIZE_STRING);
+
+            $query->set( 'meta_key', 'cqfs_build_type' );
+
+            if( $query->query_vars['orderby'] == 'cqfs_build_type'){
+                $query->set( 'orderby', 'meta_value' );
+            }
+            
+            if(isset($build_type) && !empty($build_type)){
+                $query->set( 'meta_value', $build_type );
+            }
+
+        }
+
+        /**
+         * CPT cqfs_entry
+         */
+        if ( isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'cqfs_entry' ) {
+
+            $form_id = filter_input(INPUT_GET, 'cqfs_entry_form_id', FILTER_SANITIZE_STRING);
+            $form_type = filter_input(INPUT_GET, 'cqfs_entry_form_type', FILTER_SANITIZE_STRING);
+            $result = filter_input(INPUT_GET, 'cqfs_entry_result', FILTER_SANITIZE_STRING);
+            $email = filter_input(INPUT_GET, 'cqfs_entry_user_email', FILTER_SANITIZE_STRING);
+
+            $query->set( 'meta_key', ['cqfs_entry_form_id', 'cqfs_entry_form_type', 'cqfs_entry_result', 'cqfs_entry_user_email'] );
+            
+            if( $query->query_vars['orderby'] == 'cqfs_entry_form_type' || $query->query_vars['orderby'] == 'cqfs_entry_result' ){
+                $query->set( 'orderby', 'meta_value' );
+            }
+
+            if(isset($form_id) && !empty($form_id)){
+                $query->set( 'meta_value', $form_id);
+            }
+
+            if(isset($form_type) && !empty($form_type)){
+                $query->set( 'meta_value', $form_type);
+            }
+
+            if(isset($result) && !empty($result)){
+                $query->set( 'meta_value', $result);
+            }
+
+            if(isset($email) && !empty($email)){
+                $query->set( 'meta_value', $email);
+            }
+
+
+        }
+        
+        return;
+    }
 
 }
 
