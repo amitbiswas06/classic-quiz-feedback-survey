@@ -34,7 +34,7 @@ class Utilities{
      */
     public static function cqfs_build_obj( $cqfs_build_id ){
 
-        if( !$cqfs_build_id || is_null($cqfs_build_id) ){
+        if( !$cqfs_build_id || is_null($cqfs_build_id) || get_post_status( $cqfs_build_id ) === false ){
             return null;
         }
 
@@ -119,7 +119,7 @@ class Utilities{
      */
     public static function cqfs_entry_obj( $cqfs_entry_id ){
 
-        if( !$cqfs_entry_id || is_null($cqfs_entry_id) ){
+        if( !$cqfs_entry_id || is_null($cqfs_entry_id) || get_post_status( $cqfs_entry_id ) === false ){
             return null;
         }
 
@@ -158,7 +158,7 @@ class Utilities{
         $the_cqfs_entry['email'] = esc_html( $email );//email
         $the_cqfs_entry['form_id'] = esc_attr( $form_id );//form id
         $the_cqfs_entry['form_type'] = esc_html( $form_type );//form type
-        $the_cqfs_entry['result'] = rest_sanitize_boolean($result);//boolean
+        $the_cqfs_entry['result'] = esc_html($result);//radio. passed/failed
         $the_cqfs_entry['percentage'] = esc_html( $percentage );//percentage
         $the_cqfs_entry['remarks']  = esc_html( $remarks );//pass-fail message as remarks
 

@@ -338,7 +338,7 @@ class CqfsShortcode {
         //3. percentage obtained
         $percentage = round(count($numCorrects) * 100 / count($cqfs_build['all_questions']));
         //4. Result
-        $result = $percentage >= $cqfs_build['pass_percent'] ? true : false;
+        $result = $percentage >= $cqfs_build['pass_percent'] ? esc_attr('passed') : esc_attr('failed');
         //5. each answer status
         $ansStatus = implode("\n", $ansStatus);
         //6. note for each question
@@ -356,7 +356,7 @@ class CqfsShortcode {
             'meta_input'    => array(
                 'cqfs_entry_form_id'    => $id,
                 'cqfs_entry_form_type'  => sanitize_text_field($cqfs_build['type']),
-                'cqfs_entry_result'     => rest_sanitize_boolean($result),
+                'cqfs_entry_result'     => sanitize_text_field($result),
                 'cqfs_entry_percentage' => sanitize_text_field($percentage),
                 'cqfs_entry_questions'  => wp_kses($questionsArr, 'post'),
                 'cqfs_entry_answers'    => wp_kses($answersArr, 'post'),

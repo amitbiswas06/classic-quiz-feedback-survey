@@ -44,7 +44,7 @@
             "key": "field_5f199ed5ebc32",
             "label": "Result",
             "name": "cqfs_entry_result",
-            "type": "true_false",
+            "type": "radio",
             "instructions": "The Quiz result",
             "required": 0,
             "conditional_logic": 0,
@@ -53,11 +53,16 @@
                 "class": "",
                 "id": ""
             },
-            "message": "Passed?",
-            "default_value": 0,
-            "ui": 0,
-            "ui_on_text": "",
-            "ui_off_text": ""
+            "choices": {
+                "passed": "Passed",
+                "failed": "Failed"
+            },
+            "allow_null": 0,
+            "other_choice": 0,
+            "default_value": "",
+            "layout": "horizontal",
+            "return_format": "value",
+            "save_other_choice": 0
         },
         {
             "key": "field_5f199f7aebc33",
@@ -209,5 +214,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "CPT: cqfs_entry",
-    "modified": 1595791502
+    "modified": 1595834610
 }

@@ -58,7 +58,6 @@ class Cqfs_Cpts{
             'show_in_admin_bar'     => true,
             'can_export'            => true,
             'show_in_rest'          => true,
-            'has_archive'           => true,
             'rewrite'               => $rewrite,
             'capability_type'       => array('cqfs_question','cqfs_questions'),
             'map_meta_cap'          => true
@@ -106,7 +105,6 @@ class Cqfs_Cpts{
             'show_in_admin_bar'     => true,
             'can_export'            => true,
             'show_in_rest'          => true,
-            'has_archive'           => true,
             'rewrite'               => $rewrite,
             'capability_type'       => array('cqfs_build','cqfs_builds'),
             'map_meta_cap'          => true
@@ -153,7 +151,6 @@ class Cqfs_Cpts{
             'show_in_admin_bar'     => true,
             'can_export'            => true,
             'show_in_rest'          => true,
-            'has_archive'           => true,
             'rewrite'               => $rewrite,
             'capability_type'       => array('cqfs_entry','cqfs_entries'),
             'map_meta_cap'          => true
@@ -215,7 +212,7 @@ class Cqfs_Cpts{
 
             $query->set( 'meta_key', ['cqfs_entry_form_id', 'cqfs_entry_form_type', 'cqfs_entry_result', 'cqfs_entry_user_email'] );
             
-            if( $query->query_vars['orderby'] == 'cqfs_entry_form_type' || $query->query_vars['orderby'] == 'cqfs_entry_result' ){
+            if( $query->query_vars['orderby'] == 'cqfs_entry_form_type' ){
                 $query->set( 'orderby', 'meta_value' );
             }
 

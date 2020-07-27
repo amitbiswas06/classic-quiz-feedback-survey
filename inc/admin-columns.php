@@ -209,14 +209,13 @@ class Admin_Columns {
     
             case 'result':
                 
-                $result = get_field('cqfs_entry_result');//select
-                $result = $result ? true : false;
+                $result = get_field('cqfs_entry_result');//radio
 
                 $link = esc_url( add_query_arg( 'cqfs_entry_result', urlencode(sanitize_text_field( $result ) ) ) );
                 printf(
                     '<a href="%s">%s</a>',
                     $link,
-                    $result ? esc_html__('Passed', 'cqfs') : esc_html__('Failed', 'cqfs')
+                    esc_attr($result)
                 );
     
             break;
@@ -243,7 +242,6 @@ class Admin_Columns {
      */
     public function cqfs_entry_column_sortable( $defaults ){
         $defaults['form_type'] = 'cqfs_entry_form_type';
-        $defaults['result'] = 'cqfs_entry_result';
         return $defaults;
     }
 
