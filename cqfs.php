@@ -162,9 +162,6 @@ class CQFS {
 		//ACF load point
 		add_filter('acf/settings/load_json', [ $this, 'acf_load_point' ] );
 
-		//shortcode display metabox
-		add_action('add_meta_boxes', [ $this, 'display_shortcode_metabox' ]);
-
 		//admin columns
 		require __DIR__ . '/inc/admin-columns.php';
 
@@ -173,6 +170,9 @@ class CQFS {
 
 		//build shortcode
 		require __DIR__ . '/inc/shortcode.php';
+
+		//meta boxes
+		require __DIR__ . '/admin/meta-boxes.php';
 
 		//enqueue scripts
 		add_action('wp_enqueue_scripts', [$this, 'cqfs_enqueue_scripts']);
@@ -281,27 +281,6 @@ class CQFS {
 		// return
 		return $paths;
 		
-	}
-
-	public function display_shortcode_metabox(){
-		$screens = ['cqfs_build'];
-		foreach ($screens as $screen) {
-			add_meta_box(
-				'cqfs_shortcode',
-				esc_html__('Build Type Shortcode', 'cqfs'),
-				[ $this, 'cqfs_shortcode_metabox_html' ],
-				$screen
-			);
-		}
-	}
-
-	public function cqfs_shortcode_metabox_html($post){
-
-		printf(
-			'<div class="acf-field"><div class="acf-input-wrap">
-			<input type="text" readonly value="[cqfs id=%s]"></div></div>',
-			esc_attr( $post->ID )
-		);
 	}
 
 	public function cqfs_enqueue_scripts(){
