@@ -276,21 +276,27 @@ class Utilities{
             );
             //display identity form
             //name field
+            $error_uname = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Name. Min 3, max 24 characters allowed.','cqfs') );
             printf(
-                '<label for="%s">%s</label><input id="%s" name="_cqfs_uname" type="text" placeholder="%s" required>',
+                '<label for="%s">%s</label>
+                <input id="%s" name="_cqfs_uname" type="text" placeholder="%s"><div class="error-msg error-uname hide">%s</div>',
                 'uname_' . esc_attr( $id ),
                 esc_html__('Your Name &#42;', 'cqfs'),
                 'uname_' . esc_attr( $id ),
-                esc_html__('please type your name.', 'cqfs')
+                esc_html__('please type your name.', 'cqfs'),
+                esc_html( $error_uname )
             );
 
             //email field
+            $error_email = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Email','cqfs') );
             printf(
-                '<label for="%s">%s</label><input id="%s" name="_cqfs_email" type="email" placeholder="%s" required>',
+                '<label for="%s">%s</label>
+                <input id="%s" name="_cqfs_email" type="email" placeholder="%s"><div class="error-msg error-email hide">%s</div>',
                 'uemail_' . esc_attr( $id ),
                 esc_html__('Your Email &#42;', 'cqfs'),
                 'uemail_' . esc_attr( $id ),
-                esc_html__('please type email.', 'cqfs')
+                esc_html__('please type email.', 'cqfs'),
+                esc_html( $error_email )
             );
 
             //consent message html

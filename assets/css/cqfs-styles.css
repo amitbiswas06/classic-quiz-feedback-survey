@@ -32,3 +32,9 @@
     opacity: 0;
     transition: all linear 0.3s;
 }
+.cqfs-error{
+    border: 2px solid red;
+}
+.error-msg{
+    color: red;
+}

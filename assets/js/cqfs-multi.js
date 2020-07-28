@@ -12,52 +12,133 @@
  * enableMe()
  * showMe()
  * hideMe()
- * quizRemarks()
+ * validateInput()
 **********************************************************/
 
 /**
  * Disable input, buttons etc
+ * 
  * @param {Node Element} el 
  */
 function disableMe(el){
     if( el.disabled == false ){
-        el.disabled = true,
-        el.classList.add('disabled')
+        el.disabled = true;
+        el.classList.add('disabled');
     }
 }
 
 /**
  * Enable input, buttons etc
+ * 
  * @param {Node Element} el 
  */
 function enableMe(el){
     if( el.disabled == true ){
-        el.disabled = false,
-        el.classList.remove('disabled')
+        el.disabled = false;
+        el.classList.remove('disabled');
     }
 }
 
 /**
  * Display Block
+ * 
  * @param {Node Element} el 
  */
 function showMe(el){
     if( el.classList.contains('hide') ){
-        el.classList.remove('hide')
-        el.classList.add('show')
+        el.classList.remove('hide');
+        el.classList.add('show');
     }
 }
 
 /**
  * Display None
+ * 
  * @param {Node Element} el 
  */
 function hideMe(el){
     if( el.classList.contains('show') ){
-        el.classList.remove('show')
-        el.classList.add('hide')
+        el.classList.remove('show');
+        el.classList.add('hide');
     }
 }
+
+/**
+ * Input validation check
+ * 
+ * @param {array} arr array of input nodes
+ */
+function validateInput( arr ){
+    let value = false;
+    if( arr.some( val => val.checked ) ){
+        value = true;
+    }
+    return value;
+}
+
+/**
+ * Validates the name and email field for not logged in user
+ * 
+ * @param {cqfs instance} cqfs 
+ */
+function user_name_email_validation( cqfs, event ){
+
+    //name and email field for non logged in user
+    const form_uname = cqfs.querySelector('input[name="_cqfs_uname"]');
+    const invalid_name_msg = cqfs.querySelector('.error-uname');
+    const form_email = cqfs.querySelector('input[name="_cqfs_email"]');
+    const invalid_email_msg = cqfs.querySelector('.error-email');
+
+    //regex
+    const letters = /^[A-Za-z\s]+$/;
+    const emailID = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+    [form_uname, form_email].map( v => v.classList.remove('cqfs-error') );
+    [invalid_name_msg, invalid_email_msg].map( v => hideMe(v) );
+
+    if( !form_uname.value || !form_uname.value.match(letters) || form_uname.value.length < 3 || form_uname.value.length > 25 ){
+        form_uname.classList.add('cqfs-error');
+        showMe(invalid_name_msg);
+        event.preventDefault();
+    }
+
+    if ( ! emailID.test(form_email.value) ){
+        form_email.classList.add('cqfs-error');
+        showMe(invalid_email_msg);
+        event.preventDefault();
+    }
+
+}
+
+/**
+ * Validated the cqfs_question inputs in cqfs form shortcode
+ * 
+ * @param {cqfs instance} cqfs 
+ * @param {event} event 
+ */
+function cqfs_form_input_validation( cqfs, event ){
+
+    //option sets
+    const form_options_div = Array.from( cqfs.querySelectorAll('form .question .options') );
+    const form_options = form_options_div.map( node => node.querySelectorAll('input') ).map( inp => Array.from(inp) );
+
+    form_options_div.forEach( (opt, idx) => {
+
+        const val = validateInput(form_options[idx]);
+        opt.classList.remove('cqfs-error');
+
+        //validation run for input fields and prevent submit
+        if( ! val ){
+            opt.classList.add('cqfs-error');
+            opt.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+            event.preventDefault();
+        }
+
+    });
+
+}
+
+/********************** end of utility functions ***********************/
 
 //multi page instances
 const cqfs_MultiPage = document.querySelectorAll('.cqfs.multi');
@@ -88,7 +169,6 @@ let initialize_CqfsMulti = function( cqfs ){
         const prv = cqfs.querySelector('.cqfs--prev');
 
         //form
-        //submit button
         const form = cqfs.querySelector('form');
 
         //submit button
@@ -112,7 +192,9 @@ let initialize_CqfsMulti = function( cqfs ){
             //enable next button
             if( i != arr.length -1 ){
                 q.addEventListener('click', (e) => {
+                    //store checked properties with bollean val
                     let checked = allOptions[i].map( v => v.checked );
+                    //check if atleast one is checked = true
                     if( checked.includes(true) ){
                         enableMe(nxt);
                     }else{
@@ -126,7 +208,7 @@ let initialize_CqfsMulti = function( cqfs ){
             if( i == arr.length -1 ){
                 q.addEventListener('click', (e) => {
                     let checked = allOptions[i].map( v => v.checked || v.type === 'text' || v.type === 'email' );
-                    console.log(checked)
+                    console.log(checked);
                     if( checked.includes(true) ){
                         enableMe(submit);
                     }else{
@@ -143,12 +225,11 @@ let initialize_CqfsMulti = function( cqfs ){
          * 2. Previous button
          * 3. Submit button
          */
-        nxt.addEventListener('click', next)
-        prv.addEventListener('click', prev)
-        form.addEventListener('submit', submission)
+        nxt.addEventListener('click', next);
+        prv.addEventListener('click', prev);
 
         //Add a counter variable for navigation
-        let count = 0
+        let count = 0;
 
         /**
          * @callback function `next`
@@ -157,30 +238,30 @@ let initialize_CqfsMulti = function( cqfs ){
         function next(e){
 
             //prevent default
-            e.preventDefault()
+            e.preventDefault();
 
             //disble target
-            disableMe(e.target)
+            disableMe(e.target);
 
             //enable previous button
-            enableMe(prv)
+            enableMe(prv);
 
             //hide previous question-answer set
-            hideMe( questions[count] )
+            hideMe( questions[count] );
 
             //show next question-answer set
-            showMe( questions[count].nextElementSibling )
+            showMe( questions[count].nextElementSibling );
 
             //increament counter
-            count++
+            count++;
 
             //check if count is last element
             if( count == questions.length -1 ){
                 //disable target which is next button
-                disableMe(e.target)
+                disableMe(e.target);
 
                 //enable previous button
-                enableMe(prv)
+                enableMe(prv);
             }
 
             //console.log(count)
@@ -194,45 +275,51 @@ let initialize_CqfsMulti = function( cqfs ){
         function prev(e){
 
             //prevent default
-            e.preventDefault()
+            e.preventDefault();
 
             //enable next button
-            enableMe(nxt)
+            enableMe(nxt);
 
             //disable submit button
-            disableMe(submit)
+            disableMe(submit);
 
             //hide next question-answer set
-            hideMe( questions[count] )
+            hideMe( questions[count] );
 
             //show previous question-answe set
-            showMe( questions[count].previousElementSibling )
+            showMe( questions[count].previousElementSibling );
 
             //decrement counter
-            count--
+            count--;
 
             //check if count is first element
             if( count == 0 ){
                 //disable target which is previous button
-                disableMe(e.target)
+                disableMe(e.target);
 
                 //enable next button
-                enableMe(nxt)
+                enableMe(nxt);
             }
 
             //console.log(count)
             
         }
 
-        function submission(e){
-            // e.preventDefault();
-            if( _cqfs.login_status ){
-                alert('You are logged in')
-            }else{
-                alert('You are not logged in')
-            }
+        /**
+         * Form submit event
+         */
+        form.addEventListener('submit', e => {
             
-        }
+            //validate form inputs
+            cqfs_form_input_validation( cqfs, e );
+
+            //run for not logged in users
+            //validate the name and email field
+            if( ! _cqfs.login_status ){
+                user_name_email_validation( cqfs, e );
+            }
+
+        });
 
     }//layout check
 
@@ -242,6 +329,49 @@ let initialize_CqfsMulti = function( cqfs ){
 //initialize the cqfs multi page block
 cqfs_MultiPage.forEach( cqfs => {
     initialize_CqfsMulti( cqfs );
-})
+});
 
-})();
+/********************* end of initialize_CqfsMulti ********************/
+
+/**
+ * cqfs single page forms
+ */
+//single page instances
+const cqfs_SinglePage = document.querySelectorAll('.cqfs.single');
+
+let initialize_CqfsSingle = function ( cqfs ){
+    
+    //check the layout type
+    const layoutType = cqfs.getAttribute("data-cqfs-layout");
+
+    if( layoutType === 'single' ){
+        //run if layout is a single page
+
+        //the form
+        const form = cqfs.querySelector('form');
+
+        //form submit validation
+        form.addEventListener('submit', e => {
+            
+            //validate form inputs
+            cqfs_form_input_validation( cqfs, e );
+
+            //run for not logged in users
+            //validate the name and email field
+            if( ! _cqfs.login_status ){
+                user_name_email_validation( cqfs, e );
+            }
+
+        });
+
+    }
+
+}
+
+//initialize the cqfs multi page block
+cqfs_SinglePage.forEach( cqfs => {
+    initialize_CqfsSingle( cqfs );
+});
+
+
+})();//end of main function wrapper

@@ -160,6 +160,7 @@ class CqfsShortcode {
             do_action('cqfs_after_form');
             ?>
             <div class="cqfs--processing hide"><?php esc_html_e('Processing...','cqfs'); ?></div>
+            <div class="cqfs-error-msg hide"><?php esc_html_e('Please select an option.','cqfs'); ?></div>
         </div>
         <!-- cqfs end -->
         <?php } elseif( $cqfs_build['type'] === 'quiz' && 
@@ -175,7 +176,7 @@ class CqfsShortcode {
             /**
              * Result display
              */
-            if(isset($param['_cqfs_entry_id']) && isset($param['_cqfs_email']) ){
+            if( isset($param['_cqfs_entry_id']) && isset($param['_cqfs_email']) && !empty($param['_cqfs_entry_id']) && !empty($param['_cqfs_email']) ){
 
                 //get the entry array                
                 $entry = util::cqfs_entry_obj( $entry_id );
@@ -296,37 +297,41 @@ class CqfsShortcode {
             return is_array($val);
         };
         $userAnswers = array_values(array_filter($values, $remove_non_array_callback));
-        // var_dump($userAnswers);
+        var_dump($userAnswers);
         $answersArr = [];
 
-        $i = 0;
-        foreach( $cqfs_build['all_questions'] as $question ){
-            //push questions
-            $questionsArr[] = $question['question'];
-
-            //check answers and return boolean
-            $compare = Util::cqfs_array_equality_check( $question['answers'], $userAnswers[$i] );
-            //push answer status
-            $ansStatus[] = $compare ? esc_html__('Correct Answer.', 'cqfs') : esc_html__('Wrong Answer.','cqfs');
-            //push true values
-            if($compare){
-                $numCorrects[] = $compare;
+        if($userAnswers){
+            $i = 0;
+            foreach( $cqfs_build['all_questions'] as $question ){
+                //push questions
+                $questionsArr[] = $question['question'];
+    
+                //check answers and return boolean
+                $compare = Util::cqfs_array_equality_check( $question['answers'], $userAnswers[$i] );
+                //push answer status
+                $ansStatus[] = $compare ? esc_html__('Correct Answer.', 'cqfs') : esc_html__('Wrong Answer.','cqfs');
+                //push true values
+                if($compare){
+                    $numCorrects[] = $compare;
+                }
+    
+                //push answer string in array
+                $answers = [];
+                foreach($userAnswers[$i] as $ans){
+                    $answers[] = $question['options'][$ans-1];
+                }
+                //now implode to string and push
+                $answersArr[] = sanitize_text_field(implode(" | ", $answers));
+    
+                //push the note for each question
+                $notes[] = $question['note'] ? sanitize_text_field($question['note']) : esc_html__('Not Available.','cqfs');
+    
+                $i++;
             }
-
-            //push answer string in array
-            $answers = [];
-            foreach($userAnswers[$i] as $ans){
-                $answers[] = $question['options'][$ans-1];
-            }
-            //now implode to string and push
-            $answersArr[] = sanitize_text_field(implode(" | ", $answers));
-
-            //push the note for each question
-            $notes[] = $question['note'] ? sanitize_text_field($question['note']) : esc_html__('Not Available.','cqfs');
-
-            $i++;
+    
         }
 
+        
         /**
          * Final preparation
          */
@@ -368,17 +373,26 @@ class CqfsShortcode {
         );
         
         //update post title and user email for user
+        //store email for validation use
+        $user_emailID = '';
+
         if( is_user_logged_in() ){
             $current_user = wp_get_current_user();
             $post_array['post_title'] = sanitize_text_field( $current_user->display_name );
             $post_array['meta_input']['cqfs_entry_user_email'] = sanitize_email( $current_user->user_email );
+            $user_emailID = sanitize_email( $current_user->user_email );
         }else{
             $post_array['post_title'] = $values['_cqfs_uname'] ? sanitize_text_field($values['_cqfs_uname']) : esc_html__('Guest', 'cqfs');
             $post_array['meta_input']['cqfs_entry_user_email'] = sanitize_email($values['_cqfs_email']);
+            $user_emailID = sanitize_email($values['_cqfs_email']);
         }
         
         // Insert the post into the database and store the post ID
-        $cqfs_entry_id = wp_insert_post( $post_array );
+        if( !empty($user_emailID) ){
+            $cqfs_entry_id = wp_insert_post( $post_array );
+        }else{
+            $cqfs_entry_id = 0;
+        }
 
         /****************************************
          * prepare redirection array
