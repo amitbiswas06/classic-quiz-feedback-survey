@@ -56,8 +56,22 @@ class CqfsShortcode {
         $param = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
 
         ob_start(); 
+
+        //show this message if returns a failure
+        if( isset($param['_cqfs_status']) && 
+        isset($param['_cqfs_id']) && 
+        $param['_cqfs_status'] === 'failure' && 
+        $param['_cqfs_id'] === $cqfs_build['id'] ){
+
+            $failure_msg = apply_filters('cqfs_failure_msg', esc_html__('Something went terribly wrong. Please try again.', 'cqfs') );
+            printf(
+                '<p class="cqfs-failure-msg">%s</p>',
+                esc_html( $failure_msg )
+            );
+
+        }
         
-        //check parameters
+        //check parameters and show form or result
         if ( !isset($param['_cqfs_status']) || 
         !isset($param['_cqfs_id']) || 
         $param['_cqfs_status'] !== 'success' || 
@@ -265,7 +279,10 @@ class CqfsShortcode {
 
 		//bail early if found suspecious with nonce verification.
 		if ( ! wp_verify_nonce( $nonce, 'cqfs_post' ) ) {
-			$cqfs_status = ['_cqfs_status' => urlencode(sanitize_text_field('failure'))];
+			$cqfs_status = [
+                '_cqfs_status'  => urlencode(sanitize_text_field('failure')),
+                '_cqfs_id'      => urlencode(sanitize_text_field($values['_cqfs_id']))
+            ];
 			wp_safe_redirect(
 				esc_url_raw(
 					add_query_arg( $cqfs_status, wp_unslash(esc_url(strtok($values['_wp_http_referer'], '?')) ) )
@@ -426,6 +443,7 @@ class CqfsShortcode {
         }else{
             //on faliure
             $redirect_args['_cqfs_status'] = urlencode(sanitize_text_field('failure'));
+            $redirect_args['_cqfs_id'] = urlencode(sanitize_text_field($values['_cqfs_id']));
         }
         
         // var_dump($redirect_args);//urlencode array
