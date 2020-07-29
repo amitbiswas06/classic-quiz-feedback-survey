@@ -160,6 +160,13 @@ class Cqfs_Cpts{
 
     }
 
+
+    /**
+     * Admin coulmns custom queries for filter by meta key
+     * 
+     * @param query $query for the admin.
+     * returns custom query based on custom meta key value pair
+     */
     public function cqfs_pre_get_posts( $query ){
 
         // bail early
@@ -210,28 +217,54 @@ class Cqfs_Cpts{
             $result = filter_input(INPUT_GET, 'cqfs_entry_result', FILTER_SANITIZE_STRING);
             $email = filter_input(INPUT_GET, 'cqfs_entry_user_email', FILTER_SANITIZE_STRING);
 
-            $query->set( 'meta_key', ['cqfs_entry_form_id', 'cqfs_entry_form_type', 'cqfs_entry_result', 'cqfs_entry_user_email'] );
-            
-            if( $query->query_vars['orderby'] == 'cqfs_entry_form_type' ){
-                $query->set( 'orderby', 'meta_value' );
-            }
+            //declare blank array first
+            $meta_query = array();
 
             if(isset($form_id) && !empty($form_id)){
-                $query->set( 'meta_value', $form_id);
+                $meta_query[] = array(
+                    array(
+                        'key' 		=> 'cqfs_entry_form_id', // acf field
+                        'value'		=> $form_id,
+                        'compare'	=> '=',
+                        
+                    )
+                );
             }
 
             if(isset($form_type) && !empty($form_type)){
-                $query->set( 'meta_value', $form_type);
+                $meta_query[] = array(
+                    array(
+                        'key' 		=> 'cqfs_entry_form_type', // acf field
+                        'value'		=> $form_type,
+                        'compare'	=> '=',
+                        
+                    )
+                );
             }
 
             if(isset($result) && !empty($result)){
-                $query->set( 'meta_value', $result);
+                $meta_query[] = array(
+                    array(
+                        'key' 		=> 'cqfs_entry_result', // acf field
+                        'value'		=> $result,
+                        'compare'	=> '=',
+                        
+                    )
+                );
             }
 
             if(isset($email) && !empty($email)){
-                $query->set( 'meta_value', $email);
+                $meta_query[] = array(
+                    array(
+                        'key' 		=> 'cqfs_entry_user_email', // acf field
+                        'value'		=> $email,
+                        'compare'	=> '=',
+                        
+                    )
+                );
             }
 
+            $query->set( 'meta_query', $meta_query );
 
         }
         

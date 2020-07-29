@@ -26,7 +26,6 @@ class Admin_Columns {
         //cpt cqfs_entry
         add_filter('manage_cqfs_entry_posts_columns', [$this, 'cqfs_entry_column_heads'], 10);
         add_action('manage_cqfs_entry_posts_custom_column', [$this, 'cqfs_entry_column_contents'], 10, 2);
-        add_filter('manage_edit-cqfs_entry_sortable_columns', [$this, 'cqfs_entry_column_sortable'] );
     
     }
 
@@ -234,15 +233,6 @@ class Admin_Columns {
                 
         }
 
-    }
-
-
-    /**
-     * cqfs_entry column sortable
-     */
-    public function cqfs_entry_column_sortable( $defaults ){
-        $defaults['form_type'] = 'cqfs_entry_form_type';
-        return $defaults;
     }
 
 

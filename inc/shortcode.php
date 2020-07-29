@@ -330,6 +330,7 @@ class CqfsShortcode {
             }
     
         }
+        // var_dump($numCorrects);
 
         
         /**
@@ -388,10 +389,9 @@ class CqfsShortcode {
         }
         
         // Insert the post into the database and store the post ID
+        $cqfs_entry_id = false;
         if( !empty($user_emailID) ){
             $cqfs_entry_id = wp_insert_post( $post_array );
-        }else{
-            $cqfs_entry_id = 0;
         }
 
         /****************************************
