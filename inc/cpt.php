@@ -48,6 +48,7 @@ class Cqfs_Cpts{
             'feeds'                 => false,
         );
         $args = array(
+            'menu_icon'             => 'dashicons-lightbulb',
             'label'                 => esc_html__( 'Questions', 'cqfs' ),
             'labels'                => $labels,
             'supports'              => array( 'title', 'thumbnail', 'author', 'revisions' ),
@@ -96,6 +97,7 @@ class Cqfs_Cpts{
             'feeds'                 => false,
         );
         $args = array(
+            'menu_icon'             => 'dashicons-lightbulb',
             'label'                 => esc_html__( 'CQFS Build', 'cqfs' ),
             'labels'                => $labels,
             'supports'              => array( 'title', 'author', 'revisions' ),
@@ -142,6 +144,7 @@ class Cqfs_Cpts{
             'feeds'                 => false,
         );
         $args = array(
+            'menu_icon'             => 'dashicons-lightbulb',
             'label'                 => esc_html__( 'CQFS Entry', 'cqfs' ),
             'labels'                => $labels,
             'supports'              => array( 'title', 'author', 'revisions' ),

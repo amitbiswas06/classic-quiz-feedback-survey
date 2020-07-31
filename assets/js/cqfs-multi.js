@@ -81,7 +81,10 @@ function validateInput( arr ){
  * 
  * @param {cqfs instance} cqfs 
  */
-function user_name_email_validation( cqfs, event ){
+function form_name_email_validation( cqfs, event ){
+
+    //return value
+    let returnVal = true;
 
     //name and email field for non logged in user
     const form_uname = cqfs.querySelector('input[name="_cqfs_uname"]');
@@ -100,13 +103,17 @@ function user_name_email_validation( cqfs, event ){
         form_uname.classList.add('cqfs-error');
         showMe(invalid_name_msg);
         event.preventDefault();
+        returnVal = false;
     }
 
     if ( ! emailID.test(form_email.value) ){
         form_email.classList.add('cqfs-error');
         showMe(invalid_email_msg);
         event.preventDefault();
+        returnVal = false;
     }
+
+    return returnVal;
 
 }
 
@@ -116,7 +123,10 @@ function user_name_email_validation( cqfs, event ){
  * @param {cqfs instance} cqfs 
  * @param {event} event 
  */
-function cqfs_form_input_validation( cqfs, event ){
+function form_input_validation( cqfs, event ){
+
+    //return value
+    let returnVal = true;
 
     //option sets
     const form_options_div = Array.from( cqfs.querySelectorAll('form .question .options') );
@@ -132,9 +142,12 @@ function cqfs_form_input_validation( cqfs, event ){
             opt.classList.add('cqfs-error');
             opt.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
             event.preventDefault();
+            returnVal = false;
         }
 
     });
+
+    return returnVal;
 
 }
 
@@ -311,12 +324,12 @@ let initialize_CqfsMulti = function( cqfs ){
         form.addEventListener('submit', e => {
             
             //validate form inputs
-            cqfs_form_input_validation( cqfs, e );
+            form_input_validation( cqfs, e );
 
             //run for not logged in users
             //validate the name and email field
             if( ! _cqfs.login_status ){
-                user_name_email_validation( cqfs, e );
+                form_name_email_validation( cqfs, e );
             }
 
         });
@@ -325,11 +338,6 @@ let initialize_CqfsMulti = function( cqfs ){
 
 
 }
-
-//initialize the cqfs multi page block
-cqfs_MultiPage.forEach( cqfs => {
-    initialize_CqfsMulti( cqfs );
-});
 
 /********************* end of initialize_CqfsMulti ********************/
 
@@ -353,14 +361,42 @@ let initialize_CqfsSingle = function ( cqfs ){
         //form submit validation
         form.addEventListener('submit', e => {
             
+            
             //validate form inputs
-            cqfs_form_input_validation( cqfs, e );
+            let x = form_input_validation( cqfs, e );
 
             //run for not logged in users
             //validate the name and email field
             if( ! _cqfs.login_status ){
-                user_name_email_validation( cqfs, e );
+                e.preventDefault();
+                let y = form_name_email_validation( cqfs, e );
+
+                if( x && y ){
+                    postData( _cqfs.ajaxurl, formData )
+                    .then(response => response.json() )
+                    .then( v => {
+                        console.log(v)
+                    } );
+                    
+                }
+
             }
+
+
+            //ajax submit
+            const formData = new FormData(e.target);
+
+            if( x ){
+                e.preventDefault();
+                postData( _cqfs.ajaxurl, formData )
+                .then(response => response.json() )
+                .then( v => {
+                    console.log(v)
+                } );
+                
+            }
+            
+
 
         });
 
@@ -368,10 +404,43 @@ let initialize_CqfsSingle = function ( cqfs ){
 
 }
 
-//initialize the cqfs multi page block
-cqfs_SinglePage.forEach( cqfs => {
-    initialize_CqfsSingle( cqfs );
-});
+// Example POST method implementation:
+async function postData( url = '', data ) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+            // 'Content-Type': 'multipart/form-data',
+            // 'Content-Type': 'application/json',
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json'
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        // body: JSON.stringify(data) // body data type must match "Content-Type" header
+        body: data
+    });
 
+    return response;
+
+    // return response.json(); // parses JSON response into native JavaScript objects
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    //initialize the cqfs multi page block
+    cqfs_MultiPage.forEach( cqfs => {
+        initialize_CqfsMulti( cqfs );
+    });
+
+    //initialize the cqfs multi page block
+    cqfs_SinglePage.forEach( cqfs => {
+        initialize_CqfsSingle( cqfs );
+    });
+
+})
 
 })();//end of main function wrapper

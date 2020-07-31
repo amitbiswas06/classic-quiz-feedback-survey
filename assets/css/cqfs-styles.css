@@ -38,3 +38,20 @@
 .error-msg{
     color: red;
 }
+
+/*
+* Admin use
+*/
+/* .toplevel_page_cqfs-settings>.dashicons-before:after {
+    content: "\2714";
+    border: 2px solid;
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+}
+
+.toplevel_page_cqfs-settings>.dashicons-before {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */

@@ -171,6 +171,9 @@ class CQFS {
 		//build shortcode
 		require __DIR__ . '/inc/shortcode.php';
 
+		//admin menu pages
+		require __DIR__ . '/admin/menu-pages.php';
+
 		//meta boxes
 		require __DIR__ . '/admin/meta-boxes.php';
 
@@ -289,8 +292,8 @@ class CQFS {
 		wp_enqueue_script(
 			'cqfs-multi', 
 			esc_url( plugin_dir_url(__FILE__) . 'assets/js/cqfs-multi.js'),
-			NULL,
-			'1.0.0',
+			'NULL',
+			self::CQFS_VERSION,
 			true
 		);
 
@@ -299,6 +302,7 @@ class CQFS {
 			array( 
 				'ajaxurl'		=> esc_url( admin_url( 'admin-ajax.php' ) ),
 				'login_status'	=> is_user_logged_in(),
+				'form_handle'	=> esc_attr( get_option('_cqfs_form_handle') ),
 			)
 		);
 
@@ -307,7 +311,7 @@ class CQFS {
 			'cqfs-style',
 			esc_url( plugin_dir_url(__FILE__) . 'assets/css/cqfs-styles.css'),
 			NULL,
-			'1.0.0'
+			self::CQFS_VERSION
 		);
 
 	}

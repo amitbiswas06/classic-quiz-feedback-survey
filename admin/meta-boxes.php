@@ -7,6 +7,7 @@
 //define namespaces
 namespace CQFS\ADMIN\METABOXES;
 use CQFS\INC\UTIL\Utilities as util;
+use CQFS\ROOT\CQFS as CQFS;
 
 class MetaBoxes {
 
@@ -138,9 +139,24 @@ class MetaBoxes {
 					$cqfs_entry_form_type = '';
 					$edit_page = '';
 				}
+				
+				// enqueue styles
+				wp_enqueue_style(
+					'cqfs-admin-style', 
+					plugin_dir_url(__FILE__) . 'css/cqfs-admin-style.css', 
+					array(), 
+					CQFS::CQFS_VERSION,
+					'all'
+				);
 
 				// enqueue script
-				wp_enqueue_script('cqfs_admin_script', plugin_dir_url(__FILE__) . 'js/cqfs-admin.js', NULL, '1.0.0', true);
+				wp_enqueue_script(
+					'cqfs_admin_script', 
+					plugin_dir_url(__FILE__) . 'js/cqfs-admin.js', 
+					NULL, 
+					CQFS::CQFS_VERSION, 
+					true
+				);
 				// localize script, create a custom js object
 				wp_localize_script(
 					'cqfs_admin_script',
