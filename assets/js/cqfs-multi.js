@@ -361,17 +361,36 @@ let initialize_CqfsSingle = function ( cqfs ){
         //form submit validation
         form.addEventListener('submit', e => {
             
-            
+            //form data for ajax submit
+            const formData = new FormData(e.target);
             //validate form inputs
             let x = form_input_validation( cqfs, e );
 
             //run for not logged in users
             //validate the name and email field
             if( ! _cqfs.login_status ){
-                e.preventDefault();
-                let y = form_name_email_validation( cqfs, e );
 
-                if( x && y ){
+                if( _cqfs.form_handle === 'ajax_mode' ){
+                    e.preventDefault();
+                    let y = form_name_email_validation( cqfs, e );
+    
+                    if( x && y ){
+                        postData( _cqfs.ajaxurl, formData )
+                        .then(response => response.json() )
+                        .then( v => {
+                            console.log(v)
+                        } );
+                        
+                    }
+                }
+                
+                form_name_email_validation( cqfs, e );
+
+            }else if( _cqfs.form_handle === 'ajax_mode' ){
+                //ajax submit
+
+                if( x ){
+                    e.preventDefault();
                     postData( _cqfs.ajaxurl, formData )
                     .then(response => response.json() )
                     .then( v => {
@@ -380,20 +399,6 @@ let initialize_CqfsSingle = function ( cqfs ){
                     
                 }
 
-            }
-
-
-            //ajax submit
-            const formData = new FormData(e.target);
-
-            if( x ){
-                e.preventDefault();
-                postData( _cqfs.ajaxurl, formData )
-                .then(response => response.json() )
-                .then( v => {
-                    console.log(v)
-                } );
-                
             }
             
 
