@@ -17,11 +17,11 @@ class Cqfs_Submission {
 
         //Non authenticated action for CQFS form via. action value `cqfs_response`
         add_action( 'admin_post_nopriv_cqfs_response', [$this, 'cqfs_form_submission'] );//php req
-        add_action( 'wp_ajax_nopriv_cqfs_response', [$this, 'cqfs_form_submission_fetch'] );//AJAX req
+        add_action( 'wp_ajax_nopriv_cqfs_response', [$this, 'cqfs_form_submission'] );//AJAX req
 
         //Authenticated action for the CQFS form. action value `cqfs_response`
         add_action( 'admin_post_cqfs_response', [$this, 'cqfs_form_submission'] );//php req
-        add_action( 'wp_ajax_cqfs_response', [$this, 'cqfs_form_submission_fetch'] );//AJAX req
+        add_action( 'wp_ajax_cqfs_response', [$this, 'cqfs_form_submission'] );//AJAX req
         
     }
 
@@ -32,11 +32,14 @@ class Cqfs_Submission {
      */
 	public function cqfs_form_submission(){
 
+        //check form submit mode
+        $submit_mode = sanitize_text_field( get_option('_cqfs_form_handle') );
+
         //sanitize the global POST var. XSS ok.
         //all form inputs and security inputs
 		//hidden keys (_cqfs_id, action, _cqfs_nonce, _wp_http_referer)
         $values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-        var_dump($values);//main post
+        // var_dump($values);//main post
 
 		//get the nonce
         $nonce = sanitize_text_field( $values['_cqfs_nonce'] );
@@ -49,6 +52,10 @@ class Cqfs_Submission {
                 '_cqfs_id'      => urlencode(sanitize_text_field($values['_cqfs_id']))
             ];
 
+            //send JSON response for ajax mode
+            wp_send_json_error( $cqfs_status );
+
+            //safe redirect for php mode
 			wp_safe_redirect(
 				esc_url_raw(
 					add_query_arg( $cqfs_status, wp_unslash(esc_url(strtok($values['_wp_http_referer'], '?')) ) )
@@ -81,7 +88,7 @@ class Cqfs_Submission {
             return is_array($val);
         };
         $userAnswers = array_values(array_filter($values, $remove_non_array_callback));
-        var_dump($userAnswers);
+        // var_dump($userAnswers);
         $answersArr = [];
 
         if($userAnswers){
@@ -245,6 +252,19 @@ class Cqfs_Submission {
         
         // var_dump($redirect_args);//urlencode array
 
+        //send JSON response for ajax mode
+        if( !$cqfs_entry_id && $submit_mode === 'ajax_mode'){
+            
+            wp_send_json_error( $redirect_args );
+
+        }else if( $submit_mode === 'ajax_mode' ){
+            //prepare args
+            // $redirect_args[] = $post_array;
+            $entry = util::cqfs_entry_obj($cqfs_entry_id);
+            wp_send_json_success( $entry );
+        }
+        
+
         /**
          * Redirect the page and exit
          */
@@ -259,54 +279,6 @@ class Cqfs_Submission {
 
     }
 
-
-    public function cqfs_form_submission_fetch(){
-        //sanitize the global POST var. XSS ok.
-        //all form inputs and security inputs
-		//hidden keys (_cqfs_id, action, _cqfs_nonce, _wp_http_referer)
-        // $values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-        // var_dump($values);//main post
-
-        //get the nonce
-        // $nonce = sanitize_text_field( $values['_cqfs_nonce'] );
-
-		//bail early if found suspecious with nonce verification.
-		// if ( ! wp_verify_nonce( $nonce, 'cqfs_post' ) ) {
-
-		// 	$cqfs_status = [
-        //         '_cqfs_status'  => urlencode(sanitize_text_field('failure')),
-        //         '_cqfs_id'      => urlencode(sanitize_text_field($values['_cqfs_id']))
-        //     ];
-
-        //     echo 'failure';
-
-        //     die();
-		// 	/* wp_safe_redirect(
-		// 		esc_url_raw(
-		// 			add_query_arg( $cqfs_status, wp_unslash(esc_url(strtok($values['_wp_http_referer'], '?')) ) )
-		// 		)
-        //     );
-            
-		// 	exit(); */
-
-        // }
-
-        // if( isset($_POST['_cqfs_nonce']) ){
-        //     $result = 'success';
-        //     echo $result;
-        //     die;
-        // }else{
-        //     echo 'failure';
-        //     die;
-        // }
-
-        // echo 'Hellloooo';
-        wp_send_json_success( 'It works' );
-        exit();
-
-
-    }
-    
 
 }
 

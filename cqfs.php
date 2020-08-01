@@ -306,6 +306,25 @@ class CQFS {
 			)
 		);
 
+		//for localization of string in JS use
+		$cqfs_thank_msg = apply_filters('cqfs_thankyou_message', esc_html__('Thank you for participating.', 'cqfs'));
+		$invalid_result = apply_filters('cqfs_invalid_result', esc_html__('Invalid Result','cqfs'));
+		$you_ans = apply_filters('cqfs_result_you_answered', esc_html__('You answered&#58; ', 'cqfs'));
+		$status = apply_filters('cqfs_result_ans_status', esc_html__('Status&#58; ', 'cqfs'));
+		$note = apply_filters('cqfs_result_ans_note', esc_html__('Note&#58; ', 'cqfs'));
+
+		//localize script for JS strings
+		wp_localize_script( 'cqfs-multi', '_cqfs_lang',
+			array( 
+				'thank_msg'		=> esc_html( $cqfs_thank_msg ),
+				'invalid_result'=> esc_html($invalid_result),
+				'you_ans'		=> esc_html($you_ans),
+				'status'		=> esc_html($status),
+				'note'			=> esc_html($note),
+			)
+		);
+
+
 		//style css
 		wp_enqueue_style(
 			'cqfs-style',

@@ -1,6 +1,6 @@
 (function(){
 /**
- * This script handles the multi page layout of the CQFS form
+ * This script handles the CQFS form validation and submission
  * @since 1.0.0
  */
 
@@ -13,6 +13,15 @@
  * showMe()
  * hideMe()
  * validateInput()
+ * form_name_email_validation()
+ * form_input_validation()
+ * postData()
+ * afterResponse()
+ * formSubmitEvent()
+ * 
+ * Available object
+ * _cqfs (see page source for keys)
+ * _cqfs_lang (for strings use in js)
 **********************************************************/
 
 /**
@@ -151,10 +160,138 @@ function form_input_validation( cqfs, event ){
 
 }
 
+/**
+ * Ajax POST method implementation:
+ * 
+ * @param {post url} url 
+ * @param {post data} data 
+ */
+async function postData( url = '', data ) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+            'Accept': 'application/json'
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'same-origin', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: data
+    });
+
+    return response;
+
+}
+
+
+/**
+ * Display results on ajax submit for the quiz
+ * 
+ * @param {object} obj That returns after the ajax submission
+ */
+function afterResponse( obj ){
+
+    let html = '';
+    //run on success and if quiz
+    if( obj.success && obj.data.form_type === 'quiz' ){
+
+        html += `<h3 class="cqfs-uname">Hello ${obj.data.user_title}</h3>`;
+        html += `<div class="cqfs-pass-msg">
+        <p class="cqfs-percentage">${obj.data.percentage}&#37; correct.</p>
+        <p>${obj.data.remarks}</p></div>`;
+
+        html += obj.data.all_questions.map( q => {
+            return `
+            <div class="cqfs-entry-qa">
+                <h4>${q.question}</h4>
+                <p><label>${_cqfs_lang.you_ans}</label>${q.answer}</p>
+                <p><label>${_cqfs_lang.status}</label>${q.status}</p>
+                <details><summary>${_cqfs_lang.note}</summary><p>${q.note}</p></details>
+            </div>
+            `;
+        }).join('');
+
+    }else if( obj.success && obj.data.form_type !== 'quiz' ){
+        //run if success and not quiz
+        html = `<div class="cqfs-results"><h4>${_cqfs_lang.thank_msg}</h4></div>`;
+    }else{
+        //run all other case
+        html = `<div class="cqfs-invalid-result">${_cqfs_lang.invalid_result}</div>`;
+    }
+
+    return html;
+
+}
+
+/**
+ * Submit function for both php and ajax mode
+ * and also for multi layout and single layout
+ * 
+ * @param {event}   e               Event that is passed by default
+ * @param {node}    processingDiv   Processing div which is hidden default and shown while processing
+ * @param {node}    cqfs            Main CQFS node
+ */
+function formSubmitEvent(e, processingDiv, cqfs){
+
+    //form data for ajax submit
+    const formData = new FormData(e.target);
+    //validate form inputs
+    let inpValidation = form_input_validation( cqfs, e );
+
+    //run for not logged in users
+    //validate the name and email field
+    if( ! _cqfs.login_status ){
+
+        //for ajax submit mode
+        if( !_cqfs.form_handle || _cqfs.form_handle === 'ajax_mode' ){
+            e.preventDefault();
+            let emailValidation = form_name_email_validation( cqfs, e );
+
+            if( inpValidation && emailValidation ){
+                showMe( processingDiv );
+                postData( _cqfs.ajaxurl, formData )
+                .then(response => response.json() )
+                .then( obj => {
+                    hideMe( processingDiv );
+                    e.target.remove();
+                    cqfs.insertAdjacentHTML( 'beforeend', afterResponse( obj ));
+                    console.log(obj);
+                } );
+                
+            }
+        }
+        
+        //for php submit mode
+        form_name_email_validation( cqfs, e );
+
+    }else if( !_cqfs.form_handle || _cqfs.form_handle === 'ajax_mode' ){
+
+        //ajax submit
+
+        if( inpValidation ){
+            e.preventDefault();
+            showMe( processingDiv );
+            postData( _cqfs.ajaxurl, formData )
+            .then(response => response.json() )
+            .then( obj => {
+                hideMe( processingDiv );
+                e.target.remove();
+                cqfs.insertAdjacentHTML( 'beforeend', afterResponse( obj ));
+                console.log(obj);
+            } );
+            
+        }
+
+    }
+
+}
+
 /********************** end of utility functions ***********************/
 
 //multi page instances
-const cqfs_MultiPage = document.querySelectorAll('.cqfs.multi');
+const cqfs_MultiPage = Array.from(document.querySelectorAll('.cqfs.multi'));
 
 let initialize_CqfsMulti = function( cqfs ){
     //code start for the cqfs instance
@@ -165,9 +302,6 @@ let initialize_CqfsMulti = function( cqfs ){
     if( layoutType === 'multi' ){
 
         //run if layout is a multi page
-
-        //container div for questions
-        const questionsContainer = cqfs.querySelector('.cqfs--questions');
 
         //container div for questions
         const userForm = cqfs.querySelector('.cqfs-user-form');
@@ -321,18 +455,7 @@ let initialize_CqfsMulti = function( cqfs ){
         /**
          * Form submit event
          */
-        form.addEventListener('submit', e => {
-            
-            //validate form inputs
-            form_input_validation( cqfs, e );
-
-            //run for not logged in users
-            //validate the name and email field
-            if( ! _cqfs.login_status ){
-                form_name_email_validation( cqfs, e );
-            }
-
-        });
+        form.addEventListener( 'submit', e => formSubmitEvent(e, processingDiv, cqfs) );
 
     }//layout check
 
@@ -345,9 +468,12 @@ let initialize_CqfsMulti = function( cqfs ){
  * cqfs single page forms
  */
 //single page instances
-const cqfs_SinglePage = document.querySelectorAll('.cqfs.single');
+const cqfs_SinglePage = Array.from(document.querySelectorAll('.cqfs.single'));
 
 let initialize_CqfsSingle = function ( cqfs ){
+
+    //processing div, default hide
+    const processingDiv = cqfs.querySelector('.cqfs--processing');
     
     //check the layout type
     const layoutType = cqfs.getAttribute("data-cqfs-layout");
@@ -359,79 +485,10 @@ let initialize_CqfsSingle = function ( cqfs ){
         const form = cqfs.querySelector('form');
 
         //form submit validation
-        form.addEventListener('submit', e => {
-            
-            //form data for ajax submit
-            const formData = new FormData(e.target);
-            //validate form inputs
-            let x = form_input_validation( cqfs, e );
-
-            //run for not logged in users
-            //validate the name and email field
-            if( ! _cqfs.login_status ){
-
-                if( _cqfs.form_handle === 'ajax_mode' ){
-                    e.preventDefault();
-                    let y = form_name_email_validation( cqfs, e );
-    
-                    if( x && y ){
-                        postData( _cqfs.ajaxurl, formData )
-                        .then(response => response.json() )
-                        .then( v => {
-                            console.log(v)
-                        } );
-                        
-                    }
-                }
-                
-                form_name_email_validation( cqfs, e );
-
-            }else if( _cqfs.form_handle === 'ajax_mode' ){
-                //ajax submit
-
-                if( x ){
-                    e.preventDefault();
-                    postData( _cqfs.ajaxurl, formData )
-                    .then(response => response.json() )
-                    .then( v => {
-                        console.log(v)
-                    } );
-                    
-                }
-
-            }
-            
-
-
-        });
+        form.addEventListener( 'submit', e => formSubmitEvent(e, processingDiv, cqfs) );
 
     }
 
-}
-
-// Example POST method implementation:
-async function postData( url = '', data ) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-            // 'Content-Type': 'multipart/form-data',
-            // 'Content-Type': 'application/json',
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json'
-        },
-        redirect: 'follow', // manual, *follow, error
-        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        // body: JSON.stringify(data) // body data type must match "Content-Type" header
-        body: data
-    });
-
-    return response;
-
-    // return response.json(); // parses JSON response into native JavaScript objects
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -442,7 +499,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     //initialize the cqfs multi page block
-    cqfs_SinglePage.forEach( cqfs => {
+    
+    const singlePageUniq = cqfs_SinglePage.map( node => node.getAttribute('id'))
+    .filter( (val, idx, arr) => arr.indexOf(val) === idx );
+
+    let uniq = [];
+    for(let i = 0; i < singlePageUniq.length; i++){
+        let all_dup = [];
+        for (let j = 0; j < cqfs_SinglePage.length; j++){
+            if( cqfs_SinglePage[j].getAttribute('id') === singlePageUniq[i] ){
+                all_dup.push(cqfs_SinglePage[j]);
+            }
+        }
+
+        for( let k = 1; k < all_dup.length; k++ ){
+            all_dup[k].remove();
+        }
+        console.log(all_dup);
+
+        uniq.push(all_dup[0])
+    }
+
+    console.log(uniq)
+
+    // console.log(cqfs_SinglePage);
+    uniq.forEach( cqfs => {
         initialize_CqfsSingle( cqfs );
     });
 

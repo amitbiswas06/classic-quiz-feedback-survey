@@ -154,7 +154,7 @@ class Utilities{
         //insert into blank array
 
         $the_cqfs_entry['id'] = esc_attr( $cqfs_entry_id );//the id
-        $the_cqfs_entry['username'] = esc_html( get_the_title( $cqfs_entry_id ) );//title as username
+        $the_cqfs_entry['user_title'] = esc_html( get_the_title( $cqfs_entry_id ) );//title as user_title
         $the_cqfs_entry['email'] = esc_html( $email );//email
         $the_cqfs_entry['form_id'] = esc_attr( $form_id );//form id
         $the_cqfs_entry['form_type'] = esc_html( $form_type );//form type
@@ -324,6 +324,9 @@ class Utilities{
         }
 
     }
+
+
+    // public static $cqfs_thank_msg = apply_filters('cqfs_thankyou_message', esc_html__('Thank you for participating.', 'cqfs'));
 
 
 }

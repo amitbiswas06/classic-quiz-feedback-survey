@@ -130,11 +130,12 @@ class CqfsShortcode {
                                 <?php if( $question['options'] ) {
                                     $j = 1;
                                     foreach( $question['options'] as $optn ) {
-                                        
+                                        //unique id for each build question input
+                                        $inp_id = Util::cqfs_slug($optn) . '_' . $cqfs_build['id'];
                                     ?>
                                 <div class="input-wrap">
-                                    <input name="option<?php echo $i; ?>[]" type="<?php echo esc_attr($question['input_type']); ?>" id="<?php echo Util::cqfs_slug($optn); ?>" value="<?php echo $j; ?>">
-                                    <label for="<?php echo Util::cqfs_slug($optn); ?>"><?php echo esc_html($optn); ?></label>
+                                    <input name="option<?php echo $i; ?>[]" type="<?php echo esc_attr($question['input_type']); ?>" id="<?php echo esc_attr($inp_id); ?>" value="<?php echo $j; ?>">
+                                    <label for="<?php echo esc_attr($inp_id); ?>"><?php echo esc_html($optn); ?></label>
                                 </div>
                                 <?php $j++; }} ?>
                                 
@@ -154,7 +155,7 @@ class CqfsShortcode {
                         );
 
                         //insert hidden action input
-                        printf('<input type="hidden" name="action" value="cqfs_response">');
+                        printf('<input type="hidden" name="action" value="%s">', esc_attr('cqfs_response'));
                         
                         //create nonce fields
                         wp_nonce_field('cqfs_post', '_cqfs_nonce');
@@ -212,7 +213,7 @@ class CqfsShortcode {
                 if( $entry_email == $entry['email'] ){
                     
                     //username. escaped.
-                    echo util::cqfs_display_uname( $entry['username'] );//escaped data
+                    echo util::cqfs_display_uname( $entry['user_title'] );//escaped data
                     //result div. escaped.
                     echo util::cqfs_quiz_result( $cqfs_build['pass_percent'], $entry['percentage'], $cqfs_build['pass_msg'], $cqfs_build['fail_msg'] );//escaped data
 
@@ -227,7 +228,7 @@ class CqfsShortcode {
                                 <h4>%s</h4>
                                 <p><label>%s</label>%s</p>
                                 <p><label>%s</label>%s</p>
-                                <p><label>%s</label>%s</p>
+                                <details><summary>%s</summary><p>%s</p></details>
                             </div>',
                             esc_html( $ent['question'] ),
                             $you_ans,
