@@ -11,13 +11,28 @@ use CQFS\ROOT\CQFS as CQFS;
 
 class MetaBoxes {
 
+	const QstNonce = 'cqfs_question_nonce';
+	const BuildNonce = 'cqfs_build_nonce';
+	const EntryNonce = 'cqfs_entry_nonce';
+
+	protected $values;
+
     /**
      * constructor
      */
     public function __construct(){
 
+		//sanitize the global POST var. XSS ok.
+		//all form inputs and security inputs
+		$this->values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
 		//admin scripts
 		add_action('admin_enqueue_scripts', [$this, 'cqfs_admin_scripts']);
+
+		//CPT - cqfs_question
+		add_action('add_meta_boxes', [ $this, 'cqfs_question_metaboxes' ]);
+		//save
+		add_action('save_post', [ $this, 'cqfs_question__group_save']);
 
         //CPT - cqfs_build
         add_action('add_meta_boxes', [ $this, 'cqfs_build_metaboxes' ]);
@@ -25,7 +40,72 @@ class MetaBoxes {
         //CPT - cqfs_entry
 		add_action('add_meta_boxes', [ $this, 'cqfs_entry_metaboxes' ]);
 
-    }
+	}
+	
+	/**
+	 * CPT - cqfs_question
+	 */
+	public function cqfs_question_metaboxes(){
+		$screens = ['cqfs_question'];
+		foreach ($screens as $screen) {
+
+			//questions meta box together
+			add_meta_box(
+				'cqfs_question_group',
+				esc_html__('Question Data', 'cqfs'),
+				[ $this, 'cqfs_question__group_html' ],
+				$screen
+			);
+		}
+
+	}
+	
+	public function cqfs_question__group_html($post){
+
+		wp_nonce_field( self::QstNonce, '_cqfs_qst_nonce');
+
+		//meta fields
+		$cqfs_answers = get_post_meta($post->ID, 'cqfs_answers', true);
+		?>
+		<div class="cqfs-field">
+			<div class="cqfs-label">
+				<label for="cqfs-answers"><?php echo esc_html__('Questions','cqfs'); ?></label>
+				<p class="description"><?php echo esc_html__('Please use separate line for each answer. Each line will be considered as 1, 2, 3 ... and so on.','cqfs'); ?></p>
+			</div>
+			<div class="cqfs-input">
+				<textarea name="cqfs[cqfs-answers]" id="cqfs-answers" rows="6" required><?php 
+				echo esc_html($cqfs_answers); ?></textarea>
+			</div>
+		</div>
+		<?php
+	}
+
+
+	public function cqfs_question__group_save($post_id){
+// var_dump($this->values);
+		if (!isset($this->values['_cqfs_qst_nonce']) || !wp_verify_nonce($_POST['_cqfs_qst_nonce'], self::QstNonce )){
+			return $post_id;
+		}
+
+		if(!current_user_can('edit_cqfs_question', $post_id)){
+			return $post_id;
+		}
+		
+		if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE){
+			return $post_id;
+		}	
+		
+		//if all ok above, update post
+
+		if (array_key_exists('cqfs', $this->values )) {
+            update_post_meta(
+                esc_attr($post_id),
+                sanitize_key('cqfs_answers'),
+                esc_textarea($this->values['cqfs']['cqfs-answers'])
+            );
+        }
+
+	}
 
 
     /**
@@ -34,6 +114,8 @@ class MetaBoxes {
     public function cqfs_build_metaboxes(){
 		$screens = ['cqfs_build'];
 		foreach ($screens as $screen) {
+
+			//read only field. displays shortcode
 			add_meta_box(
 				'cqfs_build_shortcode',
 				esc_html__('Build Type Shortcode', 'cqfs'),
@@ -124,7 +206,7 @@ class MetaBoxes {
 		// verify admin screen object
 		if ( is_object( $screen ) ) {
 			// enqueue only for specific post types
-			if ( in_array( $screen->post_type, ['cqfs_entry'] ) ) {
+			if ( in_array( $screen->post_type, ['cqfs_entry','cqfs_question','cqfs_build'] ) ) {
 
 				//set only for cqfs_entry edit screen
 				if( $screen->post_type === 'cqfs_entry' && isset($post_id) && isset($action) && $action === 'edit' ){

@@ -12,6 +12,7 @@
  * enableMe()
  * showMe()
  * hideMe()
+ * unique_build()
  * validateInput()
  * form_name_email_validation()
  * form_input_validation()
@@ -71,6 +72,40 @@ function hideMe(el){
         el.classList.add('hide');
     }
 }
+
+
+/**
+ * Remove CQFS shortcode objects with same ID and keeps the first entry
+ * 
+ * @param {Array} cqfs_NodeArray The main node array of CQFS shortcode object
+ */
+function unique_build( cqfs_NodeArray ){
+
+    const pageUniq = cqfs_NodeArray.map( node => node.getAttribute('id'))
+    .filter( (val, idx, arr) => arr.indexOf(val) === idx );
+
+    let uniq = [];
+    for(let i = 0; i < pageUniq.length; i++){
+        let all_dup = [];
+        for (let j = 0; j < cqfs_NodeArray.length; j++){
+            if( cqfs_NodeArray[j].getAttribute('id') === pageUniq[i] ){
+                all_dup.push(cqfs_NodeArray[j]);
+            }
+        }
+
+        for( let k = 1; k < all_dup.length; k++ ){
+            all_dup[k].remove();
+        }
+        console.log(all_dup);
+
+        uniq.push(all_dup[0]);
+    }
+
+    console.log(uniq);
+    return uniq;
+
+}
+
 
 /**
  * Input validation check
@@ -290,8 +325,11 @@ function formSubmitEvent(e, processingDiv, cqfs){
 
 /********************** end of utility functions ***********************/
 
-//multi page instances
-const cqfs_MultiPage = Array.from(document.querySelectorAll('.cqfs.multi'));
+/**
+ * Main node array for multi page layout
+ * 
+ * @param {node array} cqfs 
+ */
 
 let initialize_CqfsMulti = function( cqfs ){
     //code start for the cqfs instance
@@ -467,8 +505,6 @@ let initialize_CqfsMulti = function( cqfs ){
 /**
  * cqfs single page forms
  */
-//single page instances
-const cqfs_SinglePage = Array.from(document.querySelectorAll('.cqfs.single'));
 
 let initialize_CqfsSingle = function ( cqfs ){
 
@@ -493,40 +529,26 @@ let initialize_CqfsSingle = function ( cqfs ){
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    //multi page instances
+    const cqfs_MultiPage = Array.from(document.querySelectorAll('.cqfs.multi'));
+    const multiPageInstances = unique_build( cqfs_MultiPage );//retruns unique
+
     //initialize the cqfs multi page block
-    cqfs_MultiPage.forEach( cqfs => {
+    multiPageInstances.forEach( cqfs => {
         initialize_CqfsMulti( cqfs );
     });
 
-    //initialize the cqfs multi page block
-    
-    const singlePageUniq = cqfs_SinglePage.map( node => node.getAttribute('id'))
-    .filter( (val, idx, arr) => arr.indexOf(val) === idx );
 
-    let uniq = [];
-    for(let i = 0; i < singlePageUniq.length; i++){
-        let all_dup = [];
-        for (let j = 0; j < cqfs_SinglePage.length; j++){
-            if( cqfs_SinglePage[j].getAttribute('id') === singlePageUniq[i] ){
-                all_dup.push(cqfs_SinglePage[j]);
-            }
-        }
+    //single page instances
+    const cqfs_SinglePage = Array.from(document.querySelectorAll('.cqfs.single'));
+    const singlePageInstances = unique_build( cqfs_SinglePage );//retruns unique
 
-        for( let k = 1; k < all_dup.length; k++ ){
-            all_dup[k].remove();
-        }
-        console.log(all_dup);
-
-        uniq.push(all_dup[0])
-    }
-
-    console.log(uniq)
-
-    // console.log(cqfs_SinglePage);
-    uniq.forEach( cqfs => {
+    //initialize the cqfs single page block
+    singlePageInstances.forEach( cqfs => {
         initialize_CqfsSingle( cqfs );
     });
 
 })
+
 
 })();//end of main function wrapper

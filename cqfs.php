@@ -138,16 +138,16 @@ class CQFS {
 	public function init() {
 
 		// Check if ACF installed and activated
-		if ( ! class_exists('ACF') ) {
+		/* if ( ! class_exists('ACF') ) {
 			add_action( 'admin_notices', [ $this, 'admin_notice_missing_main_plugin' ] );
 			return;
-		}
+		} */
 
 		// Check for required ACF version
-		if ( ! version_compare( ACF_VERSION, self::MINIMUM_ACF_VERSION, '>=' ) ) {
+		/* if ( ! version_compare( ACF_VERSION, self::MINIMUM_ACF_VERSION, '>=' ) ) {
 			add_action( 'admin_notices', [ $this, 'admin_notice_MINIMUM_ACF_VERSION' ] );
 			return;
-		}
+		} */
 
 		// Check for required PHP version
 		if ( version_compare( PHP_VERSION, self::MINIMUM_PHP_VERSION, '<' ) ) {
