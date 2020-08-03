@@ -62,7 +62,7 @@ class Admin_Columns {
         {
             case 'answer_type':
                 
-                $answer_type = get_field('cqfs_answer_type'); // radio, checkbox
+                $answer_type = get_post_meta($post_ID, 'cqfs_answer_type', true); // radio, checkbox
                 echo esc_html( ucfirst($answer_type) );
     
             break;

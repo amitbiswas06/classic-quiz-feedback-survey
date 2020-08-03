@@ -4,6 +4,78 @@
  */
     "use strict";
 
+    /**
+     * global scope in cqfs
+     */
+    function text_value_numbers( value, checkType = '', ansLength = 1 ){
+        
+        //only allow digits
+        //must not start with 0
+        //only comma separated values without spaces
+        let exp = '';
+
+        if( checkType === 'radio' ){
+            exp = /^[1-9][0-9]*$/g;
+        }else if( checkType === 'checkbox' ){
+            exp = /^[1-9,][0-9,]*$/g;
+        }else{
+            exp = /^[1-9,][0-9,]*$/g;
+        }
+
+        let check = true;
+        let valueArr = value.split(",");
+        if( !value.match(exp) || valueArr.some( v => v > ansLength ) ){
+            check = false;
+        }
+
+        return check;
+    }
+
+    function create_err_div(){
+
+        let err_div = document.createElement('div');
+        err_div.classList.add('selection-error-label');
+        err_div.append( cqfs_admin_obj.err_msg );
+
+        return err_div;
+    }
+
+    //run only for cqfs_question
+
+    if( cqfs_admin_obj.post_type === 'cqfs_question'){
+        
+        const form = document.querySelector('form[name=post]');
+        const correctAnsField = document.querySelector('#cqfs-correct-answers');
+        const ansType = document.querySelector('#cqfs-answer-type');
+        const answers = document.querySelector('#cqfs-answers');
+        const answersArr = answers.value.split('\n');
+        
+        // console.log(errDiv)
+
+        form.addEventListener('submit', e => {
+            // e.preventDefault();
+
+            // console.log(correctAnsField.value.split(','));
+
+            const errDiv = document.querySelector('.selection-error-label');
+            const check = text_value_numbers( correctAnsField.value, ansType.value, answersArr.length );
+
+            if(errDiv){
+                correctAnsField.parentElement.removeChild(errDiv);
+                correctAnsField.parentElement.classList.remove('cqfs-selection-error');
+            }
+            
+            if( !correctAnsField.value || !check ){
+                e.preventDefault();
+                correctAnsField.parentElement.classList.add('cqfs-selection-error');
+                correctAnsField.parentElement.appendChild(create_err_div());
+            }
+
+        })
+
+    }
+
+
     //run only for cqfs_entry
 
     if( cqfs_admin_obj.post_type === 'cqfs_entry'){

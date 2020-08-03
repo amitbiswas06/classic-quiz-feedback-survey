@@ -30,9 +30,9 @@ class MetaBoxes {
 		add_action('admin_enqueue_scripts', [$this, 'cqfs_admin_scripts']);
 
 		//CPT - cqfs_question
-		add_action('add_meta_boxes', [ $this, 'cqfs_question_metaboxes' ]);
-		//save
-		add_action('save_post', [ $this, 'cqfs_question__group_save']);
+		// add_action('add_meta_boxes', [ $this, 'cqfs_question_metaboxes' ]);
+		// //save
+		// add_action('save_post', [ $this, 'cqfs_question__group_save']);
 
         //CPT - cqfs_build
         add_action('add_meta_boxes', [ $this, 'cqfs_build_metaboxes' ]);
@@ -54,7 +54,9 @@ class MetaBoxes {
 				'cqfs_question_group',
 				esc_html__('Question Data', 'cqfs'),
 				[ $this, 'cqfs_question__group_html' ],
-				$screen
+				$screen,
+				'normal',
+				'high'
 			);
 		}
 
@@ -62,34 +64,97 @@ class MetaBoxes {
 	
 	public function cqfs_question__group_html($post){
 
-		wp_nonce_field( self::QstNonce, '_cqfs_qst_nonce');
-
 		//meta fields
-		$cqfs_answers = get_post_meta($post->ID, 'cqfs_answers', true);
+
+		//given answers | textarea
+		$answers = get_post_meta($post->ID, 'cqfs_answers', true);
+		//answer type | select
+		$answer_type = get_post_meta($post->ID, 'cqfs_answer_type', true);
+		//correct answer | text
+		$correct_answer = get_post_meta($post->ID, 'cqfs_correct_answer', true);
+		//note | textarea
+		$note = get_post_meta($post->ID, 'cqfs_additional_note', true);
+
 		?>
-		<div class="cqfs-field">
-			<div class="cqfs-label">
-				<label for="cqfs-answers"><?php echo esc_html__('Questions','cqfs'); ?></label>
-				<p class="description"><?php echo esc_html__('Please use separate line for each answer. Each line will be considered as 1, 2, 3 ... and so on.','cqfs'); ?></p>
+		<div class="cqfs-hidden"><?php wp_nonce_field( self::QstNonce, '_cqfs_qst_nonce'); ?></div>
+		<div class="cqfs-fields">
+
+			<div class="cqfs-field">
+				<div class="cqfs-label">
+					<label for="cqfs-answers"><?php echo esc_html__('Answers','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('Please use separate line for each answer. Each line will be considered as 1, 2, 3 ... and so on.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<textarea name="cqfs[answers]" id="cqfs-answers" rows="6" required><?php 
+					echo esc_html($answers); ?></textarea>
+				</div>
 			</div>
-			<div class="cqfs-input">
-				<textarea name="cqfs[cqfs-answers]" id="cqfs-answers" rows="6" required><?php 
-				echo esc_html($cqfs_answers); ?></textarea>
+
+			<div class="cqfs-field half">
+				<div class="cqfs-label">
+					<label for="cqfs-answer-type"><?php echo esc_html__('Answer Type','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('If this question have more than one correct answer, select check boxes. Otherwise select radio button.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<select name="cqfs[answer-type]" id="cqfs-answer-type" required>
+						<?php
+						$options = array(
+							'radio'		=> esc_html__('Radio Button', 'cqfs'),
+							'checkbox'	=> esc_html__('Check Boxes', 'cqfs'),
+						);
+
+						foreach( $options as $key => $val ){
+							printf(
+								'<option value="%s" %s>%s</option>',
+								sanitize_key($key),
+								$key == $answer_type ? 'selected' : '',
+								$val
+							);
+						}
+						?>
+					</select>
+				</div>
 			</div>
+
+			<div class="cqfs-field half">
+				<div class="cqfs-label">
+					<label for="cqfs-correct-answers"><?php echo esc_html__('Correct Answer','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('Consider the answers (above) in each line as 1, 2, 3... and so on. Now, please separate with comma for multiple correct answers. eg; 2,3','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<input type="text" name="cqfs[correct-answer]" id="cqfs-correct-answers" value="<?php echo esc_attr($correct_answer); ?>" required>
+				</div>
+			</div>
+			
+			<div class="cqfs-field">
+				<div class="cqfs-label">
+					<label for="cqfs-note"><?php echo esc_html__('Additional Note','cqfs'); ?></label>
+					<p class="description"><?php echo esc_html__('This is hidden in questionnaire and showed in the result page for build type "quiz".','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<textarea name="cqfs[note]" id="cqfs-note" rows="6"><?php 
+					echo esc_html($note); ?></textarea>
+				</div>
+			</div>
+
 		</div>
+
 		<?php
 	}
 
 
 	public function cqfs_question__group_save($post_id){
-// var_dump($this->values);
+		
 		if (!isset($this->values['_cqfs_qst_nonce']) || !wp_verify_nonce($_POST['_cqfs_qst_nonce'], self::QstNonce )){
 			return $post_id;
 		}
 
-		if(!current_user_can('edit_cqfs_question', $post_id)){
-			return $post_id;
-		}
+		// Check the user's permissions.
+        if ( 'cqfs_question' == $this->values['post_type'] ) {
+            if ( ! current_user_can( 'edit_cqfs_question', $post_id ) ) {
+                return $post_id;
+            }
+        }
 		
 		if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE){
 			return $post_id;
@@ -97,13 +162,40 @@ class MetaBoxes {
 		
 		//if all ok above, update post
 
+		//save textarea for cqfs_answers
 		if (array_key_exists('cqfs', $this->values )) {
+
+			//save/update answers
             update_post_meta(
                 esc_attr($post_id),
                 sanitize_key('cqfs_answers'),
-                esc_textarea($this->values['cqfs']['cqfs-answers'])
+                esc_textarea($this->values['cqfs']['answers'])
             );
-        }
+
+			//save/update answer-type
+            update_post_meta(
+                esc_attr($post_id),
+                sanitize_key('cqfs_answer_type'),
+                sanitize_text_field($this->values['cqfs']['answer-type'])
+			);
+			
+			//save/update correct-answers
+			update_post_meta(
+                esc_attr($post_id),
+                sanitize_key('cqfs_correct_answer'),
+                sanitize_text_field( rtrim( $this->values['cqfs']['correct-answer'], ',') )
+			);
+			
+			//save/update note
+            update_post_meta(
+                esc_attr($post_id),
+                sanitize_key('cqfs_additional_note'),
+                esc_textarea($this->values['cqfs']['note'])
+			);
+			
+		}
+		
+
 
 	}
 
@@ -248,6 +340,7 @@ class MetaBoxes {
 						'post_type'		=> esc_html( $screen->post_type ),
 						'entry_type'	=> esc_html( $cqfs_entry_form_type ),//only for cqfs_entry
 						'action'		=> esc_html( $edit_page ),//only for cqfs_entry
+						'err_msg'		=> esc_html__('Required field. Field contains invalid entry.','cqfs'),
 					]
 				);
 			}
