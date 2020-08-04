@@ -30,12 +30,14 @@ class MetaBoxes {
 		add_action('admin_enqueue_scripts', [$this, 'cqfs_admin_scripts']);
 
 		//CPT - cqfs_question
-		// add_action('add_meta_boxes', [ $this, 'cqfs_question_metaboxes' ]);
-		// //save
-		// add_action('save_post', [ $this, 'cqfs_question__group_save']);
+		add_action('add_meta_boxes', [ $this, 'cqfs_question_metaboxes' ]);
+		//save
+		add_action('save_post', [ $this, 'cqfs_question__group_save']);
 
         //CPT - cqfs_build
-        add_action('add_meta_boxes', [ $this, 'cqfs_build_metaboxes' ]);
+		add_action('add_meta_boxes', [ $this, 'cqfs_build_metaboxes' ]);
+		//save
+		add_action('save_post', [ $this, 'cqfs_build__group_save']);
         
         //CPT - cqfs_entry
 		add_action('add_meta_boxes', [ $this, 'cqfs_entry_metaboxes' ]);
@@ -79,7 +81,7 @@ class MetaBoxes {
 		<div class="cqfs-hidden"><?php wp_nonce_field( self::QstNonce, '_cqfs_qst_nonce'); ?></div>
 		<div class="cqfs-fields">
 
-			<div class="cqfs-field">
+			<div class="cqfs-field cqfs-required">
 				<div class="cqfs-label">
 					<label for="cqfs-answers"><?php echo esc_html__('Answers','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
 					<p class="description"><?php echo esc_html__('Please use separate line for each answer. Each line will be considered as 1, 2, 3 ... and so on.','cqfs'); ?></p>
@@ -90,7 +92,7 @@ class MetaBoxes {
 				</div>
 			</div>
 
-			<div class="cqfs-field half">
+			<div class="cqfs-field half cqfs-required">
 				<div class="cqfs-label">
 					<label for="cqfs-answer-type"><?php echo esc_html__('Answer Type','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
 					<p class="description"><?php echo esc_html__('If this question have more than one correct answer, select check boxes. Otherwise select radio button.','cqfs'); ?></p>
@@ -99,6 +101,7 @@ class MetaBoxes {
 					<select name="cqfs[answer-type]" id="cqfs-answer-type" required>
 						<?php
 						$options = array(
+							''			=> esc_html__('Please Select...', 'cqfs'),
 							'radio'		=> esc_html__('Radio Button', 'cqfs'),
 							'checkbox'	=> esc_html__('Check Boxes', 'cqfs'),
 						);
@@ -116,10 +119,10 @@ class MetaBoxes {
 				</div>
 			</div>
 
-			<div class="cqfs-field half">
+			<div class="cqfs-field half cqfs-required">
 				<div class="cqfs-label">
 					<label for="cqfs-correct-answers"><?php echo esc_html__('Correct Answer','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
-					<p class="description"><?php echo esc_html__('Consider the answers (above) in each line as 1, 2, 3... and so on. Now, please separate with comma for multiple correct answers. eg; 2,3','cqfs'); ?></p>
+					<p class="description"><?php echo esc_html__('Consider the answers (above) in each line as 1, 2, 3... and so on. Please separate with comma for multiple correct answers. eg; 2,3 (no space)','cqfs'); ?></p>
 				</div>
 				<div class="cqfs-input">
 					<input type="text" name="cqfs[correct-answer]" id="cqfs-correct-answers" value="<?php echo esc_attr($correct_answer); ?>" required>
@@ -142,7 +145,6 @@ class MetaBoxes {
 		<?php
 	}
 
-
 	public function cqfs_question__group_save($post_id){
 		
 		if (!isset($this->values['_cqfs_qst_nonce']) || !wp_verify_nonce($_POST['_cqfs_qst_nonce'], self::QstNonce )){
@@ -162,7 +164,7 @@ class MetaBoxes {
 		
 		//if all ok above, update post
 
-		//save textarea for cqfs_answers
+		//save cqfs_answers
 		if (array_key_exists('cqfs', $this->values )) {
 
 			//save/update answers
@@ -193,8 +195,7 @@ class MetaBoxes {
                 esc_textarea($this->values['cqfs']['note'])
 			);
 			
-		}
-		
+		}	
 
 
 	}
@@ -207,24 +208,297 @@ class MetaBoxes {
 		$screens = ['cqfs_build'];
 		foreach ($screens as $screen) {
 
-			//read only field. displays shortcode
+			//main metabox
+			add_meta_box(
+				'cqfs_build_group',
+				esc_html__('Build Data', 'cqfs'),
+				[ $this, 'cqfs_build__group_html' ],
+				$screen,
+				'normal',
+				'high'
+			);
+
 			add_meta_box(
 				'cqfs_build_shortcode',
-				esc_html__('Build Type Shortcode', 'cqfs'),
-				[ $this, 'cqfs_build__shortcode_metabox' ],
-				$screen
+				esc_html__('Shortcode', 'cqfs'),
+				[ $this, 'cqfs_build__shortcode_html' ],
+				$screen,
+				'side'
 			);
+
 		}
 	}
 
-	public function cqfs_build__shortcode_metabox($post){
+	public function cqfs_build__shortcode_html($post){
+		?>
+		<div class="cqfs-field">
+			<div class="cqfs-label">
+				<label for="cqfs-build-shortcode"><?php echo esc_html__('Build Shortcode','cqfs'); ?></label>
+				<p class="description"><?php echo esc_html__('Click to copy the shortcode.','cqfs'); ?></p>
+			</div>
+			<div class="cqfs-input"><input 
+			type="text" 
+			id="cqfs-build-shortcode" 
+			value="<?php echo "&#91;cqfs id=". esc_attr($post->ID) ."&#93;"; ?>"
+			readonly></div>
+		</div>
+		<?php
+	}
 
-		printf(
-			'<div class="acf-field"><div class="acf-input-wrap">
-			<input type="text" readonly value="[cqfs id=%s]"></div></div>',
-			esc_attr( $post->ID )
-		);
-    }
+	public function cqfs_build__group_html($post){
+
+		//meta fields
+
+		//build type | select
+		$build_type = get_post_meta($post->ID, 'cqfs_build_type', true);
+
+		//build layout | select
+		$layout = get_post_meta($post->ID, 'cqfs_layout_type', true);
+
+		//build-question category | category select
+		$build_question_cat = get_post_meta($post->ID, 'cqfs_select_questions', true);
+
+		//build question order | select
+		$question_order = get_post_meta($post->ID, 'cqfs_question_order', true);
+
+		//build pass percentage | Number
+		$pass_percentage = get_post_meta($post->ID, 'cqfs_pass_percentage', true);
+
+		//build pass message | textarea
+		$pass_message = get_post_meta($post->ID, 'cqfs_pass_message', true);
+
+		//build fail message | textarea
+		$fail_message = get_post_meta($post->ID, 'cqfs_fail_message', true);
+
+		?>
+		<div class="cqfs-hidden"><?php wp_nonce_field( self::BuildNonce, '_cqfs_build_nonce'); ?></div>
+		<div class="cqfs-fields">
+
+			<div class="cqfs-field half cqfs-required">
+				<div class="cqfs-label">
+					<label for="cqfs-build-type"><?php echo esc_html__('Build Type','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('Select a build type.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<select name="cqfs[build-type]" id="cqfs-build-type" required>
+						<?php
+						$options = array(
+							''			=> esc_html__('Please Select...', 'cqfs'),
+							'quiz'		=> esc_html__('Quiz', 'cqfs'),
+							'feedback'	=> esc_html__('Feedback', 'cqfs'),
+							'survey'	=> esc_html__('Survey', 'cqfs'),
+						);
+
+						foreach( $options as $key => $val ){
+							printf(
+								'<option value="%s" %s>%s</option>',
+								sanitize_key($key),
+								$key == $build_type ? 'selected' : '',
+								$val
+							);
+						}
+						?>
+					</select>
+				</div>
+			</div>
+
+			<div class="cqfs-field half cqfs-required">
+				<div class="cqfs-label">
+					<label for="cqfs-build-layout"><?php echo esc_html__('Layout Type','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('Select a layout type.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<select name="cqfs[build-layout]" id="cqfs-build-layout" required>
+						<?php
+						$options = array(
+							''		=> esc_html__('Please Select...', 'cqfs'),
+							'multi'	=> esc_html__('Multi Page Questions', 'cqfs'),
+							'single'=> esc_html__('Single Page Questions', 'cqfs'),
+						);
+
+						foreach( $options as $key => $val ){
+							printf(
+								'<option value="%s" %s>%s</option>',
+								sanitize_key($key),
+								$key == $layout ? 'selected' : '',
+								$val
+							);
+						}
+						?>
+					</select>
+				</div>
+			</div>
+
+			<div class="cqfs-field half cqfs-required">
+				<div class="cqfs-label">
+					<label for="cqfs-build-question-category"><?php echo esc_html__('Select Questions by Category','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('Select a Category.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<select name="cqfs[build-question-category]" id="cqfs-build-question-category" required>
+						<option value=""><?php echo esc_html__('Please Select...', 'cqfs'); ?></option>
+						<?php
+						$categories = get_categories();
+						foreach( $categories as $cat ){
+							printf(
+								'<option value="%s" %s>%s</option>',
+								sanitize_key($cat->term_id),
+								$cat->term_id == $build_question_cat ? 'selected' : '',
+								esc_html($cat->name)
+							);
+						}
+						?>
+					</select>
+				</div>
+			</div>
+
+			<div class="cqfs-field half cqfs-required">
+				<div class="cqfs-label">
+					<label for="cqfs-build-qst-order"><?php echo esc_html__('Question Order','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('Select the order of the questions.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<select name="cqfs[build-qst-order]" id="cqfs-build-qst-order" required>
+						<?php
+						$options = array(
+							''		=> esc_html__('Please Select...', 'cqfs'),
+							'asc'	=> esc_html__('Ascending', 'cqfs'),
+							'desc'	=> esc_html__('Descending', 'cqfs'),
+						);
+
+						foreach( $options as $key => $val ){
+							printf(
+								'<option value="%s" %s>%s</option>',
+								sanitize_key($key),
+								$key == $question_order ? 'selected' : '',
+								$val
+							);
+						}
+						?>
+					</select>
+				</div>
+			</div>
+
+			<div class="cqfs-field cqfs-conditional-required hidden-by-conditional-logic">
+				<div class="cqfs-label">
+					<label for="cqfs-build-pass-percentage"><?php echo esc_html__('Pass Percentage','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('Set a percentage for pass mark.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<div class="cqfs-input-append"><?php esc_html_e('&#37;','cqfs'); ?></div>
+					<div class="cqfs-input-wrap">
+						<input type="number" 
+						name="cqfs[build-pass-percentage]" 
+						class="cqfs-is-appended"
+						value="<?php echo esc_attr($pass_percentage); ?>"
+						id="cqfs-build-pass-percentage">
+					</div>
+				</div>
+			</div>
+
+			<div class="cqfs-field hidden-by-conditional-logic">
+				<div class="cqfs-label">
+					<label for="cqfs-build-pass-msg"><?php echo esc_html__('Pass Message (optional)','cqfs'); ?></label>
+					<p class="description"><?php echo esc_html__('Leave empty for default.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<textarea name="cqfs[build-pass-msg]" id="cqfs-build-pass-msg" rows="4" maxlength="500"><?php 
+					echo esc_html($pass_message); ?></textarea>
+				</div>
+			</div>
+
+			<div class="cqfs-field hidden-by-conditional-logic">
+				<div class="cqfs-label">
+					<label for="cqfs-build-fail-msg"><?php echo esc_html__('Fail Message (optional)','cqfs'); ?></label>
+					<p class="description"><?php echo esc_html__('Leave empty for default.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<textarea name="cqfs[build-fail-msg]" id="cqfs-build-fail-msg" rows="4" maxlength="500"><?php 
+					echo esc_html($fail_message); ?></textarea>
+				</div>
+			</div>
+
+		</div>
+
+		<?php
+	}
+
+
+	public function cqfs_build__group_save($post_id){
+
+		if (!isset($this->values['_cqfs_build_nonce']) || !wp_verify_nonce($_POST['_cqfs_build_nonce'], self::BuildNonce )){
+			return $post_id;
+		}
+
+		// Check the user's permissions.
+        if ( 'cqfs_build' == $this->values['post_type'] ) {
+            if ( ! current_user_can( 'edit_cqfs_build', $post_id ) ) {
+                return $post_id;
+            }
+        }
+		
+		if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE){
+			return $post_id;
+		}	
+		
+		//if all ok above, update post
+
+		//save cqfs_build
+		if (array_key_exists('cqfs', $this->values )) {
+
+			//save/update build type
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_build_type'),
+				sanitize_text_field($this->values['cqfs']['build-type'])
+			);
+
+			//save/update layout type
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_layout_type'),
+				sanitize_text_field($this->values['cqfs']['build-layout'])
+			);
+
+			//save/update build question category
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_select_questions'),
+				sanitize_text_field($this->values['cqfs']['build-question-category'])
+			);
+
+			//save/update build question order
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_question_order'),
+				sanitize_text_field($this->values['cqfs']['build-qst-order'])
+			);
+
+			//save/update build pass percentage
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_pass_percentage'),
+				sanitize_text_field($this->values['cqfs']['build-pass-percentage'])
+			);
+
+			//save/update build pass message
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_pass_message'),
+				sanitize_text_field($this->values['cqfs']['build-pass-msg'])
+			);
+
+			//save/update build fail message
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_fail_message'),
+				sanitize_text_field($this->values['cqfs']['build-fail-msg'])
+			);
+
+		}
+
+
+	}
     
     /*********** end cqfs_build ***********/
 
@@ -338,9 +612,11 @@ class MetaBoxes {
 					[
 						'url' 			=> admin_url('admin-ajax.php'),
 						'post_type'		=> esc_html( $screen->post_type ),
+						'base'			=> esc_html( $screen->base ),
 						'entry_type'	=> esc_html( $cqfs_entry_form_type ),//only for cqfs_entry
 						'action'		=> esc_html( $edit_page ),//only for cqfs_entry
-						'err_msg'		=> esc_html__('Required field. Field contains invalid entry.','cqfs'),
+						'err_msg'		=> esc_html__('Required field contains invalid entry.','cqfs'),
+						'require_msg'	=> esc_html__('Required field value cannot be null.','cqfs'),
 					]
 				);
 			}

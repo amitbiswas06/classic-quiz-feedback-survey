@@ -113,7 +113,7 @@ class Admin_Columns {
         {
             case 'build_type':
                 
-                $build_type = get_field('cqfs_build_type'); // quiz, feedback, survey
+                $build_type = get_post_meta($post_ID, 'cqfs_build_type', true); // quiz, feedback, survey
                 $link = esc_url( add_query_arg( 'cqfs_build_type', urlencode(sanitize_text_field( $build_type ) ) ) );
                 printf(
                     '<a href="%s">%s</a>',
@@ -125,7 +125,7 @@ class Admin_Columns {
     
             case 'build_category':
                 
-                $build_category = get_field('cqfs_select_questions');//taxonomy
+                $build_category = get_post_meta($post_ID, 'cqfs_select_questions', true);//taxonomy
                 echo wp_kses( get_the_category_by_ID( $build_category ), 'post' );
     
             break;

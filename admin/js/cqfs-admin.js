@@ -31,20 +31,45 @@
         return check;
     }
 
-    function create_err_div(){
+    /**
+     * Numbers only from 1-100
+     */
+    function numberRange(valueToCheck){
+
+        //only allow digits
+        //must not start with 0
+        //entry between 1-100
+        const exp = /^[1-9][0-9]*$/g;
+
+        let check = true;
+        if( !valueToCheck.match(exp) || valueToCheck > 100 ){
+            check = false;
+        }
+
+        return check;
+
+    }
+
+    function create_err_div(errMsg = ''){
 
         let err_div = document.createElement('div');
         err_div.classList.add('selection-error-label');
-        err_div.append( cqfs_admin_obj.err_msg );
+        err_div.append( errMsg );
 
         return err_div;
     }
 
-    //run only for cqfs_question
 
-    if( cqfs_admin_obj.post_type === 'cqfs_question'){
+    /**
+     * run only for cqfs_question
+     * Limited to addnew and edit page
+     * base `post` from $screen in meta-boxes.php
+     */
+
+    if( cqfs_admin_obj.post_type === 'cqfs_question' && cqfs_admin_obj.base === 'post' ){
         
         const form = document.querySelector('form[name=post]');
+        const cqfsRequired = Array.from(document.querySelectorAll('.cqfs-required input, .cqfs-required select, .cqfs-required textarea'));//required fields
         const correctAnsField = document.querySelector('#cqfs-correct-answers');
         const ansType = document.querySelector('#cqfs-answer-type');
         const answers = document.querySelector('#cqfs-answers');
@@ -57,26 +82,127 @@
 
             // console.log(correctAnsField.value.split(','));
 
-            const errDiv = document.querySelector('.selection-error-label');
+            const errDiv = document.querySelectorAll('.selection-error-label');
+            const errClassDiv = document.querySelectorAll('.cqfs-selection-error');
             const check = text_value_numbers( correctAnsField.value, ansType.value, answersArr.length );
 
-            if(errDiv){
-                correctAnsField.parentElement.removeChild(errDiv);
-                correctAnsField.parentElement.classList.remove('cqfs-selection-error');
-            }
-            
-            if( !correctAnsField.value || !check ){
-                e.preventDefault();
-                correctAnsField.parentElement.classList.add('cqfs-selection-error');
-                correctAnsField.parentElement.appendChild(create_err_div());
+            if(errDiv.length){
+                for( let i = 0; i < errDiv.length; i++ ){
+                    errDiv[i].remove();
+                }
             }
 
-        })
+            if(errClassDiv.length){
+                for( let i = 0; i < errClassDiv.length; i++ ){
+                    errClassDiv[i].classList.remove('cqfs-selection-error');
+                }
+            }
+
+            //validate the required fields that are not conditionally hidden
+            cqfsRequired.map( el => {
+                if( !el.value ){
+                    e.preventDefault();
+                    el.parentElement.classList.add('cqfs-selection-error');
+                    el.parentElement.appendChild(create_err_div(cqfs_admin_obj.require_msg));
+                }
+            });
+            
+            //validate correct ans field
+            if( !check ){
+                e.preventDefault();
+                correctAnsField.parentElement.classList.add('cqfs-selection-error');
+                correctAnsField.parentElement.appendChild(create_err_div(cqfs_admin_obj.err_msg));
+            }
+
+        });
 
     }
 
 
-    //run only for cqfs_entry
+    /**
+     * run only for cqfs_build
+     * Limited to addnew and edit page
+     * base `post` from $screen in meta-boxes.php
+     */
+    if( cqfs_admin_obj.post_type === 'cqfs_build' && cqfs_admin_obj.base === 'post' ){
+
+        // alert('Hello')
+        const form = document.querySelector('form[name=post]');//main form
+        const buildType = document.querySelector('#cqfs-build-type');//build type
+        const cqfsRequired = Array.from(document.querySelectorAll('.cqfs-required input, .cqfs-required select, .cqfs-required textarea'));//required fields
+        const percentage = document.querySelector('#cqfs-build-pass-percentage');
+        const hiddenConditional = Array.from(document.querySelectorAll('.hidden-by-conditional-logic'));
+        const shortcode = document.querySelector('#cqfs-build-shortcode');
+
+        //check buildType and show/hide inputs
+        if( buildType.value == "quiz" ){
+            // alert('quiz')
+            hiddenConditional.map( el => el.classList.remove('hidden-by-conditional-logic') );
+        }else{
+            hiddenConditional.map( el => el.classList.add('hidden-by-conditional-logic') );
+        }
+
+        buildType.addEventListener('change', (e) => {
+            //check buildType and show/hide inputs
+            if( e.target.value == "quiz" ){
+                // alert('quiz')
+                hiddenConditional.map( el => el.classList.remove('hidden-by-conditional-logic') );
+            }else{
+                hiddenConditional.map( el => el.classList.add('hidden-by-conditional-logic') );
+            }
+        });
+
+        shortcode.addEventListener('click', (e) => e.target.select());
+
+        form.addEventListener('submit', e => {
+            // e.preventDefault();
+            // alert('Hey')
+
+            const errDiv = document.querySelectorAll('.selection-error-label');
+            const errClassDiv = document.querySelectorAll('.cqfs-selection-error');
+            const check = numberRange(percentage.value);
+
+            //if error div found, remove it
+            if(errDiv.length){
+                for( let i = 0; i < errDiv.length; i++ ){
+                    errDiv[i].remove();
+                }
+            }
+
+            //if error class div found, remove the class
+            if(errClassDiv.length){
+                for( let i = 0; i < errClassDiv.length; i++ ){
+                    errClassDiv[i].classList.remove('cqfs-selection-error');
+                }
+            }
+
+            //validate percentage field. required but conditionally hidden.
+            if( buildType.value == "quiz" ){
+                if( !percentage.value || !check ){
+                    e.preventDefault();
+                    percentage.parentElement.classList.add('cqfs-selection-error');
+                    percentage.parentElement.appendChild(create_err_div(cqfs_admin_obj.err_msg));
+                }
+            }
+
+            //validate the required fields that are not conditionally hidden
+            cqfsRequired.map( el => {
+                if( !el.value ){
+                    e.preventDefault();
+                    el.parentElement.classList.add('cqfs-selection-error');
+                    el.parentElement.appendChild(create_err_div(cqfs_admin_obj.require_msg));
+                }
+            });
+
+
+        });
+
+    }
+
+
+    /**
+     * run only for cqfs_entry
+     */
 
     if( cqfs_admin_obj.post_type === 'cqfs_entry'){
         // alert('I am here!');

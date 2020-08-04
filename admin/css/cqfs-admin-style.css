@@ -1,6 +1,7 @@
 /* hello */
 .cqfs-fields{
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
     margin-left: -12px !important;
     margin-right: -12px !important;
 }
@@ -20,18 +21,18 @@
     position: relative;
     margin: 0;
     padding: 15px 12px;
-    border-top: #EEEEEE solid 1px;
+    border-top: #eeeeee solid 1px;
 }
 
 .cqfs-field {
+    width: 100%;
+    flex-grow: 1;
     margin: 15px 0;
     clear: both
 }
 
 .cqfs-field.half{
-    float: left;
     width: 50%;
-    clear: none
 }
 
 .cqfs-field p.description {
@@ -136,6 +137,19 @@ body.cqfs-browser-firefox .cqfs-field select {
     overflow: hidden
 }
 
+input.cqfs-is-prepended {
+    border-radius: 0 3px 3px 0 !important
+}
+
+input.cqfs-is-appended {
+    border-radius: 3px 0 0 3px !important
+}
+
+input.cqfs-is-prepended.acf-is-appended {
+    border-radius: 0 !important
+}
+
+
 html[dir="rtl"] .cqfs-input-append {
     border-left-width: 1px;
     border-right-width: 0;
@@ -161,167 +175,6 @@ html[dir="rtl"] input.cqfs-is-prepended.cqfs-is-appended {
 
 #wp-link-wrap {
     z-index: 900001 !important
-}
-
-ul.cqfs-radio-list,
-ul.cqfs-checkbox-list 
-{
-    background: transparent;
-    position: relative;
-    padding: 1px;
-    margin: 0
-}
-
-ul.cqfs-radio-list li,
-ul.cqfs-checkbox-list li 
-{
-    font-size: 13px;
-    line-height: 22px;
-    margin: 0;
-    position: relative;
-    word-wrap: break-word
-}
-
-ul.cqfs-radio-list li label,
-ul.cqfs-checkbox-list li label 
-{
-    display: inline
-}
-
-ul.cqfs-radio-list li input[type="checkbox"],
-ul.cqfs-radio-list li input[type="radio"],
-ul.cqfs-checkbox-list li input[type="checkbox"],
-ul.cqfs-checkbox-list li input[type="radio"] 
-{
-    margin: -1px 4px 0 0;
-    vertical-align: middle
-}
-
-ul.cqfs-radio-list li input[type="text"],
-ul.cqfs-checkbox-list li input[type="text"] 
-{
-    width: auto;
-    vertical-align: middle;
-    margin: 2px 0
-}
-
-ul.cqfs-radio-list li span,
-ul.cqfs-checkbox-list li span 
-{
-    float: none
-}
-
-ul.cqfs-radio-list li i,
-ul.cqfs-checkbox-list li i 
-{
-    vertical-align: middle
-}
-
-ul.cqfs-radio-list.cqfs-hl li,
-ul.cqfs-checkbox-list.cqfs-hl li 
-{
-    margin-right: 20px;
-    clear: none
-}
-
-html[dir="rtl"] ul.cqfs-radio-list input[type="checkbox"],
-html[dir="rtl"] ul.cqfs-radio-list input[type="radio"],
-html[dir="rtl"] ul.cqfs-checkbox-list input[type="checkbox"],
-html[dir="rtl"] ul.cqfs-checkbox-list input[type="radio"] 
-{
-    margin-left: 4px;
-    margin-right: 0
-}
-
-.cqfs-button-group {
-    display: inline-block
-}
-
-.cqfs-button-group label {
-    display: inline-block;
-    border: #7e8993 solid 1px;
-    position: relative;
-    z-index: 1;
-    padding: 5px 10px;
-    background: #fff
-}
-
-.cqfs-button-group label:hover {
-    color: #016087;
-    background: #f3f5f6;
-    border-color: #0071a1;
-    z-index: 2
-}
-
-.cqfs-button-group label.selected {
-    border-color: #007cba;
-    background: #008dd4;
-    color: #fff;
-    z-index: 2
-}
-
-.cqfs-button-group input {
-    display: none !important
-}
-
-.cqfs-button-group {
-    padding-left: 1px;
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: nowrap
-}
-
-.cqfs-button-group label {
-    margin: 0 0 0 -1px;
-    flex: 1;
-    text-align: center;
-    white-space: nowrap
-}
-
-.cqfs-button-group label:first-child {
-    border-radius: 3px 0 0 3px
-}
-
-html[dir="rtl"] .cqfs-button-group label:first-child {
-    border-radius: 0 3px 3px 0
-}
-
-.cqfs-button-group label:last-child {
-    border-radius: 0 3px 3px 0
-}
-
-html[dir="rtl"] .cqfs-button-group label:last-child {
-    border-radius: 3px 0 0 3px
-}
-
-.cqfs-button-group label:only-child {
-    border-radius: 3px
-}
-
-.cqfs-button-group.-vertical {
-    padding-left: 0;
-    padding-top: 1px;
-    flex-direction: column
-}
-
-.cqfs-button-group.-vertical label {
-    margin: -1px 0 0 0
-}
-
-.cqfs-button-group.-vertical label:first-child {
-    border-radius: 3px 3px 0 0
-}
-
-.cqfs-button-group.-vertical label:last-child {
-    border-radius: 0 0 3px 3px
-}
-
-.cqfs-button-group.-vertical label:only-child {
-    border-radius: 3px
-}
-
-.cqfs-checkbox-list .button {
-    margin: 10px 0 0
 }
 
 .cqfs-selection-error {
@@ -352,31 +205,31 @@ html[dir="rtl"] .cqfs-button-group label:last-child {
     display: none !important
 }
 
-.hidden-by-conditional-logic.appear-empty {
-    display: table-cell !important
+/* cpt - cqfs_* */
+.cqfs-field input:read-only {
+    padding: 5px 15px;
+    background: #ffffff;
+    font-size: 1.4em;
+    line-height: 2;
 }
 
-.hidden-by-conditional-logic.appear-empty .cqfs-input {
-    display: none !important
-}
-
-.cqfs-postbox.cqfs-hidden {
-    display: none !important
-}
-
-
-/* cpt - cqfs_questions */
 #cqfs_question_group.postbox > .handlediv,
-#cqfs_question_group.postbox > .hndle
+#cqfs_question_group.postbox > .hndle,
+#cqfs_build_group.postbox > .handlediv,
+#cqfs_build_group.postbox > .hndle
 {
     display: none
 }
 
-#cqfs_question_group.postbox {
+#cqfs_question_group.postbox,
+#cqfs_build_group.postbox
+{
     background: transparent;
     border: none
 }
 
-#cqfs_question_group.postbox .inside{
+#cqfs_question_group.postbox .inside,
+#cqfs_build_group.postbox .inside
+{
     padding: 0;
 }
