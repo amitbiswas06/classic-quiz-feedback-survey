@@ -41,13 +41,13 @@ class Utilities{
         //the main build array
         $the_cqfs_build = [];
 
-        $type = get_field('cqfs_build_type', $cqfs_build_id);//select
-        $category = get_field('cqfs_select_questions', $cqfs_build_id);//taxonomy, returns ID
-        $question_order = get_field('cqfs_question_order', $cqfs_build_id);//ASC, DSC
-        $layout = get_field('cqfs_layout_type', $cqfs_build_id);//select, multi/single
-        $pass_percent = get_field('cqfs_pass_percentage', $cqfs_build_id);//pass percentage
-        $pass_msg = get_field('cqfs_pass_message', $cqfs_build_id);//pass message
-        $fail_msg = get_field('cqfs_fail_message', $cqfs_build_id);//fail message
+        $type = get_post_meta($cqfs_build_id, 'cqfs_build_type', true);//select
+        $category = get_post_meta($cqfs_build_id, 'cqfs_select_questions', true);//taxonomy, returns ID
+        $question_order = get_post_meta($cqfs_build_id, 'cqfs_question_order', true);//ASC, DSC
+        $layout = get_post_meta($cqfs_build_id, 'cqfs_layout_type', true);//select, multi/single
+        $pass_percent = get_post_meta($cqfs_build_id, 'cqfs_pass_percentage', true);//pass percentage
+        $pass_msg = get_post_meta($cqfs_build_id, 'cqfs_pass_message', true);//pass message
+        $fail_msg = get_post_meta($cqfs_build_id, 'cqfs_fail_message', true);//fail message
 
         $class = $type;
         $class .= ' ' . $layout;
@@ -80,15 +80,15 @@ class Utilities{
             foreach($questions as $post) :
                 setup_postdata( $post );
 
-                $options = get_field('cqfs_answers', $post->ID);//textarea, create each line.
+                $options = get_post_meta($post->ID, 'cqfs_answers', true);//textarea, create each line.
                 $options_arr = explode("\n", $options); //converted to array
 
-                $option_type = get_field('cqfs_answer_type', $post->ID);//select. radio, checkbox.
+                $option_type = get_post_meta($post->ID, 'cqfs_answer_type', true);//select. radio, checkbox.
                 
-                $correct_ans = get_field('cqfs_correct_answer', $post->ID);//comma separated number.
+                $correct_ans = get_post_meta($post->ID, 'cqfs_correct_answer', true);//comma separated number.
                 $correct_ans_arr = explode(",", str_replace(' ', '', $correct_ans));//converted to array
 
-                $note = get_field('cqfs_additional_note', $post->ID);//textarea. show only for quiz.
+                $note = get_post_meta($post->ID, 'cqfs_additional_note', true);//textarea. show only for quiz.
 
                 //prepare the question array
                 $the_cqfs_build['all_questions'][] = array(
@@ -126,27 +126,27 @@ class Utilities{
         //the main entry array
         $the_cqfs_entry = [];
 
-        $email = get_field('cqfs_entry_user_email', $cqfs_entry_id );//email
-        $form_id = get_field('cqfs_entry_form_id', $cqfs_entry_id );//text
-        $form_type = get_field('cqfs_entry_form_type', $cqfs_entry_id );//text
-        $result = get_field('cqfs_entry_result', $cqfs_entry_id );//checkbox
-        $percentage = get_field('cqfs_entry_percentage', $cqfs_entry_id );//text
-        $remarks = get_field('cqfs_entry_remarks', $cqfs_entry_id);//text message for pass fail
+        $email = get_post_meta($cqfs_entry_id, 'cqfs_entry_user_email', true );//email
+        $form_id = get_post_meta($cqfs_entry_id, 'cqfs_entry_form_id', true );//text
+        $form_type = get_post_meta($cqfs_entry_id, 'cqfs_entry_form_type', true );//text
+        $result = get_post_meta($cqfs_entry_id, 'cqfs_entry_result', true );//checkbox
+        $percentage = get_post_meta($cqfs_entry_id, 'cqfs_entry_percentage', true );//text
+        $remarks = get_post_meta($cqfs_entry_id, 'cqfs_entry_remarks', true);//text message for pass fail
 
         //handle arrays
-        $questions = get_field('cqfs_entry_questions', $cqfs_entry_id );//textarea with line break
+        $questions = get_post_meta($cqfs_entry_id, 'cqfs_entry_questions', true );//textarea with line break
             //convert to array
             $questions = preg_split('/\r\n|\r|\n/', $questions);
 
-        $answers = get_field('cqfs_entry_answers', $cqfs_entry_id );//textarea with line break
+        $answers = get_post_meta($cqfs_entry_id, 'cqfs_entry_answers', true );//textarea with line break
             //convert to array
             $answers = preg_split('/\r\n|\r|\n/', $answers);
             
-        $status = get_field('cqfs_entry_status', $cqfs_entry_id );//textarea with line break
+        $status = get_post_meta($cqfs_entry_id, 'cqfs_entry_status', true );//textarea with line break
             //convert to array
             $status = preg_split('/\r\n|\r|\n/', $status);
 
-        $notes = get_field('cqfs_entry_notes', $cqfs_entry_id );//textarea with line break
+        $notes = get_post_meta($cqfs_entry_id, 'cqfs_entry_notes', true );//textarea with line break
             //convert to array
             $notes = preg_split('/\r\n|\r|\n/', $notes);
         

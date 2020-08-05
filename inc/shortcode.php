@@ -197,7 +197,7 @@ class CqfsShortcode {
             $entry_id = esc_attr($param['_cqfs_entry_id']);
             $entry_email = esc_attr($param['_cqfs_email']);
             
-            echo "<div id='cqfs-results-{$entry_id}' class='cqfs-results'>";
+            echo "<div id='cqfs-{$entry_id}' class='cqfs results {$cqfs_build['classname']}'>";
             /**
              * Result display
              */
@@ -262,7 +262,9 @@ class CqfsShortcode {
              */
             $cqfs_thank_msg = apply_filters('cqfs_thankyou_message', esc_html__('Thank you for participating.', 'cqfs'));
             printf(
-                '<div class="cqfs-results"><h4>%s</h4></div>',
+                '<div id="cqfs-%s" class="cqfs thankyou %s"><h4>%s</h4></div>',
+                esc_attr($param['_cqfs_id']),
+                esc_attr($cqfs_build['classname']),
                 esc_html( $cqfs_thank_msg )
             );
         } ?>

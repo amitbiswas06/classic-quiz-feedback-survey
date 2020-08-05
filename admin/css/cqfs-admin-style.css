@@ -145,7 +145,7 @@ input.cqfs-is-appended {
     border-radius: 3px 0 0 3px !important
 }
 
-input.cqfs-is-prepended.acf-is-appended {
+input.cqfs-is-prepended.cqfs-is-appended {
     border-radius: 0 !important
 }
 
@@ -216,20 +216,24 @@ html[dir="rtl"] input.cqfs-is-prepended.cqfs-is-appended {
 #cqfs_question_group.postbox > .handlediv,
 #cqfs_question_group.postbox > .hndle,
 #cqfs_build_group.postbox > .handlediv,
-#cqfs_build_group.postbox > .hndle
+#cqfs_build_group.postbox > .hndle,
+#cqfs_entry_group.postbox > .handlediv,
+#cqfs_entry_group.postbox > .hndle
 {
     display: none
 }
 
 #cqfs_question_group.postbox,
-#cqfs_build_group.postbox
+#cqfs_build_group.postbox,
+#cqfs_entry_group.postbox
 {
     background: transparent;
     border: none
 }
 
 #cqfs_question_group.postbox .inside,
-#cqfs_build_group.postbox .inside
+#cqfs_build_group.postbox .inside,
+#cqfs_entry_group.postbox .inside
 {
     padding: 0;
 }

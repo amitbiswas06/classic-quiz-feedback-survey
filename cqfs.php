@@ -43,7 +43,7 @@ class CQFS {
 	 *
 	 * @var string Minimum ACF version required to run the plugin.
 	 */
-	const MINIMUM_ACF_VERSION = '5.8.12';
+	// const MINIMUM_ACF_VERSION = '5.8.12';
 
 	/**
 	 * Minimum PHP Version
@@ -157,10 +157,10 @@ class CQFS {
 
 		//ACF save point
 		//must be removed in distribution
-		add_filter('acf/settings/save_json', [ $this, 'acf_save_point' ] );
+		// add_filter('acf/settings/save_json', [ $this, 'acf_save_point' ] );
 
 		//ACF load point
-		add_filter('acf/settings/load_json', [ $this, 'acf_load_point' ] );
+		// add_filter('acf/settings/load_json', [ $this, 'acf_load_point' ] );
 
 		//admin columns
 		require __DIR__ . '/inc/admin-columns.php';
@@ -192,14 +192,14 @@ class CQFS {
 	 *
 	 * @access public
 	 */
-	public function admin_notice_missing_main_plugin() {
+	/* public function admin_notice_missing_main_plugin() {
 
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
 		}
 
 		$message = sprintf(
-			/* translators: 1: Plugin name 2: ACF */
+			// translators: 1: Plugin name 2: ACF /
 			esc_html__( '"%1$s" requires "%2$s" to be installed and activated.', 'cqfs' ),
 			'<strong>' . esc_html__( 'Classic Quiz Feedback Survey', 'cqfs' ) . '</strong>',
 			'<strong>' . esc_html__( 'Advanced Custom Fields', 'cqfs' ) . '</strong>'
@@ -207,7 +207,7 @@ class CQFS {
 
 		printf( '<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message );
 
-	}
+	} */
 
 	/**
 	 * Admin notice
@@ -218,14 +218,14 @@ class CQFS {
 	 *
 	 * @access public
 	 */
-	public function admin_notice_MINIMUM_ACF_VERSION() {
+	/* public function admin_notice_MINIMUM_ACF_VERSION() {
 
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
 		}
 
 		$message = sprintf(
-			/* translators: 1: Plugin name 2: ACF 3: Required ACF version */
+			// translators: 1: Plugin name 2: ACF 3: Required ACF version /
 			esc_html__( '"%1$s" requires "%2$s" version %3$s or greater.', 'cqfs' ),
 			'<strong>' . esc_html__( 'Classic Quiz Feedback Survey', 'cqfs' ) . '</strong>',
 			'<strong>' . esc_html__( 'Advanced Custom Fields', 'cqfs' ) . '</strong>',
@@ -234,7 +234,7 @@ class CQFS {
 
 		printf( '<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message );
 
-	}
+	} */
 
 	/**
 	 * Admin notice
@@ -263,7 +263,7 @@ class CQFS {
 
 	}
 
-	public function acf_save_point( $path ) {
+	/* public function acf_save_point( $path ) {
     
 		// update path
 		$path = plugin_dir_path( __FILE__ ) . 'assets/acf-fields';
@@ -271,9 +271,9 @@ class CQFS {
 		// return
 		return $path;
 		
-	}
+	} */
 
-	public function acf_load_point( $paths ) {
+	/* public function acf_load_point( $paths ) {
     
 		// remove original path (optional)
 		unset($paths[0]);
@@ -284,7 +284,7 @@ class CQFS {
 		// return
 		return $paths;
 		
-	}
+	} */
 
 	public function cqfs_enqueue_scripts(){
 		

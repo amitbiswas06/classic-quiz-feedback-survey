@@ -184,7 +184,7 @@ class Admin_Columns {
         {
             case 'form_id':
                 
-                $form_id = get_field('cqfs_entry_form_id'); // form built with cqfs_build
+                $form_id = get_post_meta($post_ID, 'cqfs_entry_form_id', true); // form built with cqfs_build
                 $link = esc_url( add_query_arg( 'cqfs_entry_form_id', urlencode(sanitize_text_field( $form_id ) ) ) );
                 printf(
                     '<a href="%s">%s</a>',
@@ -196,7 +196,7 @@ class Admin_Columns {
     
             case 'form_type':
                 
-                $form_type = get_field('cqfs_entry_form_type');//select
+                $form_type = get_post_meta($post_ID, 'cqfs_entry_form_type', true);//select
                 $link = esc_url( add_query_arg( 'cqfs_entry_form_type', urlencode(sanitize_text_field( $form_type ) ) ) );
                 printf(
                     '<a href="%s">%s</a>',
@@ -208,7 +208,7 @@ class Admin_Columns {
     
             case 'result':
                 
-                $result = get_field('cqfs_entry_result');//radio
+                $result = get_post_meta($post_ID, 'cqfs_entry_result', true);//radio
 
                 $link = esc_url( add_query_arg( 'cqfs_entry_result', urlencode(sanitize_text_field( $result ) ) ) );
                 printf(
@@ -221,7 +221,7 @@ class Admin_Columns {
 
             case 'email':
                 
-                $email = get_field('cqfs_entry_user_email');//email
+                $email = get_post_meta($post_ID, 'cqfs_entry_user_email', true);//email
                 $link = esc_url( add_query_arg( 'cqfs_entry_user_email', urlencode(sanitize_email( $email ) ) ) );
                 printf(
                     '<a href="%s">%s</a>',

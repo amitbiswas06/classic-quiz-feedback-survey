@@ -226,7 +226,7 @@ class Cqfs_Cpts{
             if(isset($form_id) && !empty($form_id)){
                 $meta_query[] = array(
                     array(
-                        'key' 		=> 'cqfs_entry_form_id', // acf field
+                        'key' 		=> 'cqfs_entry_form_id', // cqfs field
                         'value'		=> $form_id,
                         'compare'	=> '=',
                         
@@ -237,7 +237,7 @@ class Cqfs_Cpts{
             if(isset($form_type) && !empty($form_type)){
                 $meta_query[] = array(
                     array(
-                        'key' 		=> 'cqfs_entry_form_type', // acf field
+                        'key' 		=> 'cqfs_entry_form_type', // cqfs field
                         'value'		=> $form_type,
                         'compare'	=> '=',
                         
@@ -248,7 +248,7 @@ class Cqfs_Cpts{
             if(isset($result) && !empty($result)){
                 $meta_query[] = array(
                     array(
-                        'key' 		=> 'cqfs_entry_result', // acf field
+                        'key' 		=> 'cqfs_entry_result', // cqfs field
                         'value'		=> $result,
                         'compare'	=> '=',
                         
@@ -259,7 +259,7 @@ class Cqfs_Cpts{
             if(isset($email) && !empty($email)){
                 $meta_query[] = array(
                     array(
-                        'key' 		=> 'cqfs_entry_user_email', // acf field
+                        'key' 		=> 'cqfs_entry_user_email', // cqfs field
                         'value'		=> $email,
                         'compare'	=> '=',
                         
