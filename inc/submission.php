@@ -1,5 +1,6 @@
 <?php
 /**
+ * Front end shortcode:
  * Form submission handler and response object
  * @since 1.0.0
  */
@@ -9,7 +10,7 @@ namespace CQFS\INC\SUBMIT;
 
 //use namespace
 use CQFS\INC\UTIL\Utilities as Util;
-use WP_Query;
+use WP_Query; //for custom email check
 
 class Cqfs_Submission {
 

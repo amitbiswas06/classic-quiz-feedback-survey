@@ -1,4 +1,7 @@
-/* hello */
+/*
+ * Main style sheet for CQFS admin pages and CPT fields
+ * @since 1.0
+ */
 .cqfs-fields{
     display: flex;
     flex-wrap: wrap;

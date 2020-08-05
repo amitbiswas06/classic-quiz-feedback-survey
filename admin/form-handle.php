@@ -1,6 +1,7 @@
 <?php
 /**
- * Form handle class for wp admin
+ * Form handle class for CQFS admin settings pages
+ * Handled by `admin-post.php`
  * @since 1.0.0
  */
 
@@ -15,6 +16,11 @@ class FormHandle {
         add_action( 'admin_post_cqfs_admin_response', [$this, 'admin_submission'] );//php req
     }
 
+
+    /**
+     * Submission to `admin-post.php`
+     * Validate and return
+     */
     public function admin_submission(){
 
         //sanitize the global POST var. XSS ok.
@@ -87,4 +93,7 @@ class FormHandle {
 
 }
 
-$form_handle = new FormHandle;
+// instanciate if admin
+if( is_admin() ){
+    $form_handle = new FormHandle;
+}

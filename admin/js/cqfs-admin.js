@@ -1,6 +1,6 @@
 (function(){
 /**
- * JavaScript for the admin screens
+ * JavaScript for the CQFS admin screens
  */
     "use strict";
 
@@ -259,7 +259,6 @@
 
         
     }// endif `cqfs_entry`
-
     
 
 })();

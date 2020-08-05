@@ -326,7 +326,4 @@ class Utilities{
     }
 
 
-    // public static $cqfs_thank_msg = apply_filters('cqfs_thankyou_message', esc_html__('Thank you for participating.', 'cqfs'));
-
-
 }

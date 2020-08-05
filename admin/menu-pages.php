@@ -19,20 +19,23 @@ class MenuPages {
         add_action( 'admin_init', [$this, 'cqfs_register_settings'] );
 
         //admin form submission handle
-        require __DIR__ . '/form-handle.php';
+        require CQFS_PATH . 'admin/form-handle.php';
 
         //enqueue the scripts
         add_action('admin_enqueue_scripts', [$this, 'cqfs_settings_enqueue_scripts']);
     }
 
+    /**
+     * Register settings for the CQFS admin settings page
+     */
     public function cqfs_register_settings() {
-        //register our settings
+        //register cqfs settings
         register_setting( 'cqfs-settings-group', '_cqfs_form_handle' );
-        // unregister_setting( 'cqfs-settings-group', '_cqfs_form_handle' );
-        // delete_option( '_cqfs_form_handle' );
-        
     }
 
+    /**
+     * Add a menu page for the settings etc pages.
+     */
     public function cqfs_admin_main_page(){
         
         add_menu_page(
@@ -46,6 +49,10 @@ class MenuPages {
         );
     }
 
+
+    /**
+     * Settings page HTML form
+     */
     public function cqfs_settings_page(){
 
         //get options
@@ -58,21 +65,6 @@ class MenuPages {
 
     <div class="content">
         <h1 class="page-title"><?php echo esc_html__('Welcome to CQFS Settings', 'cqfs'); ?></h1>
-        
-        <!-- <div class="form-wrap">
-            <h2><?php //echo esc_html__('CQFS License','cqfs'); ?></h2>
-            <form id="cqfs-license-form">
-                <div class="form-input-wrap">
-                    <label for="cqfs-customer-email"><?php //echo esc_html__('Your email ID: ','cqfs'); ?></label>
-                    <input name="cqfs-customer-email" id="cqfs-customer-email" type="email">
-                </div>
-                <div class="form-input-wrap">
-                    <label for="cqfs-auth-code"><?php //echo esc_html__('Authorization Code: ','cqfs'); ?></label>
-                    <input name="cqfs-auth-code" id="cqfs-auth-code" type="password">
-                </div>
-                <button type="submit"><?php //echo esc_html__('Verify License', 'cqfs') ?></button>
-            </form>
-        </div> -->
 
         <div class="form-wrap">
             <h2 class="all-settings-title"><?php echo esc_html__('All Settings'); ?></h2>
@@ -107,7 +99,6 @@ class MenuPages {
                 //submit button
                 submit_button(); 
                 var_dump($form_mode);
-                // var_dump(plugin_dir_url(__FILE__) . 'css/cqfs-admin-style.css');
 
                 ?>
 
@@ -125,6 +116,9 @@ class MenuPages {
     }
 
 
+    /**
+     * Enqueue scripts for admin menu pages of CQFS
+     */
     public function cqfs_settings_enqueue_scripts(){
 
         if( get_current_screen()->base === 'toplevel_page_cqfs-settings' ){
@@ -148,6 +142,7 @@ class MenuPages {
 
 }
 
+// instanciate if admin
 if( is_admin() ){
     $menu_pages = new MenuPages;
 }

@@ -22,7 +22,7 @@ class CqfsShortcode {
         add_shortcode( 'cqfs', [$this, 'cqfs_shortcode'] );
 
         //require the sublission handle
-        require __DIR__ . '/submission.php';
+        require CQFS_PATH . 'inc/submission.php';
         
     }
 

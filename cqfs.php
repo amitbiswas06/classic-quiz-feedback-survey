@@ -14,6 +14,8 @@ Domain Path: /languages/
 //define namespace
 namespace CQFS\ROOT;
 
+define( 'CQFS_PATH', plugin_dir_path( __FILE__ ) );
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -37,15 +39,6 @@ class CQFS {
 	const CQFS_VERSION = '1.0.0';
 
 	/**
-	 * Minimum ACF Version
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var string Minimum ACF version required to run the plugin.
-	 */
-	// const MINIMUM_ACF_VERSION = '5.8.12';
-
-	/**
 	 * Minimum PHP Version
 	 *
 	 * @since 1.0.0
@@ -53,6 +46,8 @@ class CQFS {
 	 * @var string Minimum PHP version required to run the plugin.
 	 */
 	const MINIMUM_PHP_VERSION = '7.4.0';
+
+	// define( 'MY_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 
 	/**
 	 * Instance
@@ -98,8 +93,12 @@ class CQFS {
 
 		add_action( 'init', [ $this, 'i18n' ] );
 		add_action( 'plugins_loaded', [ $this, 'init' ] );
-		require __DIR__ . '/inc/cpt.php';
-		require __DIR__ . '/inc/roles.php';
+
+		//register custom post type
+		require CQFS_PATH . 'inc/cpt.php';
+
+		//add custom post type capabilities to admin
+		require CQFS_PATH . 'inc/roles.php';
         register_activation_hook( __FILE__, array( 'Cqfs_Roles', 'add_caps_admin' ) );
 		register_deactivation_hook( __FILE__, array( 'Cqfs_Roles', 'remove_caps_admin' ) );
 		
@@ -125,7 +124,7 @@ class CQFS {
 	/**
 	 * Initialize the plugin
 	 *
-	 * Load the plugin only after ACF (and other plugins) are loaded.
+	 * Load the plugin only after checking.
 	 * Checks for basic plugin requirements, if one check fail don't continue,
 	 * if all check have passed load the files required to run the plugin.
 	 *
@@ -137,104 +136,41 @@ class CQFS {
 	 */
 	public function init() {
 
-		// Check if ACF installed and activated
-		/* if ( ! class_exists('ACF') ) {
-			add_action( 'admin_notices', [ $this, 'admin_notice_missing_main_plugin' ] );
-			return;
-		} */
-
-		// Check for required ACF version
-		/* if ( ! version_compare( ACF_VERSION, self::MINIMUM_ACF_VERSION, '>=' ) ) {
-			add_action( 'admin_notices', [ $this, 'admin_notice_MINIMUM_ACF_VERSION' ] );
-			return;
-		} */
-
 		// Check for required PHP version
 		if ( version_compare( PHP_VERSION, self::MINIMUM_PHP_VERSION, '<' ) ) {
 			add_action( 'admin_notices', [ $this, 'admin_notice_minimum_php_version' ] );
 			return;
 		}
 
-		//ACF save point
-		//must be removed in distribution
-		// add_filter('acf/settings/save_json', [ $this, 'acf_save_point' ] );
+		//admin menu pages
+		require CQFS_PATH . 'admin/menu-pages.php';
 
-		//ACF load point
-		// add_filter('acf/settings/load_json', [ $this, 'acf_load_point' ] );
+		//cqfs_question metaboxes
+		require CQFS_PATH . 'admin/meta-boxes/metabox-question.php';
+
+		//cqfs_build metaboxes
+		require CQFS_PATH . 'admin/meta-boxes/metabox-build.php';
+
+		//cqfs_entry metaboxes
+		require CQFS_PATH . 'admin/meta-boxes/metabox-entry.php';
 
 		//admin columns
-		require __DIR__ . '/inc/admin-columns.php';
+		require CQFS_PATH . 'inc/admin-columns.php';
 
-		// utility class object
-		require __DIR__ . '/inc/utilities.php';
+		//admin scripts
+		require CQFS_PATH . 'admin/admin-scripts.php';
+
+		//utility class object
+		require CQFS_PATH . 'inc/utilities.php';
 
 		//build shortcode
-		require __DIR__ . '/inc/shortcode.php';
+		require CQFS_PATH . 'inc/shortcode.php';
 
-		//admin menu pages
-		require __DIR__ . '/admin/menu-pages.php';
-
-		//meta boxes
-		require __DIR__ . '/admin/meta-boxes.php';
-
-		//enqueue scripts
+		//enqueue scripts to front
 		add_action('wp_enqueue_scripts', [$this, 'cqfs_enqueue_scripts']);
-
 
 	}
 
-	/**
-	 * Admin notice
-	 *
-	 * Warning when the site doesn't have ACF installed or activated.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @access public
-	 */
-	/* public function admin_notice_missing_main_plugin() {
-
-		if ( isset( $_GET['activate'] ) ) {
-			unset( $_GET['activate'] );
-		}
-
-		$message = sprintf(
-			// translators: 1: Plugin name 2: ACF /
-			esc_html__( '"%1$s" requires "%2$s" to be installed and activated.', 'cqfs' ),
-			'<strong>' . esc_html__( 'Classic Quiz Feedback Survey', 'cqfs' ) . '</strong>',
-			'<strong>' . esc_html__( 'Advanced Custom Fields', 'cqfs' ) . '</strong>'
-		);
-
-		printf( '<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message );
-
-	} */
-
-	/**
-	 * Admin notice
-	 *
-	 * Warning when the site doesn't have a minimum required ACF version.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @access public
-	 */
-	/* public function admin_notice_MINIMUM_ACF_VERSION() {
-
-		if ( isset( $_GET['activate'] ) ) {
-			unset( $_GET['activate'] );
-		}
-
-		$message = sprintf(
-			// translators: 1: Plugin name 2: ACF 3: Required ACF version /
-			esc_html__( '"%1$s" requires "%2$s" version %3$s or greater.', 'cqfs' ),
-			'<strong>' . esc_html__( 'Classic Quiz Feedback Survey', 'cqfs' ) . '</strong>',
-			'<strong>' . esc_html__( 'Advanced Custom Fields', 'cqfs' ) . '</strong>',
-			 self::MINIMUM_ACF_VERSION
-		);
-
-		printf( '<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message );
-
-	} */
 
 	/**
 	 * Admin notice
@@ -263,32 +199,10 @@ class CQFS {
 
 	}
 
-	/* public function acf_save_point( $path ) {
-    
-		// update path
-		$path = plugin_dir_path( __FILE__ ) . 'assets/acf-fields';
-		
-		// return
-		return $path;
-		
-	} */
-
-	/* public function acf_load_point( $paths ) {
-    
-		// remove original path (optional)
-		unset($paths[0]);
-		
-		// append path
-		$paths[] = plugin_dir_path( __FILE__ ) . 'assets/acf-fields';
-		
-		// return
-		return $paths;
-		
-	} */
 
 	public function cqfs_enqueue_scripts(){
 		
-		//for multi page question
+		//for all types of CQFS form
 		wp_enqueue_script(
 			'cqfs-multi', 
 			esc_url( plugin_dir_url(__FILE__) . 'assets/js/cqfs-multi.js'),
@@ -297,7 +211,7 @@ class CQFS {
 			true
 		);
 
-		//localize script
+		//localize script for front end
 		wp_localize_script( 'cqfs-multi', '_cqfs',
 			array( 
 				'ajaxurl'		=> esc_url( admin_url( 'admin-ajax.php' ) ),
@@ -306,7 +220,7 @@ class CQFS {
 			)
 		);
 
-		//for localization of string in JS use
+		//for localization of string in JS use in front
 		$cqfs_thank_msg = apply_filters('cqfs_thankyou_message', esc_html__('Thank you for participating.', 'cqfs'));
 		$invalid_result = apply_filters('cqfs_invalid_result', esc_html__('Invalid Result','cqfs'));
 		$you_ans = apply_filters('cqfs_result_you_answered', esc_html__('You answered&#58; ', 'cqfs'));
@@ -325,7 +239,7 @@ class CQFS {
 		);
 
 
-		//style css
+		//style css enqueue for front end
 		wp_enqueue_style(
 			'cqfs-style',
 			esc_url( plugin_dir_url(__FILE__) . 'assets/css/cqfs-styles.css'),
