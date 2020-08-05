@@ -42,11 +42,15 @@ class Cqfs_Submission {
         $values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
         // var_dump($values);//main post
 
+        //unique nonce fields
+        $nonce_action = esc_attr('cqfs_post_') . esc_attr($values['_cqfs_id']);
+        $nonce_name = esc_attr('_cqfs_nonce_') . esc_attr($values['_cqfs_id']);
+
 		//get the nonce
-        $nonce = sanitize_text_field( $values['_cqfs_nonce'] );
+        $nonce = sanitize_text_field( $values[$nonce_name] );
 
 		//bail early if found suspecious with nonce verification.
-		if ( ! wp_verify_nonce( $nonce, 'cqfs_post' ) ) {
+		if ( ! wp_verify_nonce( $nonce, $nonce_action ) ) {
 
 			$cqfs_status = [
                 '_cqfs_status'  => urlencode(sanitize_text_field('failure')),

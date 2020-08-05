@@ -4,6 +4,9 @@
  */
     "use strict";
 
+    let isSubmit = false;
+    let isModified = false;
+
     /**
      * global scope in cqfs
      */
@@ -82,6 +85,9 @@
 
             // console.log(correctAnsField.value.split(','));
 
+            // set the global variable `isSubmit` to true
+            isSubmit = true;
+
             const errDiv = document.querySelectorAll('.selection-error-label');
             const errClassDiv = document.querySelectorAll('.cqfs-selection-error');
             const check = text_value_numbers( correctAnsField.value, ansType.value, answersArr.length );
@@ -157,6 +163,9 @@
         form.addEventListener('submit', e => {
             // e.preventDefault();
             // alert('Hey')
+
+            // set the global variable `isSubmit` to true
+            isSubmit = true;
 
             const errDiv = document.querySelectorAll('.selection-error-label');
             const errClassDiv = document.querySelectorAll('.cqfs-selection-error');

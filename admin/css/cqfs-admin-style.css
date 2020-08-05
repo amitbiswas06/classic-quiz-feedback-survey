@@ -208,6 +208,15 @@ html[dir="rtl"] input.cqfs-is-prepended.cqfs-is-appended {
     display: none !important
 }
 
+.cqfs-radio-list{
+    list-style: none;
+}
+
+.cqfs-radio-list.horizontal li {
+    display: inline-block;
+    margin-right: 15px;
+}
+
 /* cpt - cqfs_* */
 .cqfs-field input:read-only {
     padding: 5px 15px;

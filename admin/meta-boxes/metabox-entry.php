@@ -174,7 +174,7 @@ class Entry {
 						<?php
 						$list = array(
 							'passed' => esc_html__('Passed', 'cqfs'),
-							'failed' => esc_html__('failed', 'cqfs'),
+							'failed' => esc_html__('Failed', 'cqfs'),
 						);
 						foreach( $list as $key => $val ){
 							printf(

@@ -2,7 +2,7 @@
 /*
 Plugin Name: Classic Quiz Feedback Survey
 Plugin URI: https://github.com/amitbiswas06/classic-quiz-feedback-survey
-Description: It's a classic plugin for quiz app, feedback or survey. Advanced custom fields plugin is required.
+Description: It's a classic plugin for quiz app, feedback or survey.
 Version: 1.0.0
 Author: Amit Biswas
 Author URI: https://templateartist.com
