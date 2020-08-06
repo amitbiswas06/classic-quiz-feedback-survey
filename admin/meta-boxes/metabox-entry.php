@@ -318,12 +318,15 @@ class Entry {
 				sanitize_text_field($this->values['cqfs']['entry-form-type'])
 			);
 
-			//save/update entry result
-			update_post_meta(
-				esc_attr($post_id),
-				sanitize_key('cqfs_entry_result'),
-				sanitize_text_field($this->values['cqfs']['entry-result'])
-			);
+			//save/update entry result, sp. case
+			//check if field is not empty as this is a radio inp and not required field
+			if( !empty($this->values['cqfs']['entry-result']) ){
+				update_post_meta(
+					esc_attr($post_id),
+					sanitize_key('cqfs_entry_result'),
+					sanitize_text_field($this->values['cqfs']['entry-result'])
+				);
+			}
 
 			//save/update percentage obtained
 			update_post_meta(

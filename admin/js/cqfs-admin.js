@@ -4,11 +4,17 @@
  */
     "use strict";
 
+    // global submit check
     let isSubmit = false;
-    let isModified = false;
 
+    
     /**
-     * global scope in cqfs
+     * Check text input value with the conditional logic
+     * for cqfs_question only
+     * 
+     * @param {string} value        input value for answer input
+     * @param {string} checkType    checkbox or radio question type
+     * @param {number} ansLength    length of question
      */
     function text_value_numbers( value, checkType = '', ansLength = 1 ){
         
@@ -34,8 +40,12 @@
         return check;
     }
 
+    
     /**
-     * Numbers only from 1-100
+     * Check numbers only from 1-100
+     * 
+     * @param {string} valueToCheck text input value
+     * @returns `bool`              returns boolean
      */
     function numberRange(valueToCheck){
 
@@ -53,6 +63,13 @@
 
     }
 
+
+    /**
+     * Creates and return error div html
+     * 
+     * @param {string} errMsg string as message
+     * @returns `node` HTML node with error message
+     */
     function create_err_div(errMsg = ''){
 
         let err_div = document.createElement('div');
@@ -64,8 +81,35 @@
 
 
     /**
+     * Stores and returns form data as a encoded string
+     * 
+     * @param {HTMLFormElement} form   form HTML node
+     * @returns `string`    form data as a encoded string
+     */
+    function storeFormData( form ){
+
+        // observer form data change if user is leaving without saving
+        let formData = new FormData(form);
+        let fromArray = [];
+
+        //push to the form array which is declared blank array above
+        for(let pair of formData.entries()) {
+            fromArray.push(pair[0] + '=' + pair[1]);
+        }
+
+        // map and join the form data array into a string
+        let finalArr = fromArray.map( v => v ).join('&');
+        // encode and store the form data string
+        let final = encodeURIComponent( finalArr );
+
+        return final;
+
+    }
+
+
+    /**
      * run only for cqfs_question
-     * Limited to addnew and edit page
+     * Limited to "add-new" and "edit" page
      * base `post` from $screen in meta-boxes.php
      */
 
@@ -78,12 +122,9 @@
         const answers = document.querySelector('#cqfs-answers');
         const answersArr = answers.value.split('\n');
         
-        // console.log(errDiv)
 
+        // form submit and validations
         form.addEventListener('submit', e => {
-            // e.preventDefault();
-
-            // console.log(correctAnsField.value.split(','));
 
             // set the global variable `isSubmit` to true
             isSubmit = true;
@@ -92,19 +133,21 @@
             const errClassDiv = document.querySelectorAll('.cqfs-selection-error');
             const check = text_value_numbers( correctAnsField.value, ansType.value, answersArr.length );
 
+            // if error div found, remove it at this point
             if(errDiv.length){
                 for( let i = 0; i < errDiv.length; i++ ){
                     errDiv[i].remove();
                 }
             }
 
+            // if error class found, remove at this point
             if(errClassDiv.length){
                 for( let i = 0; i < errClassDiv.length; i++ ){
                     errClassDiv[i].classList.remove('cqfs-selection-error');
                 }
             }
 
-            //validate the required fields that are not conditionally hidden
+            // validate the required fields that are not conditionally hidden
             cqfsRequired.map( el => {
                 if( !el.value ){
                     e.preventDefault();
@@ -113,7 +156,7 @@
                 }
             });
             
-            //validate correct ans field
+            // validate correct ans field
             if( !check ){
                 e.preventDefault();
                 correctAnsField.parentElement.classList.add('cqfs-selection-error');
@@ -122,12 +165,33 @@
 
         });
 
+        // event listner for window object `beforeunload`
+        const initForm = storeFormData( form );
+        window.addEventListener("beforeunload", function (e) {
+
+            // new form data store before unload event
+            const newForm = storeFormData( form );
+
+            // bail early if form is submitting
+            if( isSubmit ){
+                return;
+            }
+
+            // finally check if form data changes are there.
+            if( initForm != newForm ){
+                e.preventDefault();
+                return e.returnValue = '';
+            }
+
+        });
+        
+
     }
 
 
     /**
      * run only for cqfs_build
-     * Limited to addnew and edit page
+     * Limited to "add-new" and "edit" page
      * base `post` from $screen in meta-boxes.php
      */
     if( cqfs_admin_obj.post_type === 'cqfs_build' && cqfs_admin_obj.base === 'post' ){
@@ -206,16 +270,40 @@
 
         });
 
+
+        // event listner for window object `beforeunload`
+        const initForm = storeFormData( form );
+        window.addEventListener("beforeunload", function (e) {
+
+            // new form data store before unload event
+            const newForm = storeFormData( form );
+
+            // bail early if form is submitting
+            if( isSubmit ){
+                return;
+            }
+
+            // finally check if form data changes are there.
+            if( initForm != newForm ){
+                e.preventDefault();
+                return e.returnValue = '';
+            }
+
+        });
+
     }
 
 
     /**
      * run only for cqfs_entry
+     * Limited to "add-new" and "edit" page
+     * base `post` from $screen in meta-boxes.php
      */
 
-    if( cqfs_admin_obj.post_type === 'cqfs_entry'){
+    if( cqfs_admin_obj.post_type === 'cqfs_entry' && cqfs_admin_obj.base === 'post' ){
         // alert('I am here!');
 
+        const form = document.querySelector('form[name=post]');//main form
         const all_cqfs_metabox = Array.from( document.querySelectorAll('#title, .cqfs-input input[type="number"], .cqfs-input input[type="text"], .cqfs-input input[type="radio"], .cqfs-input input[type="email"], .cqfs-input textarea'));
         const enableBtn = document.querySelector('#cqfs-entry-enable');//enable btn
         const disableBtn = document.querySelector('#cqfs-entry-disable');//disable btn
@@ -265,6 +353,31 @@
             } );
 
         }
+
+        //set the isSubmit var to true when submitting
+        form.addEventListener('submit', e => {
+            isSubmit = true;
+        });
+
+        // event listner for window object `beforeunload`
+        const initForm = storeFormData( form );
+        window.addEventListener("beforeunload", function (e) {
+
+            // new form data store before unload event
+            const newForm = storeFormData( form );
+
+            // bail early if form is submitting
+            if( isSubmit ){
+                return;
+            }
+
+            // finally check if form data changes are there.
+            if( initForm != newForm ){
+                e.preventDefault();
+                return e.returnValue = '';
+            }
+
+        });
 
         
     }// endif `cqfs_entry`
