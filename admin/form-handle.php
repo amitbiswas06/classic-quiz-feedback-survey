@@ -10,10 +10,31 @@ namespace CQFS\ADMIN\FORMHANDLE;
 
 class FormHandle {
 
+    const SETTINGS_NONCE = 'cqfs_admin_settings';
+    protected $values;
+    protected $failure_args;
+    protected $success_args;
+
     public function __construct() {
+
+        //sanitize the global POST var. XSS ok.
+		//all form inputs and security inputs
+        $this->values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+        $this->failure_args = [
+            'page'          => urlencode(sanitize_text_field('cqfs-settings')),
+            '_cqfs_status'  => urlencode(sanitize_text_field('update-failed')),
+        ];
+
+        $this->success_args = [
+            'page'          => urlencode(sanitize_text_field('cqfs-settings')),
+            '_cqfs_status'  => urlencode(sanitize_text_field('settings-updated')),
+        ];
+
         //hooks goes here
         //Authenticated action for the CQFS form. action value `cqfs_response`
         add_action( 'admin_post_cqfs_admin_response', [$this, 'admin_submission'] );//php req
+    
     }
 
 
@@ -23,62 +44,51 @@ class FormHandle {
      */
     public function admin_submission(){
 
-        //sanitize the global POST var. XSS ok.
-        //all form inputs and security inputs
-        //hidden keys (_cqfs_id, action, _cqfs_nonce, _wp_http_referer)
-        $user_capability = current_user_can('manage_options');
-        $values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-        var_dump($values);//main post
-
-        //get the nonce
-        $nonce = sanitize_text_field( $values['_cqfs_admin_nonce'] );
-
-        //failure url args
-        $failure_args = [
-            'page'          => urlencode(sanitize_text_field('cqfs-settings')),
-            '_cqfs_status'  => urlencode(sanitize_text_field('update-failed')),
-        ];
-
-        //failure return url
         $failure_url = esc_url_raw(
-            add_query_arg( $failure_args, wp_unslash( esc_url( strtok($values['_wp_http_referer'], '?') ) ) )
+            add_query_arg( $this->failure_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?') ) ) )
         );
 
-        //bail early if found suspecious with nonce verification.
-		if ( ! wp_verify_nonce( $nonce, 'cqfs_admin_post' ) ) {
+        $success_url = esc_url_raw(
+            add_query_arg( $this->success_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?') ) ) )
+        );
 
+        // check nonce
+		if ( !isset( $this->values['_cqfs_admin_nonce'] ) || !wp_verify_nonce( $this->values['_cqfs_admin_nonce'], self::SETTINGS_NONCE )){
+			//failure return
+			wp_safe_redirect( $failure_url );
+
+            //exit immediately
+			exit();
+		}
+
+		// Check the user's permissions.
+        if ( ! current_user_can( 'manage_options' ) ) {
             //failure return
 			wp_safe_redirect( $failure_url );
 
             //exit immediately
 			exit();
-
         }
 
         /**************************************************************/
-        //run if nonce ok
+        // run if nonce, user permission is ok
         
-        $form_handle_mode = sanitize_text_field( $values['_cqfs_form_handle'] );
+        // set blank on purpose of error free while updating
+        $form_handle_mode = '';
+        $update_form_handle = false;
 
-        //if user's capability check is true
-        if( $user_capability ){
-            //then update the form handle option and store boolean in variable
-            $update_opt = update_option('_cqfs_form_handle', $form_handle_mode );
+        // check if key exists and get then set the value
+        if( array_key_exists('_cqfs', $this->values ) ){
+
+            // the received value of this field
+            $form_handle_mode = sanitize_text_field( $this->values['_cqfs']['form_handle'] );
+
+            // updates and stores boolean
+            $update_form_handle = !empty($form_handle_mode) ? update_option('_cqfs_form_handle', $form_handle_mode ) : false;
         }
 
-        //success url args
-        $success_args = [
-            'page'          => urlencode(sanitize_text_field('cqfs-settings')),
-            '_cqfs_status'  => urlencode(sanitize_text_field('settings-updated')),
-        ];
-
-        //success return url
-        $success_url = esc_url_raw(
-            add_query_arg( $success_args, wp_unslash( esc_url( strtok($values['_wp_http_referer'], '?') ) ) )
-        );
-
         //if option updated successfully
-        if( $update_opt ){
+        if( $update_form_handle ){
             //success return
             wp_safe_redirect( $success_url );
         }else{

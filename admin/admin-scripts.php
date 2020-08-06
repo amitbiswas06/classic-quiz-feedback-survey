@@ -16,14 +16,13 @@ class Scripts {
      */
     public function __construct(){
 
-		//admin scripts
+		//admin enqueue scripts
 		add_action('admin_enqueue_scripts', [$this, 'cqfs_admin_scripts']);
 
 	}
-	
 
 	/**
-	 * admin enqueue scripts
+	 * admin scripts and localize
 	 */
 	public function cqfs_admin_scripts() {
 
@@ -39,8 +38,10 @@ class Scripts {
 
 		// verify admin screen object
 		if ( is_object( $screen ) ) {
-			// enqueue only for specific post types
-			if ( in_array( $screen->post_type, ['cqfs_entry','cqfs_question','cqfs_build'] ) ) {
+			// enqueue only for specific post types and admin pages of CQFS
+			if ( in_array( $screen->post_type, 
+			['cqfs_entry','cqfs_question','cqfs_build'] ) ||
+			$screen->base === 'toplevel_page_cqfs-settings' ) {
 
 				//set only for cqfs_entry edit screen
 				if( $screen->post_type === 'cqfs_entry' && isset($post_id) && isset($action) && $action === 'edit' ){

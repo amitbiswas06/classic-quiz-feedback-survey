@@ -1,5 +1,6 @@
 (function(){
 /**
+ * front end shortcode forms
  * This script handles the CQFS shortcode form validation and submission
  * @since 1.0.0
  */

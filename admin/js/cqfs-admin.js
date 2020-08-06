@@ -196,7 +196,6 @@
      */
     if( cqfs_admin_obj.post_type === 'cqfs_build' && cqfs_admin_obj.base === 'post' ){
 
-        // alert('Hello')
         const form = document.querySelector('form[name=post]');//main form
         const buildType = document.querySelector('#cqfs-build-type');//build type
         const cqfsRequired = Array.from(document.querySelectorAll('.cqfs-required input, .cqfs-required select, .cqfs-required textarea'));//required fields
@@ -206,7 +205,6 @@
 
         //check buildType and show/hide inputs
         if( buildType.value == "quiz" ){
-            // alert('quiz')
             hiddenConditional.map( el => el.classList.remove('hidden-by-conditional-logic') );
         }else{
             hiddenConditional.map( el => el.classList.add('hidden-by-conditional-logic') );
@@ -215,7 +213,6 @@
         buildType.addEventListener('change', (e) => {
             //check buildType and show/hide inputs
             if( e.target.value == "quiz" ){
-                // alert('quiz')
                 hiddenConditional.map( el => el.classList.remove('hidden-by-conditional-logic') );
             }else{
                 hiddenConditional.map( el => el.classList.add('hidden-by-conditional-logic') );
@@ -225,8 +222,6 @@
         shortcode.addEventListener('click', (e) => e.target.select());
 
         form.addEventListener('submit', e => {
-            // e.preventDefault();
-            // alert('Hey')
 
             // set the global variable `isSubmit` to true
             isSubmit = true;
@@ -301,7 +296,6 @@
      */
 
     if( cqfs_admin_obj.post_type === 'cqfs_entry' && cqfs_admin_obj.base === 'post' ){
-        // alert('I am here!');
 
         const form = document.querySelector('form[name=post]');//main form
         const all_cqfs_metabox = Array.from( document.querySelectorAll('#title, .cqfs-input input[type="number"], .cqfs-input input[type="text"], .cqfs-input input[type="radio"], .cqfs-input input[type="email"], .cqfs-input textarea'));
@@ -381,6 +375,46 @@
 
         
     }// endif `cqfs_entry`
+
+
+    /**
+     * run only for cqfs settings page in admin
+     * base `toplevel_page_cqfs-settings` from $screen in meta-boxes.php
+     */
+    if( cqfs_admin_obj.base === 'toplevel_page_cqfs-settings' ){
+        // alert('I am at settings page')
+
+        const form = document.querySelector('form[name=cqfs-general-settings]');
+
+        form.addEventListener('submit', (e) => {
+
+            //set submit is true
+            isSubmit = true;
+        });
+
+
+        // event listner for window object `beforeunload`
+        const initForm = storeFormData( form );
+        window.addEventListener("beforeunload", function (e) {
+
+            // new form data store before unload event
+            const newForm = storeFormData( form );
+
+            // bail early if form is submitting
+            if( isSubmit ){
+                return;
+            }
+
+            // finally check if form data changes are there.
+            if( initForm != newForm ){
+                e.preventDefault();
+                return e.returnValue = '';
+            }
+
+        });
+
+
+    }
     
 
 })();
