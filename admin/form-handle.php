@@ -10,10 +10,23 @@ namespace CQFS\ADMIN\FORMHANDLE;
 
 class FormHandle {
 
+    // admin settings form nonce
     const SETTINGS_NONCE = 'cqfs_admin_settings';
+
+    // this will store post variables
     protected $values;
+
+    // failure url arguments
     protected $failure_args;
+
+    // success url arguments
     protected $success_args;
+
+    // failure url
+    protected $failure_url;
+
+    // success url
+    protected $success_url;
 
     public function __construct() {
 
@@ -21,15 +34,33 @@ class FormHandle {
 		//all form inputs and security inputs
         $this->values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
+        // prepare failure url args
         $this->failure_args = [
             'page'          => urlencode(sanitize_text_field('cqfs-settings')),
             '_cqfs_status'  => urlencode(sanitize_text_field('update-failed')),
         ];
 
+        // prepare success url args
         $this->success_args = [
             'page'          => urlencode(sanitize_text_field('cqfs-settings')),
             '_cqfs_status'  => urlencode(sanitize_text_field('settings-updated')),
         ];
+
+        // check if we are at admin-post.php or not
+        if( isset( $this->values['_wp_http_referer'] ) && !empty( $this->values['_wp_http_referer'] ) ){
+            // set failure url
+            $this->failure_url = esc_url_raw(
+                add_query_arg( $this->failure_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?') ) ) )
+            );
+
+            // set success url
+            $this->success_url = esc_url_raw(
+                add_query_arg( $this->success_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?') ) ) )
+            );
+        }else{
+            $this->failure_url = "";
+            $this->success_url = "";
+        }
 
         //hooks goes here
         //Authenticated action for the CQFS form. action value `cqfs_response`
@@ -44,18 +75,10 @@ class FormHandle {
      */
     public function admin_submission(){
 
-        $failure_url = esc_url_raw(
-            add_query_arg( $this->failure_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?') ) ) )
-        );
-
-        $success_url = esc_url_raw(
-            add_query_arg( $this->success_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?') ) ) )
-        );
-
         // check nonce
 		if ( !isset( $this->values['_cqfs_admin_nonce'] ) || !wp_verify_nonce( $this->values['_cqfs_admin_nonce'], self::SETTINGS_NONCE )){
 			//failure return
-			wp_safe_redirect( $failure_url );
+			wp_safe_redirect( $this->failure_url );
 
             //exit immediately
 			exit();
@@ -64,36 +87,38 @@ class FormHandle {
 		// Check the user's permissions.
         if ( ! current_user_can( 'manage_options' ) ) {
             //failure return
-			wp_safe_redirect( $failure_url );
+			wp_safe_redirect( $this->failure_url );
 
             //exit immediately
 			exit();
         }
 
         /**************************************************************/
-        // run if nonce, user permission is ok
-        
-        // set blank on purpose of error free while updating
-        $form_handle_mode = '';
-        $update_form_handle = false;
+        // run if nonce and user permission is ok
 
         // check if key exists and get then set the value
         if( array_key_exists('_cqfs', $this->values ) ){
 
-            // the received value of this field
-            $form_handle_mode = sanitize_text_field( $this->values['_cqfs']['form_handle'] );
+            // received value of form-handle
+            $form_handle_mode = sanitize_text_field( $this->values['_cqfs']['form-handle'] );
+            // received value of allow-all
+            $allow_all = rest_sanitize_boolean( $this->values['_cqfs']['allow-all'] );
 
-            // updates and stores boolean
-            $update_form_handle = !empty($form_handle_mode) ? update_option('_cqfs_form_handle', $form_handle_mode ) : false;
-        }
+            // updates and stores form-handle
+            if( $form_handle_mode ){
+                update_option('_cqfs_form_handle', $form_handle_mode );
+            }
 
-        //if option updated successfully
-        if( $update_form_handle ){
+            // update allow-all
+            update_option('_cqfs_allow_all', $allow_all );
+
+
             //success return
-            wp_safe_redirect( $success_url );
+            wp_safe_redirect( $this->success_url );
+
         }else{
             //failure return
-            wp_safe_redirect( $failure_url );
+            wp_safe_redirect( $this->failure_url );
         }
         
         //exit immediately

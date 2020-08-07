@@ -134,7 +134,7 @@ class CqfsShortcode {
                                         $inp_id = Util::cqfs_slug($optn) . '_' . $cqfs_build['id'];
                                     ?>
                                 <div class="input-wrap">
-                                    <input name="option<?php echo $i; ?>[]" type="<?php echo esc_attr($question['input_type']); ?>" id="<?php echo esc_attr($inp_id); ?>" value="<?php echo $j; ?>">
+                                    <input name="cqfs[option_<?php echo $i; ?>][]" type="<?php echo esc_attr($question['input_type']); ?>" id="<?php echo esc_attr($inp_id); ?>" value="<?php echo $j; ?>">
                                     <label for="<?php echo esc_attr($inp_id); ?>"><?php echo esc_html($optn); ?></label>
                                 </div>
                                 <?php $j++; }} ?>
