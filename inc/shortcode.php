@@ -146,7 +146,7 @@ class CqfsShortcode {
                         endforeach;
 
                         //if not logged in, display user info form
-                        Util::cqfs_user_info_form( $cqfs_build['id'], $cqfs_build['layout'] );
+                        Util::cqfs_user_info_form( $cqfs_build['id'], true, $cqfs_build['layout'] );
 
                         //insert form ID in a hidden field
                         printf(

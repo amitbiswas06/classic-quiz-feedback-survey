@@ -70,6 +70,59 @@ class Cqfs_Submission {
         add_action( 'wp_ajax_cqfs_response', [$this, 'cqfs_form_submission'] );//AJAX req
         
 
+        // realtime login status check
+        add_action( 'wp_ajax_cqfs_login_status_check', [$this, 'cqfs_login_status_check'] );//AJAX req
+        add_action( 'wp_ajax_nopriv_cqfs_login_status_check', [$this, 'cqfs_login_status_check'] );//AJAX req
+
+
+        // login function
+        add_action( 'wp_ajax_nopriv_cqfs_login', [$this, 'cqfs_login'] );//AJAX req
+
+    }
+
+    public function cqfs_login(){
+        
+        //bail early if found suspecious with nonce verification.
+		if ( !isset( $this->values['_cqfs_login_nonce'] ) || ! wp_verify_nonce( $this->values['_cqfs_login_nonce'], 'cqfs_login' ) ) {
+        
+            wp_send_json_error(['security_check' => false]);
+        
+        }
+
+        if( isset($this->values['cqfs_username']) && isset($this->values['cqfs_password']) ){
+
+            $creds = array(
+                'user_login'    => sanitize_user($this->values['cqfs_username']),
+                'user_password' => $this->values['cqfs_password'],
+                'remember'      => true
+            );
+         
+            $user = wp_signon( $creds, false );
+         
+            if ( is_wp_error( $user ) ) {
+                wp_send_json_error($user->get_error_message());
+            }else{
+                wp_send_json_success(['login' => true]);
+            }
+            
+        }
+        
+
+        wp_send_json($this->values);
+
+        exit();
+    }
+
+    public function cqfs_login_status_check(){
+
+        if( is_user_logged_in() ){
+            wp_send_json(['logged_in' => true]);
+        }else{
+            wp_send_json(['logged_in' => false]);
+        }
+
+        exit();
+
     }
 
 
@@ -116,7 +169,11 @@ class Cqfs_Submission {
         $notes = []; //notes for each question
 
         //prepare answers
-        $userAnswers = array_values( $this->values['cqfs'] );
+        $userAnswers = [];
+        if(array_key_exists('cqfs', $this->values)){
+            $userAnswers = array_values( $this->values['cqfs'] );
+        }
+        
         // var_dump($userAnswers);
         $answersArr = [];
 

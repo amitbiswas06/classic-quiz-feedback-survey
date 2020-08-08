@@ -222,6 +222,21 @@ async function postData( url = '', data ) {
 }
 
 
+async function checkLoginStatus( url = '', data ) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        headers: {
+            'Accept': 'application/json'
+        },
+        body: data
+    });
+
+    return response;
+
+}
+
+
 /**
  * Display results on ajax submit for the quiz
  * 
@@ -323,6 +338,21 @@ function formSubmitEvent(e, processingDiv, cqfs){
     }
 
 }
+
+
+function realtime_login_status(){
+    
+    let data = new FormData();
+    data.append('action', 'cqfs_login_status_check');
+    checkLoginStatus( _cqfs.ajaxurl, data )
+    .then( response => response.json() )
+    .then( obj => {
+        console.log(obj.logged_in);
+    } );
+
+}
+
+
 
 /********************** end of utility functions ***********************/
 
@@ -522,13 +552,71 @@ let initialize_CqfsSingle = function ( cqfs ){
         const form = cqfs.querySelector('form');
 
         //form submit validation
-        form.addEventListener( 'submit', e => formSubmitEvent(e, processingDiv, cqfs) );
+        // form.addEventListener( 'submit', e => formSubmitEvent(e, processingDiv, cqfs) );
+
+        form.addEventListener('submit', e => {
+
+            e.preventDefault();
+            console.log('submit clicked');
+
+            realtime_login_status();
+
+        });
 
     }
 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // login modal
+    const loginModal = document.getElementById('cqfs-login');
+    const openModalLinks = Array.from(document.querySelectorAll('.cqfs-modal-link'));
+    const closeBtn = document.querySelector('.cqfs-close');
+    
+    // run if login modal is available
+    if( loginModal ){
+
+        const loginForm = loginModal.querySelector('form[name="cqfs-login-form"]');
+
+        // When the user clicks the button, open the modal 
+        openModalLinks.map( el => el.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = "block";
+        }));
+
+        // When the user clicks on <span> (x), close the modal
+        closeBtn.onclick = function() {
+            loginModal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if ( event.target == loginModal ) {
+                loginModal.style.display = "none";
+            }
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+
+            // prevent default
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            postData( _cqfs.ajaxurl, formData )
+            .then(response => response.json() )
+            .then( obj => {
+                console.log(obj);
+            } );
+
+
+        });
+
+    }
+    
+
+
+
 
     //multi page instances
     const cqfs_MultiPage = Array.from(document.querySelectorAll('.cqfs.multi'));

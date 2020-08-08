@@ -101,7 +101,7 @@ class CQFS {
 		require CQFS_PATH . 'inc/roles.php';
         register_activation_hook( __FILE__, array( 'Cqfs_Roles', 'add_caps_admin' ) );
 		register_deactivation_hook( __FILE__, array( 'Cqfs_Roles', 'remove_caps_admin' ) );
-		
+
 	}
 
 	/**
@@ -168,6 +168,9 @@ class CQFS {
 
 		//enqueue scripts to front
 		add_action('wp_enqueue_scripts', [$this, 'cqfs_enqueue_scripts']);
+
+		// add login form for CQFS use
+		add_action( 'wp_footer', [ 'CQFS\INC\UTIL\Utilities', 'cqfs_login_submit_form'] );
 
 	}
 

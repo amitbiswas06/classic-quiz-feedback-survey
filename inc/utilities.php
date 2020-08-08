@@ -259,7 +259,7 @@ class Utilities{
      * @param string $legal         The custom text/html invoked. wp_kses filtered
      * @return html                 string escaped.
      */
-    public static function cqfs_user_info_form( $id, $layout_type = "multi", $legal = "" ){
+    public static function cqfs_user_info_form( $id, $guest = false, $layout_type = "multi", $legal = "" ){
         if( !is_user_logged_in() ){
 
             if( $layout_type === 'multi' ){
@@ -268,36 +268,47 @@ class Utilities{
                 echo '<div class="cqfs-user-form">';
             }
 
-            //guest user message
-            $guest_user_form_msg = apply_filters( 'cqfs_guest_user_form_msg', esc_html__('Hello Guest&#33; please provide the following info&#46;', 'cqfs'));
             printf(
-                '<p class="cqfs-user-form--msg">%s</p>',
-                esc_html( $guest_user_form_msg )
-            );
-            //display identity form
-            //name field
-            $error_uname = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Name. Min 3, max 24 characters allowed.','cqfs') );
-            printf(
-                '<label for="%s">%s</label>
-                <input id="%s" name="_cqfs_uname" type="text" placeholder="%s"><div class="error-msg error-uname hide">%s</div>',
-                'uname_' . esc_attr( $id ),
-                esc_html__('Your Name &#42;', 'cqfs'),
-                'uname_' . esc_attr( $id ),
-                esc_html__('please type your name.', 'cqfs'),
-                esc_html( $error_uname )
+                __('<a class="cqfs-modal-link" href="#">%s</a>'),
+                esc_html__('Login and submit','cqfs')
             );
 
-            //email field
-            $error_email = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Email','cqfs') );
-            printf(
-                '<label for="%s">%s</label>
-                <input id="%s" name="_cqfs_email" type="email" placeholder="%s"><div class="error-msg error-email hide">%s</div>',
-                'uemail_' . esc_attr( $id ),
-                esc_html__('Your Email &#42;', 'cqfs'),
-                'uemail_' . esc_attr( $id ),
-                esc_html__('please type email.', 'cqfs'),
-                esc_html( $error_email )
-            );
+            // display if guest mode is on
+            if( $guest ){
+
+                //guest user message
+                $guest_user_form_msg = apply_filters( 'cqfs_guest_user_form_msg', esc_html__('Or you may submit as a guest. Please provide the following info.', 'cqfs'));
+                printf(
+                    '<p class="cqfs-user-form--msg">%s</p>',
+                    esc_html( $guest_user_form_msg )
+                );
+                //display identity form
+                //name field
+                $error_uname = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Name. Min 3, max 24 characters allowed.','cqfs') );
+                printf(
+                    '<label for="%s">%s</label>
+                    <input id="%s" name="_cqfs_uname" type="text" placeholder="%s"><div class="error-msg error-uname hide">%s</div>',
+                    'uname_' . esc_attr( $id ),
+                    esc_html__('Your Name &#42;', 'cqfs'),
+                    'uname_' . esc_attr( $id ),
+                    esc_html__('please type your name.', 'cqfs'),
+                    esc_html( $error_uname )
+                );
+
+                //email field
+                $error_email = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Email','cqfs') );
+                printf(
+                    '<label for="%s">%s</label>
+                    <input id="%s" name="_cqfs_email" type="email" placeholder="%s"><div class="error-msg error-email hide">%s</div>',
+                    'uemail_' . esc_attr( $id ),
+                    esc_html__('Your Email &#42;', 'cqfs'),
+                    'uemail_' . esc_attr( $id ),
+                    esc_html__('please type email.', 'cqfs'),
+                    esc_html( $error_email )
+                );
+
+            }
+
 
             //consent message html
             $consent = apply_filters('cqfs_user_form_consent', $legal );
@@ -322,6 +333,59 @@ class Utilities{
             echo '</div>';
 
         }
+
+    }
+
+
+    public static function cqfs_login_submit_form(){
+
+        // if user is logged in, return immediately
+        if( is_user_logged_in() ){
+            return;
+        }
+
+        ?>
+        <div id="cqfs-login" class="cqfs-modal">
+
+            <div class="cqfs-modal-content">
+                <div class="cqfs-modal-header">
+                    <span class="cqfs-close"><?php echo esc_html__('&times;','cqfs'); ?></span>
+                    <h3><?php echo esc_html__('Please login to submit','cqfs'); ?></h3>
+                </div>
+                <div class="cqfs-modal-body">
+                    <form name="cqfs-login-form" action="<?php echo esc_url( admin_url('admin-ajax.php') ); ?>" method="post">
+                        <div class="hidden-fields">
+                            <?php
+                            // insert hidden action input
+                            printf('<input type="hidden" name="action" value="%s">', esc_attr('cqfs_login'));
+                            // create nonce field
+                            wp_nonce_field( 'cqfs_login', '_cqfs_login_nonce' );
+                            ?>
+                        </div>
+                        <fieldset>
+                            <legend><?php echo esc_html__('Secure Login','cqfs'); ?></legend>
+                            <div class="cqfs-login-input">
+                                <label for="cqfs_login_username"><?php echo esc_html__('Username or email', 'cqfs'); ?></label>
+                                <input type="text" name="cqfs_username" id="cqfs_login_username" autocapitalize="off" size="20">
+                            </div>
+                            <div class="cqfs-login-input">
+                                <label for="cqfs_login_password"><?php echo esc_html__('Password', 'cqfs'); ?></label>
+                                <input type="password" name="cqfs_password" id="cqfs_login_password">
+                            </div>
+                            <button type="submit"><?php echo esc_html__('Login','cqfs'); ?></button>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="cqfs-modal-footer">
+                    <p class="cqfs-forget-password">
+                        <a href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php echo esc_html__('Forgot password? Click here.','cqfs'); ?></a>
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+        
+        <?php
 
     }
 

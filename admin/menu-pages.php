@@ -110,9 +110,9 @@ class MenuPages {
 
                             <div class="cqfs-field">
                                 <div class="cqfs-label">
-                                    <label for="cqfs-allow-all"><?php echo esc_html__('Enable all users.','cqfs'); ?></label>
+                                    <label for="cqfs-allow-all"><?php echo esc_html__('Allow guest users.','cqfs'); ?></label>
                                     <p class="description"><?php 
-                                    echo esc_html__('Also allow non logged in users to participate. Email ID will be required.','cqfs'); 
+                                    echo esc_html__('Allow guest users to participate. Email ID will be required.','cqfs'); 
                                     ?></p>
                                 </div>
                                 <div class="cqfs-input">
