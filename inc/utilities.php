@@ -260,7 +260,6 @@ class Utilities{
      * @return html                 string escaped.
      */
     public static function cqfs_user_info_form( $id, $guest = false, $layout_type = "multi", $legal = "" ){
-        if( !is_user_logged_in() ){
 
             if( $layout_type === 'multi' ){
                 echo '<div class="cqfs-user-form hide">';
@@ -268,13 +267,20 @@ class Utilities{
                 echo '<div class="cqfs-user-form">';
             }
 
-            printf(
-                __('<a class="cqfs-modal-link" href="#">%s</a>'),
-                esc_html__('Login and submit','cqfs')
-            );
+            if( is_user_logged_in() ){
+                printf(
+                    __('<p class="logged-in-msg">%s</p>'),
+                    esc_html__('You are logged in.','cqfs')
+                );
+            }
 
             // display if guest mode is on
-            if( $guest ){
+            if( !is_user_logged_in() && $guest ){
+
+                printf(
+                    __('<a class="cqfs-modal-link" href="#">%s</a>'),
+                    esc_html__('Login and submit','cqfs')
+                );
 
                 //guest user message
                 $guest_user_form_msg = apply_filters( 'cqfs_guest_user_form_msg', esc_html__('Or you may submit as a guest. Please provide the following info.', 'cqfs'));
@@ -332,8 +338,6 @@ class Utilities{
 
             echo '</div>';
 
-        }
-
     }
 
 
@@ -345,7 +349,7 @@ class Utilities{
         }
 
         ?>
-        <div id="cqfs-login" class="cqfs-modal">
+        <div id="cqfs-login" class="cqfs-modal display-none transition">
 
             <div class="cqfs-modal-content">
                 <div class="cqfs-modal-header">
@@ -366,15 +370,16 @@ class Utilities{
                             <legend><?php echo esc_html__('Secure Login','cqfs'); ?></legend>
                             <div class="cqfs-login-input">
                                 <label for="cqfs_login_username"><?php echo esc_html__('Username or email', 'cqfs'); ?></label>
-                                <input type="text" name="cqfs_username" id="cqfs_login_username" autocapitalize="off" size="20">
+                                <input type="text" name="cqfs_username" id="cqfs_login_username" autocapitalize="off" size="20" required>
                             </div>
                             <div class="cqfs-login-input">
                                 <label for="cqfs_login_password"><?php echo esc_html__('Password', 'cqfs'); ?></label>
-                                <input type="password" name="cqfs_password" id="cqfs_login_password">
+                                <input type="password" name="cqfs_password" id="cqfs_login_password" required>
                             </div>
                             <button type="submit"><?php echo esc_html__('Login','cqfs'); ?></button>
                         </fieldset>
                     </form>
+                    <div class="cqfs-alert-message display-none transition"></div>
                 </div>
                 <div class="cqfs-modal-footer">
                     <p class="cqfs-forget-password">

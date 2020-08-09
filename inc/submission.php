@@ -85,7 +85,10 @@ class Cqfs_Submission {
         //bail early if found suspecious with nonce verification.
 		if ( !isset( $this->values['_cqfs_login_nonce'] ) || ! wp_verify_nonce( $this->values['_cqfs_login_nonce'], 'cqfs_login' ) ) {
         
-            wp_send_json_error(['security_check' => false]);
+            wp_send_json_error([
+                'login'     => false,
+                'message'   => esc_html__('Security check unsuccessful.','cqfs')
+            ]);
         
         }
 
@@ -100,9 +103,16 @@ class Cqfs_Submission {
             $user = wp_signon( $creds, false );
          
             if ( is_wp_error( $user ) ) {
-                wp_send_json_error($user->get_error_message());
+                wp_send_json_error([
+                    'login'     => false,
+                    'message'   => esc_html($user->get_error_message())
+                ]);
             }else{
-                wp_send_json_success(['login' => true]);
+                wp_send_json_success([
+                    'login'     => true,
+                    'message'   => esc_html__('Login Successful.', 'cqfs'),
+                    'status'    => esc_html__('You are logged in.', 'cqfs')
+                ]);
             }
             
         }

@@ -27,6 +27,46 @@
 **********************************************************/
 
 /**
+ * Fadein function
+ * 
+ * @param {node} el 
+ */
+function fadeIn(el){
+
+    el.style.display = "block";
+    el.style.opacity = 0;
+    el.classList.remove('display-none');
+
+    setTimeout( () => {
+        el.style.opacity = 1
+    }, 200 );
+
+}
+
+function fadeOut(el){
+
+    el.style.opacity = 0;
+
+    setTimeout( () => {
+        el.style.display = "none";
+    }, 200 );
+
+}
+
+/* let show = document.getElementById('show')
+let hide = document.getElementById('hide')
+let redbox = document.getElementById('redbox')
+
+show.onclick = (e) => {
+    e.preventDefault();
+    fadeIn(redbox)
+}
+hide.onclick = (e) => {
+    e.preventDefault();
+    fadeOut(redbox)
+} */
+
+/**
  * Disable input, buttons etc
  * 
  * @param {Node Element} el 
@@ -421,7 +461,7 @@ let initialize_CqfsMulti = function( cqfs ){
 
             //for the last set of answers option
             //disable the next button and enable the submit button
-            if( i == arr.length -1 ){
+            /* if( i == arr.length -1 ){
                 q.addEventListener('click', (e) => {
                     let checked = allOptions[i].map( v => v.checked || v.type === 'text' || v.type === 'email' );
                     console.log(checked);
@@ -431,7 +471,7 @@ let initialize_CqfsMulti = function( cqfs ){
                         disableMe(submit);
                     }
                 } );
-            }
+            } */
 
         });
 
@@ -478,6 +518,7 @@ let initialize_CqfsMulti = function( cqfs ){
 
                 //enable previous button
                 enableMe(prv);
+                enableMe(submit);
             }
 
             //console.log(count)
@@ -512,6 +553,7 @@ let initialize_CqfsMulti = function( cqfs ){
             if( count == 0 ){
                 //disable target which is previous button
                 disableMe(e.target);
+                disableMe(submit);
 
                 //enable next button
                 enableMe(nxt);
@@ -573,6 +615,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginModal = document.getElementById('cqfs-login');
     const openModalLinks = Array.from(document.querySelectorAll('.cqfs-modal-link'));
     const closeBtn = document.querySelector('.cqfs-close');
+    const alertMsg = document.querySelector('.cqfs-alert-message');
+    const userForms = Array.from(document.querySelectorAll('.cqfs-user-form'));
+    console.log(userForms)
     
     // run if login modal is available
     if( loginModal ){
@@ -582,18 +627,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // When the user clicks the button, open the modal 
         openModalLinks.map( el => el.addEventListener('click', (e) => {
             e.preventDefault();
-            loginModal.style.display = "block";
+            fadeIn(loginModal);
         }));
 
         // When the user clicks on <span> (x), close the modal
         closeBtn.onclick = function() {
-            loginModal.style.display = "none";
+            fadeOut(loginModal)
         }
 
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function(event) {
             if ( event.target == loginModal ) {
-                loginModal.style.display = "none";
+                fadeOut(loginModal)
             }
         }
 
@@ -607,6 +652,24 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json() )
             .then( obj => {
                 console.log(obj);
+                if( obj.data.login ){
+                    e.target.style.display = 'none';
+                    alertMsg.classList.remove('display-none');
+                    alertMsg.innerHTML = obj.data.message;
+
+                    setTimeout( () => {
+                        fadeOut(loginModal);
+                        // console.log(userForms)
+                        userForms.map( el => el.innerHTML = obj.data.status );
+                    }, 1500 );
+
+                }
+
+                if( !obj.data.login ){
+                    alertMsg.classList.remove('display-none');
+                    alertMsg.innerHTML = obj.data.message;
+                }
+
             } );
 
 
