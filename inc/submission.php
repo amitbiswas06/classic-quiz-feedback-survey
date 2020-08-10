@@ -89,6 +89,8 @@ class Cqfs_Submission {
                 'login'     => false,
                 'message'   => esc_html__('Security check unsuccessful.','cqfs')
             ]);
+
+            exit();
         
         }
 
@@ -108,17 +110,20 @@ class Cqfs_Submission {
                     'message'   => esc_html($user->get_error_message())
                 ]);
             }else{
+                wp_set_current_user($user->ID);
+                wp_set_auth_cookie($user->ID);
                 wp_send_json_success([
                     'login'     => true,
                     'message'   => esc_html__('Login Successful.', 'cqfs'),
-                    'status'    => esc_html__('You are logged in.', 'cqfs')
+                    'status'    => esc_html__('You are logged in.', 'cqfs'),
+                    'nonce'     => wp_create_nonce('_cqfs_post_'),
                 ]);
             }
             
         }
         
 
-        wp_send_json($this->values);
+        // wp_send_json($this->values);
 
         exit();
     }
@@ -126,9 +131,16 @@ class Cqfs_Submission {
     public function cqfs_login_status_check(){
 
         if( is_user_logged_in() ){
-            wp_send_json(['logged_in' => true]);
+            wp_send_json([
+                'logged_in' => true,
+                'nonce'     => wp_create_nonce('_cqfs_post_')
+
+            ]);
         }else{
-            wp_send_json(['logged_in' => false]);
+            wp_send_json([
+                'logged_in' => false,
+                'nonce'     => wp_create_nonce('_cqfs_post_')
+            ]);
         }
 
         exit();
@@ -142,7 +154,7 @@ class Cqfs_Submission {
      */
 	public function cqfs_form_submission(){
 
-        // var_dump($this->values);//main $_post
+        var_dump($this->values);//main $_post
 
         $cqfsID = '';
         if( isset($this->values['_cqfs_id']) ){
@@ -150,17 +162,18 @@ class Cqfs_Submission {
         }
         
         //unique nonce fields
-        $nonce_action = esc_attr('cqfs_post_') . $cqfsID;
+        $nonce_action = esc_attr('_cqfs_post_');
         $nonce_name = esc_attr('_cqfs_nonce_') . $cqfsID;
 
 		//bail early if found suspecious with nonce verification.
 		if ( !isset( $this->values[$nonce_name] ) || ! wp_verify_nonce( $this->values[$nonce_name], $nonce_action ) ) {
 
             //send JSON response for ajax mode on failure
-            wp_send_json_error( $this->failure_args );
+            // wp_send_json_error( $this->failure_args );
 
             //safe redirect for php mode on failure
-			wp_safe_redirect( $this->failure_url );
+            // wp_safe_redirect( $this->failure_url );
+            var_dump($this->failure_args);
             
 			exit();
 

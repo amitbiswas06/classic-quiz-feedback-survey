@@ -102,6 +102,8 @@ class CQFS {
         register_activation_hook( __FILE__, array( 'Cqfs_Roles', 'add_caps_admin' ) );
 		register_deactivation_hook( __FILE__, array( 'Cqfs_Roles', 'remove_caps_admin' ) );
 
+		add_action( 'set_logged_in_cookie', [$this, 'my_update_cookie'] );
+
 	}
 
 	/**
@@ -251,6 +253,11 @@ class CQFS {
 		);
 
 	}
+
+	public function my_update_cookie( $logged_in_cookie ){
+		$_COOKIE[LOGGED_IN_COOKIE] = $logged_in_cookie;
+	}
+	
 
 
 }//class CQFS end

@@ -380,18 +380,23 @@ function formSubmitEvent(e, processingDiv, cqfs){
 }
 
 
-function realtime_login_status(){
-    
-    let data = new FormData();
-    data.append('action', 'cqfs_login_status_check');
-    checkLoginStatus( _cqfs.ajaxurl, data )
+function cqfs_form_submission(e){
+
+    let loginAction = new FormData();
+        loginAction.append('action', 'cqfs_login_status_check');
+
+    e.preventDefault();
+    checkLoginStatus( _cqfs.ajaxurl, loginAction )
     .then( response => response.json() )
-    .then( obj => {
-        console.log(obj.logged_in);
-    } );
+    .then( loginStatus => {
+        
+        console.log(loginStatus);
+
+    });
 
 }
-
+const loginCheckBtn = document.querySelector('#login-check');
+loginCheckBtn.addEventListener( 'click', cqfs_form_submission );
 
 
 /********************** end of utility functions ***********************/
@@ -596,12 +601,41 @@ let initialize_CqfsSingle = function ( cqfs ){
         //form submit validation
         // form.addEventListener( 'submit', e => formSubmitEvent(e, processingDiv, cqfs) );
 
-        form.addEventListener('submit', e => {
+        form.addEventListener('submit', async e => {
 
-            e.preventDefault();
-            console.log('submit clicked');
+            const loginClass = cqfs.classList.contains('cqfs-logged-in');
+            const inpValid = form_input_validation( cqfs, e );
 
-            realtime_login_status();
+            if( !loginClass ){
+
+                form_name_email_validation( cqfs, e );
+                console.log('not logged in')
+
+            }
+
+            //form data for ajax submit
+            // const formData = new FormData(e.target);
+            // let loginAction = new FormData();
+            //     loginAction.append('action', 'cqfs_login_status_check');
+
+            // await checkLoginStatus( _cqfs.ajaxurl, loginAction )
+            // .then( response => response.json() )
+            // .then( loginStatus => {
+                
+            //     const status = loginStatus.logged_in;
+            //     if( !status ){
+            //         // form_input_validation( cqfs, e );
+            //         form_name_email_validation( cqfs, e );
+            //         alert('not logged in')
+            //     }else{
+            //         // form_input_validation( cqfs, e );
+            //         alert('logged in');
+            //     }
+
+            // })
+            // .catch(err => {  
+            //     console.error('Request failed', err) 
+            // });
 
         });
 
@@ -617,7 +651,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.querySelector('.cqfs-close');
     const alertMsg = document.querySelector('.cqfs-alert-message');
     const userForms = Array.from(document.querySelectorAll('.cqfs-user-form'));
-    console.log(userForms)
+    const cqfsDivs = Array.from(document.querySelectorAll('.cqfs'));
+    console.log(userForms);
     
     // run if login modal is available
     if( loginModal ){
@@ -648,11 +683,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const formData = new FormData(e.target);
 
-            postData( _cqfs.ajaxurl, formData )
-            .then(response => response.json() )
-            .then( obj => {
-                console.log(obj);
-                if( obj.data.login ){
+            let fetch1 = postData( _cqfs.ajaxurl, formData );
+            // .then(response => response.json() )
+            // .then( obj => {
+                // return obj;
+                // console.log(obj);
+                /* if( obj.data.login ){
                     e.target.style.display = 'none';
                     alertMsg.classList.remove('display-none');
                     alertMsg.innerHTML = obj.data.message;
@@ -661,6 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         fadeOut(loginModal);
                         // console.log(userForms)
                         userForms.map( el => el.innerHTML = obj.data.status );
+                        cqfsDivs.map( el => el.classList.add('cqfs-logged-in'));
                     }, 1500 );
 
                 }
@@ -668,9 +705,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if( !obj.data.login ){
                     alertMsg.classList.remove('display-none');
                     alertMsg.innerHTML = obj.data.message;
-                }
+                } */
 
-            } );
+            // } )
+            // .then( data => cqfs_form_submission )
+            // .then( newdata => console.log(newdata))
+
+            let loginAction = new FormData();
+                loginAction.append('action', 'cqfs_login_status_check');
+
+            let fetch2 = checkLoginStatus( _cqfs.ajaxurl, loginAction );
+
+            Promise.all( [fetch1, fetch2] )
+            .then( res => {
+                res.forEach( val => console.log(val.json()) )
+            })
+            .catch( err => console.log(err) );
 
 
         });

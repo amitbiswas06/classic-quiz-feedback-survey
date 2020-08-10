@@ -158,7 +158,7 @@ class CqfsShortcode {
                         printf('<input type="hidden" name="action" value="%s">', esc_attr('cqfs_response'));
                         
                         //create unique nonce fields for every form
-                        $nonce_action = esc_attr('cqfs_post_') . esc_attr($cqfs_build['id']);
+                        $nonce_action = esc_attr('_cqfs_post_');
                         $nonce_name = esc_attr('_cqfs_nonce_') . esc_attr($cqfs_build['id']);
                         wp_nonce_field( $nonce_action, $nonce_name );
 
