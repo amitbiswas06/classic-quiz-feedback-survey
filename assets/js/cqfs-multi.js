@@ -397,7 +397,7 @@ function formSubmitEvent(e, processingDiv, cqfs){
 
 }
 
-
+// TEMP
 function cqfs_form_submission(e){
 
     let loginAction = new FormData();
@@ -699,9 +699,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
     
-
-
-
 
     //multi page instances
     const cqfs_MultiPage = Array.from(document.querySelectorAll('.cqfs.multi'));

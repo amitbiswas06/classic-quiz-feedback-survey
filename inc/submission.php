@@ -107,7 +107,7 @@ class Cqfs_Submission {
             if ( is_wp_error( $user ) ) {
                 wp_send_json_error([
                     'login'     => false,
-                    'message'   => esc_html($user->get_error_message())
+                    'message'   => wp_kses($user->get_error_message(), 'post')
                 ]);
             }else{
                 wp_set_current_user($user->ID);
