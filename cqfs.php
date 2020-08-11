@@ -102,8 +102,17 @@ class CQFS {
         register_activation_hook( __FILE__, array( 'Cqfs_Roles', 'add_caps_admin' ) );
 		register_deactivation_hook( __FILE__, array( 'Cqfs_Roles', 'remove_caps_admin' ) );
 
-		add_action( 'set_logged_in_cookie', [$this, 'my_update_cookie'] );
+		// set logged in cookie immediately after ajax login
+		add_action( 'set_logged_in_cookie', [$this, 'cqfs_update_logged_in_cookie'] );
 
+	}
+
+	/**
+	 * Set logged in cookie immediately after login
+	 * this helps to return wp nonce created after ajax login
+	 */
+	public function cqfs_update_logged_in_cookie( $logged_in_cookie ){
+		$_COOKIE[LOGGED_IN_COOKIE] = $logged_in_cookie;
 	}
 
 	/**
@@ -222,6 +231,7 @@ class CQFS {
 				'ajaxurl'		=> esc_url( admin_url( 'admin-ajax.php' ) ),
 				'login_status'	=> is_user_logged_in(),
 				'form_handle'	=> esc_attr( get_option('_cqfs_form_handle') ),
+				'allow_guest'	=> esc_attr( get_option('_cqfs_allow_all') ),
 			)
 		);
 
@@ -254,10 +264,6 @@ class CQFS {
 
 	}
 
-	public function my_update_cookie( $logged_in_cookie ){
-		$_COOKIE[LOGGED_IN_COOKIE] = $logged_in_cookie;
-	}
-	
 
 
 }//class CQFS end

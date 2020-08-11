@@ -87,9 +87,12 @@ class CqfsShortcode {
         $param['_cqfs_status'] !== 'success' || 
         $param['_cqfs_id'] !== $cqfs_build['id'] ) { 
             //display the form
+
+            $classes = $cqfs_build['classname'];
+            $classes .= is_user_logged_in() ? ' ' . 'cqfs-logged-in' : '';
         ?>
         <!-- cqfs start -->
-        <div id="cqfs-<?php echo esc_attr($cqfs_build['id']); ?>" class="cqfs <?php echo esc_attr($cqfs_build['classname']) ?>" data-cqfs-layout = <?php echo esc_attr($cqfs_build['layout']); ?>>
+        <div id="cqfs-<?php echo esc_attr($cqfs_build['id']); ?>" class="cqfs <?php echo esc_attr($classes) ?>" data-cqfs-layout = <?php echo esc_attr($cqfs_build['layout']); ?>>
             <?php 
             if( $atts['title'] !== 'false' ){
                 printf(
@@ -145,8 +148,10 @@ class CqfsShortcode {
                         $i++;
                         endforeach;
 
+                        //allow guest checkbox value - boolean
+                        $allow_guest = esc_attr( get_option('_cqfs_allow_all') );
                         //if not logged in, display user info form
-                        Util::cqfs_user_info_form( $cqfs_build['id'], true, $cqfs_build['layout'] );
+                        Util::cqfs_user_info_form( $cqfs_build['id'], $cqfs_build['layout'], $allow_guest );
 
                         //insert form ID in a hidden field
                         printf(

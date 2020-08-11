@@ -181,21 +181,25 @@ function form_name_email_validation( cqfs, event ){
     const letters = /^[A-Za-z\s]+$/;
     const emailID = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-    [form_uname, form_email].map( v => v.classList.remove('cqfs-error') );
-    [invalid_name_msg, invalid_email_msg].map( v => hideMe(v) );
+    if( form_uname && form_email ){
 
-    if( !form_uname.value || !form_uname.value.match(letters) || form_uname.value.length < 3 || form_uname.value.length > 25 ){
-        form_uname.classList.add('cqfs-error');
-        showMe(invalid_name_msg);
-        event.preventDefault();
-        returnVal = false;
-    }
+        [form_uname, form_email].map( v => v.classList.remove('cqfs-error') );
+        [invalid_name_msg, invalid_email_msg].map( v => hideMe(v) );
 
-    if ( ! emailID.test(form_email.value) ){
-        form_email.classList.add('cqfs-error');
-        showMe(invalid_email_msg);
-        event.preventDefault();
-        returnVal = false;
+        if( !form_uname.value || !form_uname.value.match(letters) || form_uname.value.length < 3 || form_uname.value.length > 25 ){
+            form_uname.classList.add('cqfs-error');
+            showMe(invalid_name_msg);
+            event.preventDefault();
+            returnVal = false;
+        }
+
+        if ( ! emailID.test(form_email.value) ){
+            form_email.classList.add('cqfs-error');
+            showMe(invalid_email_msg);
+            event.preventDefault();
+            returnVal = false;
+        }
+
     }
 
     return returnVal;
@@ -331,14 +335,24 @@ function formSubmitEvent(e, processingDiv, cqfs){
     //validate form inputs
     let inpValidation = form_input_validation( cqfs, e );
 
+    const loginClass = cqfs.classList.contains('cqfs-logged-in');
+    const allowGuest = _cqfs.allow_guest;
+
     //run for not logged in users
     //validate the name and email field
-    if( ! _cqfs.login_status ){
+    if( ! loginClass ){
 
         //for ajax submit mode
         if( !_cqfs.form_handle || _cqfs.form_handle === 'ajax_mode' ){
             e.preventDefault();
-            let emailValidation = form_name_email_validation( cqfs, e );
+
+            let emailValidation = true;
+            if( allowGuest ){
+                emailValidation = form_name_email_validation( cqfs, e );
+            }else{
+                emailValidation = false;
+                alert('Please login to submit');
+            }
 
             if( inpValidation && emailValidation ){
                 showMe( processingDiv );
@@ -352,10 +366,14 @@ function formSubmitEvent(e, processingDiv, cqfs){
                 } );
                 
             }
+        }else if( allowGuest ){
+            //for php submit mode
+            form_name_email_validation( cqfs, e );
+        }else{
+            e.preventDefault();
+            alert('Please login to submit');
         }
         
-        //for php submit mode
-        form_name_email_validation( cqfs, e );
 
     }else if( !_cqfs.form_handle || _cqfs.form_handle === 'ajax_mode' ){
 
@@ -601,43 +619,7 @@ let initialize_CqfsSingle = function ( cqfs ){
         //form submit validation
         // form.addEventListener( 'submit', e => formSubmitEvent(e, processingDiv, cqfs) );
 
-        form.addEventListener('submit', async e => {
-
-            const loginClass = cqfs.classList.contains('cqfs-logged-in');
-            const inpValid = form_input_validation( cqfs, e );
-
-            if( !loginClass ){
-
-                form_name_email_validation( cqfs, e );
-                console.log('not logged in')
-
-            }
-
-            //form data for ajax submit
-            // const formData = new FormData(e.target);
-            // let loginAction = new FormData();
-            //     loginAction.append('action', 'cqfs_login_status_check');
-
-            // await checkLoginStatus( _cqfs.ajaxurl, loginAction )
-            // .then( response => response.json() )
-            // .then( loginStatus => {
-                
-            //     const status = loginStatus.logged_in;
-            //     if( !status ){
-            //         // form_input_validation( cqfs, e );
-            //         form_name_email_validation( cqfs, e );
-            //         alert('not logged in')
-            //     }else{
-            //         // form_input_validation( cqfs, e );
-            //         alert('logged in');
-            //     }
-
-            // })
-            // .catch(err => {  
-            //     console.error('Request failed', err) 
-            // });
-
-        });
+        form.addEventListener('submit', e => formSubmitEvent(e, processingDiv, cqfs) );
 
     }
 
@@ -652,7 +634,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertMsg = document.querySelector('.cqfs-alert-message');
     const userForms = Array.from(document.querySelectorAll('.cqfs-user-form'));
     const cqfsDivs = Array.from(document.querySelectorAll('.cqfs'));
-    console.log(userForms);
+    const cqfsNonce = Array.from( document.querySelectorAll('input[name^=_cqfs_nonce_]') );
+    console.log(cqfsNonce);
     
     // run if login modal is available
     if( loginModal ){
@@ -683,12 +666,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const formData = new FormData(e.target);
 
-            let fetch1 = postData( _cqfs.ajaxurl, formData );
-            // .then(response => response.json() )
-            // .then( obj => {
+            postData( _cqfs.ajaxurl, formData )
+            .then(response => response.json() )
+            .then( obj => {
                 // return obj;
-                // console.log(obj);
-                /* if( obj.data.login ){
+                console.log(obj);
+                if( obj.data.login ){
                     e.target.style.display = 'none';
                     alertMsg.classList.remove('display-none');
                     alertMsg.innerHTML = obj.data.message;
@@ -698,6 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // console.log(userForms)
                         userForms.map( el => el.innerHTML = obj.data.status );
                         cqfsDivs.map( el => el.classList.add('cqfs-logged-in'));
+                        cqfsNonce.map( inp => inp.value = obj.data.nonce);
                     }, 1500 );
 
                 }
@@ -705,21 +689,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if( !obj.data.login ){
                     alertMsg.classList.remove('display-none');
                     alertMsg.innerHTML = obj.data.message;
-                } */
+                }
 
-            // } )
-            // .then( data => cqfs_form_submission )
-            // .then( newdata => console.log(newdata))
-
-            let loginAction = new FormData();
-                loginAction.append('action', 'cqfs_login_status_check');
-
-            let fetch2 = checkLoginStatus( _cqfs.ajaxurl, loginAction );
-
-            Promise.all( [fetch1, fetch2] )
-            .then( res => {
-                res.forEach( val => console.log(val.json()) )
-            })
+            } )
             .catch( err => console.log(err) );
 
 

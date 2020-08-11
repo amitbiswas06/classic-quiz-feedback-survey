@@ -62,8 +62,8 @@ class MenuPages {
         //form mode value
         $form_mode = esc_attr( get_option('_cqfs_form_handle') );
 
-        //allow all checkbox value
-        $allow_all = esc_attr( get_option('_cqfs_allow_all') );
+        //allow guest checkbox value
+        $allow_guest = esc_attr( get_option('_cqfs_allow_all') );
 
         ?>
         <div class="cqfs-admin">
@@ -119,7 +119,7 @@ class MenuPages {
                                     <input type="checkbox" 
                                     name="_cqfs[allow-all]" 
                                     id="cqfs-allow-all" <?php 
-                                    if($allow_all) { echo esc_attr('checked'); } ?>>
+                                    if($allow_guest) { echo esc_attr('checked'); } ?>>
                                 </div>
                             </div>
 
@@ -129,7 +129,7 @@ class MenuPages {
 
                         //submit button
                         submit_button(); 
-                        var_dump($allow_all);
+                        var_dump($allow_guest);
 
                         ?>
 

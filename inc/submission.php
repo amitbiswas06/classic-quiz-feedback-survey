@@ -111,7 +111,6 @@ class Cqfs_Submission {
                 ]);
             }else{
                 wp_set_current_user($user->ID);
-                wp_set_auth_cookie($user->ID);
                 wp_send_json_success([
                     'login'     => true,
                     'message'   => esc_html__('Login Successful.', 'cqfs'),
@@ -121,9 +120,6 @@ class Cqfs_Submission {
             }
             
         }
-        
-
-        // wp_send_json($this->values);
 
         exit();
     }
@@ -154,7 +150,7 @@ class Cqfs_Submission {
      */
 	public function cqfs_form_submission(){
 
-        var_dump($this->values);//main $_post
+        // var_dump($this->values);//main $_post
 
         $cqfsID = '';
         if( isset($this->values['_cqfs_id']) ){
@@ -169,11 +165,11 @@ class Cqfs_Submission {
 		if ( !isset( $this->values[$nonce_name] ) || ! wp_verify_nonce( $this->values[$nonce_name], $nonce_action ) ) {
 
             //send JSON response for ajax mode on failure
-            // wp_send_json_error( $this->failure_args );
+            wp_send_json_error( $this->failure_args );
 
             //safe redirect for php mode on failure
-            // wp_safe_redirect( $this->failure_url );
-            var_dump($this->failure_args);
+            wp_safe_redirect( $this->failure_url );
+            // var_dump($this->failure_args);
             
 			exit();
 

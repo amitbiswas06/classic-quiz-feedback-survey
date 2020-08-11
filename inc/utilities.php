@@ -259,7 +259,7 @@ class Utilities{
      * @param string $legal         The custom text/html invoked. wp_kses filtered
      * @return html                 string escaped.
      */
-    public static function cqfs_user_info_form( $id, $guest = false, $layout_type = "multi", $legal = "" ){
+    public static function cqfs_user_info_form( $id, $layout_type = "multi", $guest = false, $legal = "" ){
 
             if( $layout_type === 'multi' ){
                 echo '<div class="cqfs-user-form hide">';
@@ -275,43 +275,47 @@ class Utilities{
             }
 
             // display if guest mode is on
-            if( !is_user_logged_in() && $guest ){
+            if( !is_user_logged_in() ){
 
                 printf(
                     __('<a class="cqfs-modal-link" href="#">%s</a>'),
                     esc_html__('Login and submit','cqfs')
                 );
 
-                //guest user message
-                $guest_user_form_msg = apply_filters( 'cqfs_guest_user_form_msg', esc_html__('Or you may submit as a guest. Please provide the following info.', 'cqfs'));
-                printf(
-                    '<p class="cqfs-user-form--msg">%s</p>',
-                    esc_html( $guest_user_form_msg )
-                );
-                //display identity form
-                //name field
-                $error_uname = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Name. Min 3, max 24 characters allowed.','cqfs') );
-                printf(
-                    '<label for="%s">%s</label>
-                    <input id="%s" name="_cqfs_uname" type="text" placeholder="%s"><div class="error-msg error-uname hide">%s</div>',
-                    'uname_' . esc_attr( $id ),
-                    esc_html__('Your Name &#42;', 'cqfs'),
-                    'uname_' . esc_attr( $id ),
-                    esc_html__('please type your name.', 'cqfs'),
-                    esc_html( $error_uname )
-                );
+                if( $guest ){
 
-                //email field
-                $error_email = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Email','cqfs') );
-                printf(
-                    '<label for="%s">%s</label>
-                    <input id="%s" name="_cqfs_email" type="email" placeholder="%s"><div class="error-msg error-email hide">%s</div>',
-                    'uemail_' . esc_attr( $id ),
-                    esc_html__('Your Email &#42;', 'cqfs'),
-                    'uemail_' . esc_attr( $id ),
-                    esc_html__('please type email.', 'cqfs'),
-                    esc_html( $error_email )
-                );
+                    //guest user message
+                    $guest_user_form_msg = apply_filters( 'cqfs_guest_user_form_msg', esc_html__('Or you may submit as a guest. Please provide the following info.', 'cqfs'));
+                    printf(
+                        '<p class="cqfs-user-form--msg">%s</p>',
+                        esc_html( $guest_user_form_msg )
+                    );
+                    //display identity form
+                    //name field
+                    $error_uname = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Name. Min 3, max 24 characters allowed.','cqfs') );
+                    printf(
+                        '<label for="%s">%s</label>
+                        <input id="%s" name="_cqfs_uname" type="text" placeholder="%s"><div class="error-msg error-uname hide">%s</div>',
+                        'uname_' . esc_attr( $id ),
+                        esc_html__('Your Name &#42;', 'cqfs'),
+                        'uname_' . esc_attr( $id ),
+                        esc_html__('please type your name.', 'cqfs'),
+                        esc_html( $error_uname )
+                    );
+
+                    //email field
+                    $error_email = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Email','cqfs') );
+                    printf(
+                        '<label for="%s">%s</label>
+                        <input id="%s" name="_cqfs_email" type="email" placeholder="%s"><div class="error-msg error-email hide">%s</div>',
+                        'uemail_' . esc_attr( $id ),
+                        esc_html__('Your Email &#42;', 'cqfs'),
+                        'uemail_' . esc_attr( $id ),
+                        esc_html__('please type email.', 'cqfs'),
+                        esc_html( $error_email )
+                    );
+
+                }
 
             }
 

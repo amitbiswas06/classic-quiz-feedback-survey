@@ -102,7 +102,7 @@ class FormHandle {
             // received value of form-handle
             $form_handle_mode = sanitize_text_field( $this->values['_cqfs']['form-handle'] );
             // received value of allow-all
-            $allow_all = rest_sanitize_boolean( $this->values['_cqfs']['allow-all'] );
+            $allow_guest = rest_sanitize_boolean( $this->values['_cqfs']['allow-all'] );
 
             // updates and stores form-handle
             if( $form_handle_mode ){
@@ -110,7 +110,7 @@ class FormHandle {
             }
 
             // update allow-all
-            update_option('_cqfs_allow_all', $allow_all );
+            update_option('_cqfs_allow_all', $allow_guest );
 
 
             //success return
