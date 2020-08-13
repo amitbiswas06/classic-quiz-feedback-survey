@@ -399,4 +399,39 @@ class Utilities{
     }
 
 
+    /**
+     * Fires Email
+     * 
+     * @param string|array $to
+     * @param string $subject
+     * @param string $body
+     * @return bool
+     */
+    public static function cqfs_mail( $to, $subject = '', $body = '' ){
+
+        $blog_name = esc_html(get_bloginfo('name'));
+        $admin_email = sanitize_email(get_bloginfo('admin_email'));
+        $status = false;
+
+        if( $to ){
+
+            if( !empty($subject) ){
+                $subject = $subject;
+            }else{
+                $subject = esc_html__('Classic quiz feedback survey','cqfs');
+            }
+            
+            $headers = array();
+            $headers[] = "From: {$blog_name} <{$admin_email}>";
+            $headers[] = "Content-Type: text/html; charset=UTF-8";
+ 
+            $status = wp_mail( $to, $subject, $body, $headers );
+
+        }
+
+        return $status;
+
+    }
+
+
 }

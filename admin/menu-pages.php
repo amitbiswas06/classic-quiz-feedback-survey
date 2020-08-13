@@ -14,6 +14,12 @@ class MenuPages {
         //construct the page
         add_action( 'admin_menu', [$this, 'cqfs_admin_main_page'] );
 
+        //construct the page
+        add_action( 'admin_menu', [$this, 'cqfs_cpt_menu_pages'] );
+
+        // submenu items
+        add_action( 'admin_menu', [$this, 'cqfs_submenu_items'] );
+
         //call register settings function
         add_action( 'admin_init', [$this, 'cqfs_register_settings'] );
 
@@ -38,16 +44,32 @@ class MenuPages {
     /**
      * Add a menu page for the settings etc pages.
      */
+    public function cqfs_cpt_menu_pages(){
+        
+        add_menu_page(
+            esc_html__( 'CQFS Post Types', 'cqfs' ),
+            esc_html__('CQFS', 'cqfs'),
+            'edit_cqfs_questions',
+            sanitize_key('cqfs-post-types'),
+            '',
+            'dashicons-lightbulb',
+            24
+        );
+    }
+
+    /**
+     * Add a menu page for the settings etc pages.
+     */
     public function cqfs_admin_main_page(){
         
         add_menu_page(
             esc_html__( 'CQFS Settings', 'cqfs' ),
-            esc_html__('CQFS', 'cqfs'),
+            esc_html__('CQFS Settings', 'cqfs'),
             'manage_options',
             sanitize_key('cqfs-settings'),
             [$this, 'cqfs_settings_page'],
             'dashicons-lightbulb',
-            25
+            24
         );
     }
 
@@ -128,8 +150,7 @@ class MenuPages {
                         <?php 
 
                         //submit button
-                        submit_button(); 
-                        var_dump($allow_guest);
+                        submit_button();
 
                         ?>
 
@@ -144,6 +165,41 @@ class MenuPages {
                     
         </div>
         <?php
+    }
+
+
+    public function cqfs_submenu_items(){
+
+        add_submenu_page(
+            'cqfs-post-types', 
+            esc_html__('Add Question', 'cqfs'), 
+            esc_html__('Add Question', 'cqfs'),
+            'edit_cqfs_questions', 
+            'post-new.php?post_type=cqfs_question',
+            '',
+            1
+        );
+
+        add_submenu_page(
+            'cqfs-post-types', 
+            esc_html__('Add Build', 'cqfs'), 
+            esc_html__('Add Build', 'cqfs'),
+            'edit_cqfs_builds', 
+            'post-new.php?post_type=cqfs_build',
+            '',
+            3
+        );
+
+        add_submenu_page(
+            'cqfs-post-types', 
+            esc_html__('Add Entry', 'cqfs'), 
+            esc_html__('Add Entry', 'cqfs'),
+            'edit_cqfs_entries', 
+            'post-new.php?post_type=cqfs_entry',
+            '',
+            5
+        );
+
     }
 
 

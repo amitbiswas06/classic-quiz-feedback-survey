@@ -397,26 +397,6 @@ function formSubmitEvent(e, processingDiv, cqfs){
 
 }
 
-// TEMP
-function cqfs_form_submission(e){
-
-    let loginAction = new FormData();
-        loginAction.append('action', 'cqfs_login_status_check');
-
-    e.preventDefault();
-    checkLoginStatus( _cqfs.ajaxurl, loginAction )
-    .then( response => response.json() )
-    .then( loginStatus => {
-        
-        console.log(loginStatus);
-
-    });
-
-}
-const loginCheckBtn = document.querySelector('#login-check');
-loginCheckBtn.addEventListener( 'click', cqfs_form_submission );
-
-
 /********************** end of utility functions ***********************/
 
 /**

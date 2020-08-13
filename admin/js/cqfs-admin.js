@@ -7,7 +7,6 @@
     // global submit check
     let isSubmit = false;
 
-    
     /**
      * Check text input value with the conditional logic
      * for cqfs_question only
@@ -122,7 +121,6 @@
         const answers = document.querySelector('#cqfs-answers');
         const answersArr = answers.value.split('\n');
         
-
         // form submit and validations
         form.addEventListener('submit', e => {
 

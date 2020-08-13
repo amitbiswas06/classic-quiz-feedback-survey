@@ -64,17 +64,10 @@ class Cqfs_Submission {
         add_action( 'admin_post_nopriv_cqfs_response', [$this, 'cqfs_form_submission'] );//php req
         add_action( 'wp_ajax_nopriv_cqfs_response', [$this, 'cqfs_form_submission'] );//AJAX req
 
-
         //Authenticated action for the CQFS form. action value `cqfs_response`
         add_action( 'admin_post_cqfs_response', [$this, 'cqfs_form_submission'] );//php req
         add_action( 'wp_ajax_cqfs_response', [$this, 'cqfs_form_submission'] );//AJAX req
         
-
-        // realtime login status check
-        add_action( 'wp_ajax_cqfs_login_status_check', [$this, 'cqfs_login_status_check'] );//AJAX req
-        add_action( 'wp_ajax_nopriv_cqfs_login_status_check', [$this, 'cqfs_login_status_check'] );//AJAX req
-
-
         // login function
         add_action( 'wp_ajax_nopriv_cqfs_login', [$this, 'cqfs_login'] );//AJAX req
 
@@ -122,25 +115,6 @@ class Cqfs_Submission {
         }
 
         exit();
-    }
-
-    public function cqfs_login_status_check(){
-
-        if( is_user_logged_in() ){
-            wp_send_json([
-                'logged_in' => true,
-                'nonce'     => wp_create_nonce('_cqfs_post_')
-
-            ]);
-        }else{
-            wp_send_json([
-                'logged_in' => false,
-                'nonce'     => wp_create_nonce('_cqfs_post_')
-            ]);
-        }
-
-        exit();
-
     }
 
 
@@ -340,6 +314,9 @@ class Cqfs_Submission {
         //on successful `cqfs_entry` post creation
         if( $cqfs_entry_id ){
 
+            // fire email
+            $send_email = Util::cqfs_mail( $user_emailID, '', 'success message in the body' );
+
             //add form id
             $redirect_args['_cqfs_id'] = urlencode($cqfsID);
 
@@ -372,26 +349,33 @@ class Cqfs_Submission {
         if( !$cqfs_entry_id && $this->submit_mode === 'ajax_mode'){
             
             wp_send_json_error( $redirect_args );
+            exit();
 
         }else if( $this->submit_mode === 'ajax_mode' ){
             //prepare args
             // $redirect_args[] = $post_array;
             $entry = util::cqfs_entry_obj($cqfs_entry_id);
             wp_send_json_success( $entry );
+
+            //exit immediately
+            exit();
         }
         
 
-        /**
-         * Redirect the page and exit
-         */
-        wp_safe_redirect(
-            esc_url_raw(
-                add_query_arg( $redirect_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?' ) ) ) )
-            )
-        );
+        if( $this->submit_mode === 'php_mode' ){
+            /**
+             * Redirect the page and exit
+             */
+            wp_safe_redirect(
+                esc_url_raw(
+                    add_query_arg( $redirect_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?' ) ) ) )
+                )
+            );
 
-        //exit immediately
-        exit();	
+            //exit immediately
+            exit();	
+        }
+        
 
     }
 

@@ -5,9 +5,32 @@
 .cqfs-fields{
     display: flex;
     flex-wrap: wrap;
-    margin-left: -12px !important;
-    margin-right: -12px !important;
+    margin-left: -12px;
+    margin-right: -12px;
 }
+
+.cqfs-admin .cqfs-fields{
+    margin: 0;
+}
+
+.cqfs-admin{
+    display: block;
+}
+
+@media (min-width:768px){
+    .cqfs-admin{
+        display: flex;
+        flex-direction: row;
+    }
+    .cqfs-admin .content{
+        width: 70%;
+    }
+    .cqfs-admin .sidebar{
+        width: 30%;
+        background: #ffffff;
+    }
+}
+
 
 .cqfs-fields,
 .cqfs-field,
@@ -227,10 +250,13 @@ html[dir="rtl"] input.cqfs-is-prepended.cqfs-is-appended {
 
 #cqfs_question_group.postbox > .handlediv,
 #cqfs_question_group.postbox > .hndle,
+#cqfs_question_group.postbox > .postbox-header,
 #cqfs_build_group.postbox > .handlediv,
 #cqfs_build_group.postbox > .hndle,
+#cqfs_build_group.postbox > .postbox-header,
 #cqfs_entry_group.postbox > .handlediv,
-#cqfs_entry_group.postbox > .hndle
+#cqfs_entry_group.postbox > .hndle,
+#cqfs_entry_group.postbox > .postbox-header
 {
     display: none
 }
@@ -248,4 +274,16 @@ html[dir="rtl"] input.cqfs-is-prepended.cqfs-is-appended {
 #cqfs_entry_group.postbox .inside
 {
     padding: 0;
+    margin-top: 0;
+}
+
+/* menu pages */
+li#toplevel_page_cqfs-post-types ul li:nth-child(2n+1) {
+    padding-bottom: 4px;
+    border-bottom: 1px solid #6b6b6b;
+}
+
+li#toplevel_page_cqfs-post-types ul li:last-child{
+    padding-bottom: 0;
+    border-bottom: none;
 }

@@ -36,14 +36,14 @@ class FormHandle {
 
         // prepare failure url args
         $this->failure_args = [
-            'page'          => urlencode(sanitize_text_field('cqfs-settings')),
-            '_cqfs_status'  => urlencode(sanitize_text_field('update-failed')),
+            'page'          => urlencode( sanitize_text_field('cqfs-settings') ),
+            '_cqfs_status'  => urlencode( sanitize_text_field('update-failed') ),
         ];
 
         // prepare success url args
         $this->success_args = [
-            'page'          => urlencode(sanitize_text_field('cqfs-settings')),
-            '_cqfs_status'  => urlencode(sanitize_text_field('settings-updated')),
+            'page'          => urlencode( sanitize_text_field('cqfs-settings') ),
+            '_cqfs_status'  => urlencode( sanitize_text_field('settings-updated') ),
         ];
 
         // check if we are at admin-post.php or not
@@ -97,27 +97,25 @@ class FormHandle {
         // run if nonce and user permission is ok
 
         // check if key exists and get then set the value
-        if( array_key_exists('_cqfs', $this->values ) ){
+        if( array_key_exists( '_cqfs', $this->values ) ){
+
+            $form_handle_mode = false;
+            $allow_guest = false;
 
             // received value of form-handle
-            $form_handle_mode = sanitize_text_field( $this->values['_cqfs']['form-handle'] );
-            // received value of allow-all
-
-            if(isset($this->values['_cqfs']['allow-all'])){
-                $allow_guest = rest_sanitize_boolean( $this->values['_cqfs']['allow-all'] );
-            }else{
-                $allow_guest = false;
+            if( isset( $this->values['_cqfs']['form-handle'] ) ){
+                $form_handle_mode = sanitize_text_field( $this->values['_cqfs']['form-handle'] );
             }
             
-
-            // updates and stores form-handle
-            if( $form_handle_mode ){
-                update_option('_cqfs_form_handle', $form_handle_mode );
+            // received value of allow-all
+            if( isset( $this->values['_cqfs']['allow-all'] ) ){
+                $allow_guest = rest_sanitize_boolean( $this->values['_cqfs']['allow-all'] );
             }
 
+            // updates and stores form-handle
+            update_option( '_cqfs_form_handle', $form_handle_mode );
             // update allow-all
-            update_option('_cqfs_allow_all', $allow_guest );
-
+            update_option( '_cqfs_allow_all', $allow_guest );
 
             //success return
             wp_safe_redirect( $this->success_url );

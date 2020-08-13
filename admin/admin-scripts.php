@@ -17,8 +17,22 @@ class Scripts {
     public function __construct(){
 
 		//admin enqueue scripts
+		add_action('admin_enqueue_scripts', [$this, 'cqfs_admin_css']);
+
+		//admin enqueue scripts
 		add_action('admin_enqueue_scripts', [$this, 'cqfs_admin_scripts']);
 
+	}
+
+	public function cqfs_admin_css(){
+		// enqueue styles
+		wp_enqueue_style(
+			'cqfs-admin-style', 
+			plugin_dir_url(__FILE__) . 'css/cqfs-admin-style.css', 
+			array(), 
+			CQFS::CQFS_VERSION,
+			'all'
+		);
 	}
 
 	/**
@@ -56,15 +70,6 @@ class Scripts {
 					$cqfs_entry_form_type = '';
 					$edit_page = '';
 				}
-				
-				// enqueue styles
-				wp_enqueue_style(
-					'cqfs-admin-style', 
-					plugin_dir_url(__FILE__) . 'css/cqfs-admin-style.css', 
-					array(), 
-					CQFS::CQFS_VERSION,
-					'all'
-				);
 
 				// enqueue script
 				wp_enqueue_script(
