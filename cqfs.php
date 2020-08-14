@@ -99,7 +99,17 @@ class CQFS {
 
 		//add custom post type capabilities to admin
 		require CQFS_PATH . 'inc/roles.php';
-        register_activation_hook( __FILE__, array( 'Cqfs_Roles', 'add_caps_admin' ) );
+
+		// create a cqfs result page on plugin activation
+		register_activation_hook( __FILE__, array( 'Cqfs_Roles', 'cqfs_result_page' ) );
+
+		// set custom page templates
+		add_filter( 'template_include', array( 'Cqfs_Roles', 'cqfs_set_custom_templates' ), 99 );
+
+		// add custom capabilities to the admin on plugin activation
+		register_activation_hook( __FILE__, array( 'Cqfs_Roles', 'add_caps_admin' ) );
+		
+		// remove custom capabilities of the admin on plugin deactivation
 		register_deactivation_hook( __FILE__, array( 'Cqfs_Roles', 'remove_caps_admin' ) );
 
 		// set logged in cookie immediately after ajax login

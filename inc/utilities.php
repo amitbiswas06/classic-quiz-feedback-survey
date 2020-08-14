@@ -269,8 +269,8 @@ class Utilities{
 
             if( is_user_logged_in() ){
                 printf(
-                    __('<p class="logged-in-msg">%s</p>'),
-                    esc_html__('You are logged in.','cqfs')
+                    __('<p class="logged-in-msg">%s</p>', 'cqfs'),
+                    esc_html__('You are logged in.', 'cqfs')
                 );
             }
 
@@ -278,8 +278,8 @@ class Utilities{
             if( !is_user_logged_in() ){
 
                 printf(
-                    __('<a class="cqfs-modal-link" href="#">%s</a>'),
-                    esc_html__('Login and submit','cqfs')
+                    __('<a class="cqfs-modal-link" href="#">%s</a>', 'cqfs'),
+                    esc_html__('Login and submit', 'cqfs')
                 );
 
                 if( $guest ){
@@ -409,8 +409,8 @@ class Utilities{
      */
     public static function cqfs_mail( $to, $subject = '', $body = '' ){
 
-        $blog_name = esc_html(get_bloginfo('name'));
-        $admin_email = sanitize_email(get_bloginfo('admin_email'));
+        $blog_name = apply_filters( 'cqfs_site_name', esc_html(get_bloginfo('name')) );
+        $admin_email = apply_filters( 'cqfs_admin_email', sanitize_email(get_bloginfo('admin_email')) );
         $status = false;
 
         if( $to ){
@@ -422,7 +422,7 @@ class Utilities{
             }
             
             $headers = array();
-            $headers[] = "From: {$blog_name} <{$admin_email}>";
+            $headers[] = "From: " . esc_html($blog_name) . " <" . sanitize_email($admin_email) . ">";
             $headers[] = "Content-Type: text/html; charset=UTF-8";
  
             $status = wp_mail( $to, $subject, $body, $headers );

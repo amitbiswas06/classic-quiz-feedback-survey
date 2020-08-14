@@ -314,8 +314,22 @@ class Cqfs_Submission {
         //on successful `cqfs_entry` post creation
         if( $cqfs_entry_id ){
 
+            // prepare email body
+            $home_url = home_url('/');
+            $result_page_obj = get_page_by_path('cqfs-result');
+            $result_page_id = '';
+
+            if( !null == $result_page_obj ){
+                $result_page_id = $result_page_obj->ID;
+            }
+
+            $result_page_url = esc_url( $home_url ) . '?page_id=' . esc_attr( $result_page_id );
+            $result_page_url .= "&cqfs_entry=";
+            $result_page_url .= esc_attr($cqfs_entry_id);
+            $result_page_url .= "&email=";
+            $result_page_url .= urlencode( sanitize_email($user_emailID) );
             // fire email
-            $send_email = Util::cqfs_mail( $user_emailID, '', 'success message in the body' );
+            $send_email = Util::cqfs_mail( sanitize_email($user_emailID), '', $result_page_url );
 
             //add form id
             $redirect_args['_cqfs_id'] = urlencode($cqfsID);

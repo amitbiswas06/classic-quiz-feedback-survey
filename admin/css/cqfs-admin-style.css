@@ -2,21 +2,35 @@
  * Main style sheet for CQFS admin pages and CPT fields
  * @since 1.0
  */
+
+/* admin */
+.cqfs-admin .cqfs-fields{
+    margin: 0;
+}
+.cqfs-admin{
+    display: block;
+}
+.cqfs-admin .cqfs-field.checkbox{
+    display: flex;
+}
+.cqfs-admin .cqfs-field.checkbox .cqfs-label {
+    order: 2;
+    margin-left: 5px;
+}
+.cqfs-admin .form-wrap{
+    padding: 20px 0;
+    margin-right: 20px;
+    border-bottom: 2px solid #ffffff;
+}
+
+/* -- admin -- */
+
 .cqfs-fields{
     display: flex;
     flex-wrap: wrap;
     margin-left: -12px;
     margin-right: -12px;
 }
-
-.cqfs-admin .cqfs-fields{
-    margin: 0;
-}
-
-.cqfs-admin{
-    display: block;
-}
-
 @media (min-width:768px){
     .cqfs-admin{
         display: flex;
