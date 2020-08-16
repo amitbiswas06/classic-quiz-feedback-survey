@@ -15,6 +15,7 @@ Domain Path: /languages/
 namespace CQFS\ROOT;
 
 define( 'CQFS_PATH', plugin_dir_path( __FILE__ ) );
+define( 'CQFS_RESULT', 'cqfs-result');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.

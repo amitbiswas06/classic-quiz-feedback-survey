@@ -7,6 +7,8 @@
 //define namespaces
 namespace CQFS\ADMIN\MENUPAGES;
 
+use CQFS\INC\UTIL\Utilities as Util;
+
 class MenuPages {
 
     public function __construct() {
@@ -64,15 +66,15 @@ class MenuPages {
         ) );
 
         $footer = sprintf(
-            __('<p>This email was sent from <a href="%s">%s</a> &copy; %s</p>','cqfs'),
-            esc_url_raw( get_bloginfo('url') ),
+            __('This email was sent from <a href="%s">%s</a> &copy; %s','cqfs'),
+            esc_url_raw( home_url('/') ),
             esc_html( get_bloginfo('name') ),
             esc_html(date('Y'))
         );
         // additional notes in email
         register_setting( 'cqfs-settings-group', '_cqfs_mail_footer', array(
             'type'      => 'string',
-            'default'   => wp_kses( $footer, 'post' ),
+            'default'   => wp_kses( $footer, Util::$allowed_in_table ),
         ) );
 
     }
@@ -228,10 +230,10 @@ class MenuPages {
         $email_user = esc_attr( get_option('_cqfs_mail_user') );
 
         //email additional notes
-        $email_notes = wp_kses( get_option('_cqfs_mail_notes'), 'post' );
+        $email_notes = wp_kses( get_option('_cqfs_mail_notes'), Util::$allowed_in_table );
 
         //email footer content
-        $email_footer = wp_kses( get_option('_cqfs_mail_footer'), 'post' );
+        $email_footer = wp_kses( get_option('_cqfs_mail_footer'), Util::$allowed_in_table );
 
         ?>
         <div class="form-wrap">
@@ -278,7 +280,7 @@ class MenuPages {
                         <div class="cqfs-label">
                             <label for="cqfs-mail-additional"><?php echo esc_html__('Additional Notes','cqfs'); ?></label>
                             <p class="description"><?php 
-                            echo esc_html__('Add any additional notes in the email. It will appear above the footer. HTML allowed like post.','cqfs'); 
+                            echo esc_html__('Add any additional notes in the email. It will appear above the footer. Allowed Html br, b, em, a, span. Inline style allowed.','cqfs'); 
                             ?></p>
                         </div>
                         <div class="cqfs-input">
@@ -292,7 +294,7 @@ class MenuPages {
                         <div class="cqfs-label">
                             <label for="cqfs-mail-footer"><?php echo esc_html__('Email Footer','cqfs'); ?></label>
                             <p class="description"><?php 
-                            echo esc_html__('Add custom footer content for the email. HTML allowed like post.','cqfs'); 
+                            echo esc_html__('Add custom footer content for the email. Allowed Html br, b, em, a, span. Inline style allowed.','cqfs'); 
                             ?></p>
                         </div>
                         <div class="cqfs-input">
@@ -307,15 +309,9 @@ class MenuPages {
 
                 //submit button
                 submit_button();
-                $result_page_id = get_page_by_path('cqfs-result');
-                $home_url = home_url('/');
-                $result_page_obj = get_page_by_path('cqfs-result');
-            $result_page_id = '';
-
-            if( !null == $result_page_obj ){
-                $result_page_id = $result_page_obj->ID;
-            }
-                var_dump($result_page_id);
+                $custom_logo_id = get_theme_mod( 'custom_logo' );
+                $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
+                var_dump(Util::$allowed_in_table);
                 ?>
             </form>
         </div>

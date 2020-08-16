@@ -72,14 +72,14 @@ class Cqfs_Roles {
             return;
         }
         
-        if ( null === get_page_by_path('cqfs-result') ) {
+        if ( null === get_page_by_path(CQFS_RESULT) ) {
            
             $current_user = wp_get_current_user();
             
             // create post object
             $result_page = array(
                 'post_title'  => esc_html__( 'Cqfs Result','cqfs' ),
-                'post_name'   => esc_attr('cqfs-result'),
+                'post_name'   => esc_attr(CQFS_RESULT),
                 'post_content'=> esc_html__('This page displays CQFS results. Please do not delete this page.','cqfs'),
                 'post_status' => 'publish',
                 'post_author' => esc_attr($current_user->ID),
@@ -100,7 +100,7 @@ class Cqfs_Roles {
      */
     public static function cqfs_set_custom_templates( $template ){
 
-        if(is_page('cqfs-result')){
+        if(is_page(CQFS_RESULT)){
 
             $file = CQFS_PATH . 'cqfs-templates/template-results.php';
             if ( '' != $file ) {

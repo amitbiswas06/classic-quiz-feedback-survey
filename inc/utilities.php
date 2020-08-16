@@ -12,6 +12,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Utilities{
 
+    public static $allowed_in_table = array(
+        'br'    => array(),
+        'a'     => array(
+            'href'  => array(),
+            'title' => array(),
+            'style' => array(),
+        ),
+        'b'     => array(),
+        'em'    => array(),
+        'span'  => array(
+            'style' => array(),
+        ),
+    );
+
     /**
      * prepare the clean slug for use
      * 
@@ -155,7 +169,7 @@ class Utilities{
 
         $the_cqfs_entry['id'] = esc_attr( $cqfs_entry_id );//the id
         $the_cqfs_entry['user_title'] = esc_html( get_the_title( $cqfs_entry_id ) );//title as user_title
-        $the_cqfs_entry['email'] = esc_html( $email );//email
+        $the_cqfs_entry['email'] = sanitize_email( $email );//email
         $the_cqfs_entry['form_id'] = esc_attr( $form_id );//form id
         $the_cqfs_entry['form_type'] = esc_html( $form_type );//form type
         $the_cqfs_entry['result'] = esc_html($result);//radio. passed/failed
@@ -197,7 +211,7 @@ class Utilities{
 
         if( $accPercentage >= $passPercentage ){
             //pass message
-            $default_pass_msg = apply_filters( 'cqfs_default_pass_msg', esc_html__('Congratulations! You have passed.', 'cqfs'));
+            $default_pass_msg = apply_filters( 'cqfs_pass_msg', esc_html__('Congratulations! You have passed.', 'cqfs'));
             return sprintf(
                 __('<div class="cqfs-pass-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>', 'cqfs'),
                 esc_html($accPercentage) . esc_html__("&#37;", 'cqfs'),
@@ -418,18 +432,159 @@ class Utilities{
             if( !empty($subject) ){
                 $subject = $subject;
             }else{
-                $subject = esc_html__('Classic quiz feedback survey','cqfs');
+                $subject = apply_filters( 'cqfs_default_subject', esc_html__('Classic quiz feedback survey','cqfs'));
             }
             
             $headers = array();
             $headers[] = "From: " . esc_html($blog_name) . " <" . sanitize_email($admin_email) . ">";
             $headers[] = "Content-Type: text/html; charset=UTF-8";
  
-            $status = wp_mail( $to, $subject, $body, $headers );
+            $status = wp_mail( sanitize_email($to), esc_html($subject), $body, $headers );
 
         }
 
         return $status;
+
+    }
+
+
+    public static function cqfs_mail_body( $cqfs_build_id, $cqfs_entry_id, $is_admin = false ){
+
+        $build_obj = self::cqfs_build_obj( $cqfs_build_id );
+        $entry_obj = self::cqfs_entry_obj( $cqfs_entry_id );
+
+        // prepare email body
+
+        $home_url = home_url('/');
+        $result_page_obj = get_page_by_path(CQFS_RESULT);
+        $result_page_url = "";
+
+        if( !null == $result_page_obj ){
+            
+            $result_page_url = esc_url( $home_url ) . '?page_id=' . esc_attr( $result_page_obj->ID );
+            $result_page_url .= "&cqfs_entry=";
+            $result_page_url .= esc_attr($cqfs_entry_id);
+            $result_page_url .= "&email=";
+            $result_page_url .= urlencode( sanitize_email($entry_obj['email']) );
+
+        }
+
+        $logo_id = get_theme_mod( 'custom_logo' );
+        $logo_url = wp_get_attachment_image_src( $logo_id , 'full' );//false if nothing
+        $blog_name = apply_filters( 'cqfs_site_name', esc_html(get_bloginfo('name')) );
+        $quiz_passed = apply_filters('cqfs_quiz_pass_msg_email', esc_html__('Congratulations! You have passed the quiz.','cqfs'));
+        $quiz_failed = apply_filters('cqfs_quiz_fail_msg_email', esc_html__('Sorry! You did not passed the quiz.','cqfs'));
+        $quiz_thanks = apply_filters('cqfs_quiz_thank_msg', esc_html__('Thank you for participating in the quiz. Here is your result page link below.','cqfs'));
+        $feedback_msg = apply_filters('cqfs_feedback_msg_email', esc_html__('Thank you for your feedback.','cqfs'));
+        $survey_msg = apply_filters('cqfs_survey_msg_email', esc_html__('Thank you for participating in the survey.','cqfs'));
+        
+        // admin message
+        $admin_msgs = sprintf(
+            __( wp_kses('Hello Admin! You just received a new "%s" entry.', self::$allowed_in_table),'cqfs'),
+            esc_html($build_obj['type'])
+        );
+        $admin_msg = apply_filters('cqfs_admin_msg_email', $admin_msgs );
+
+        //email additional notes
+        $email_notes = wp_kses( get_option('_cqfs_mail_notes'), self::$allowed_in_table );
+
+        //email footer content
+        $email_footer = wp_kses( get_option('_cqfs_mail_footer'), self::$allowed_in_table );
+
+        ob_start();
+        ?>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" 
+    style="font-family: Arial, sans-serif; text-align: center; font-size: 16px;">	
+		<tr>
+			<td style="padding: 10px 0 30px 0;">
+				<table id="cqfs-table" align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border: 1px solid #cccccc; border-collapse: collapse;">
+                    <?php if($logo_url) :?>
+                    <tr>
+                        <td style="padding: 30px 30px 0; font-size: 28px; font-weight: 700;">
+                            <img src="<?php echo esc_url($logo_url); ?>" alt="" height="100"/>
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                    <tr>
+                        <td style="padding: 10px 10px 0;"><?php echo esc_html($blog_name); ?></td>
+                    </tr>
+					<tr>
+						<td style="padding: 40px 30px 40px 30px;">
+							<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+                                <?php if( $is_admin ) :?>
+                                <tr>
+									<td style="font-size: 24px;">
+										<b><?php esc_html($admin_msg); ?></b>
+									</td>
+								</tr>
+                                <?php endif; ?>
+
+                                <?php if( !$is_admin && $entry_obj['form_type'] != 'quiz' ) :?>
+                                <tr>
+									<td style="font-size: 24px;">
+                                        <b><?php 
+                                        switch( $entry_obj['form_type'] ){
+                                            case 'feedback' : echo esc_html($feedback_msg);
+                                            break;
+                                            case 'survey' : echo esc_html($survey_msg);
+                                            break;
+                                        }
+                                        ?></b>
+									</td>
+								</tr>
+                                <?php endif; ?>
+
+                                <?php if( !$is_admin && $entry_obj['form_type'] === 'quiz' ) :?>
+								<tr>
+									<td style="font-size: 24px;">
+                                        <b><?php 
+                                            switch( $entry_obj['result'] ){
+                                                case 'passed' : echo esc_html($quiz_passed);
+                                                break;
+                                                case 'failed' : echo esc_html($quiz_failed);
+                                                break;
+                                            }
+                                        ?></b>
+									</td>
+                                </tr>
+								<tr>
+									<td style="padding: 20px 0 30px 0; font-size: 16px;">
+										<?php echo esc_html($quiz_thanks); ?>
+									</td>
+								</tr>
+                                <tr>
+									<td style="padding: 20px 0 30px 0; font-size: 16px;">
+                                        <a href="<?php echo esc_url($result_page_url); ?>" 
+                                        style="padding:12px 25px; color:#f8f8f8; background: #222222;"><?php 
+                                        echo esc_html__('View Result','cqfs'); ?></a>
+									</td>
+                                </tr>
+                                <?php endif; ?>
+
+                                <?php if( !empty($email_notes) ) :?>
+                                <tr>
+                                    <td>
+                                        <?php echo wp_kses( $email_notes, self::$allowed_in_table ); ?>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
+							</table>
+						</td>
+					</tr>      
+					<tr>
+                        <td bgcolor="#dddddd" style="padding: 30px 30px 30px 30px; font-size: 14px;">
+							<?php echo wp_kses( $email_footer, self::$allowed_in_table ); ?>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+        <?php
+        return ob_get_clean();
 
     }
 

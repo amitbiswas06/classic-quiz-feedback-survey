@@ -314,22 +314,14 @@ class Cqfs_Submission {
         //on successful `cqfs_entry` post creation
         if( $cqfs_entry_id ){
 
-            // prepare email body
-            $home_url = home_url('/');
-            $result_page_obj = get_page_by_path('cqfs-result');
-            $result_page_id = '';
+            $body = Util::cqfs_mail_body($cqfsID, $cqfs_entry_id);
+            $body_admin = Util::cqfs_mail_body($cqfsID, $cqfs_entry_id, true);
+            $admin_email = get_bloginfo('admin_email');
+            // fire email to user
+            $send_email = Util::cqfs_mail( sanitize_email($user_emailID), esc_html($cqfs_build['title']), $body );
 
-            if( !null == $result_page_obj ){
-                $result_page_id = $result_page_obj->ID;
-            }
-
-            $result_page_url = esc_url( $home_url ) . '?page_id=' . esc_attr( $result_page_id );
-            $result_page_url .= "&cqfs_entry=";
-            $result_page_url .= esc_attr($cqfs_entry_id);
-            $result_page_url .= "&email=";
-            $result_page_url .= urlencode( sanitize_email($user_emailID) );
-            // fire email
-            $send_email = Util::cqfs_mail( sanitize_email($user_emailID), '', $result_page_url );
+            // fire email to admin
+            $send_email_admin = Util::cqfs_mail( sanitize_email($admin_email), esc_html($cqfs_build['title']), $body_admin );
 
             //add form id
             $redirect_args['_cqfs_id'] = urlencode($cqfsID);
