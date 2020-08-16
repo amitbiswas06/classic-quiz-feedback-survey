@@ -423,8 +423,8 @@ class Utilities{
      */
     public static function cqfs_mail( $to, $subject = '', $body = '' ){
 
-        $blog_name = apply_filters( 'cqfs_site_name', esc_html(get_bloginfo('name')) );
-        $admin_email = apply_filters( 'cqfs_admin_email', sanitize_email(get_bloginfo('admin_email')) );
+        $blog_name = apply_filters( 'cqfs_email_site_name', esc_html(get_bloginfo('name')) );
+        $admin_email = apply_filters( 'cqfs_email_admin_email', sanitize_email(get_bloginfo('admin_email')) );
         $status = false;
 
         if( $to ){
@@ -432,7 +432,7 @@ class Utilities{
             if( !empty($subject) ){
                 $subject = $subject;
             }else{
-                $subject = apply_filters( 'cqfs_default_subject', esc_html__('Classic quiz feedback survey','cqfs'));
+                $subject = apply_filters( 'cqfs_email_default_subject', esc_html__('Classic quiz feedback survey','cqfs'));
             }
             
             $headers = array();
@@ -469,21 +469,25 @@ class Utilities{
 
         }
 
+        $hello_user = sprintf(
+            __('Hello %s,'),
+            esc_html( $entry_obj['user_title'] )
+        );
         $logo_id = get_theme_mod( 'custom_logo' );
         $logo_url = wp_get_attachment_image_src( $logo_id , 'full' );//false if nothing
-        $blog_name = apply_filters( 'cqfs_site_name', esc_html(get_bloginfo('name')) );
-        $quiz_passed = apply_filters('cqfs_quiz_pass_msg_email', esc_html__('Congratulations! You have passed the quiz.','cqfs'));
-        $quiz_failed = apply_filters('cqfs_quiz_fail_msg_email', esc_html__('Sorry! You did not passed the quiz.','cqfs'));
-        $quiz_thanks = apply_filters('cqfs_quiz_thank_msg', esc_html__('Thank you for participating in the quiz. Here is your result page link below.','cqfs'));
-        $feedback_msg = apply_filters('cqfs_feedback_msg_email', esc_html__('Thank you for your feedback.','cqfs'));
-        $survey_msg = apply_filters('cqfs_survey_msg_email', esc_html__('Thank you for participating in the survey.','cqfs'));
+        $blog_name = apply_filters( 'cqfs_email_site_name', esc_html(get_bloginfo('name')) );
+        $quiz_passed = apply_filters('cqfs_email_quiz_pass_msg', esc_html__('Congratulations! You have passed the quiz.','cqfs'));
+        $quiz_failed = apply_filters('cqfs_email_quiz_fail_msg', esc_html__('Sorry! You did not passed the quiz.','cqfs'));
+        $quiz_thanks = apply_filters('cqfs_email_quiz_thank_msg', esc_html__('Thank you for participating in the quiz. Here is your result page link below.','cqfs'));
+        $feedback_msg = apply_filters('cqfs_email_feedback_msg', esc_html__('Thank you for your feedback.','cqfs'));
+        $survey_msg = apply_filters('cqfs_email_survey_msg', esc_html__('Thank you for participating in the survey.','cqfs'));
         
         // admin message
         $admin_msgs = sprintf(
-            __( wp_kses('Hello Admin! You just received a new "%s" entry.', self::$allowed_in_table),'cqfs'),
+            __( wp_kses('Hello Admin! You just received a new "%s" entry.', self::$allowed_in_table ),'cqfs'),
             esc_html($build_obj['type'])
         );
-        $admin_msg = apply_filters('cqfs_admin_msg_email', $admin_msgs );
+        $admin_msg = apply_filters('cqfs_email_admin_msg', $admin_msgs );
 
         //email additional notes
         $email_notes = wp_kses( get_option('_cqfs_mail_notes'), self::$allowed_in_table );
@@ -501,8 +505,11 @@ class Utilities{
 				<table id="cqfs-table" align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border: 1px solid #cccccc; border-collapse: collapse;">
                     <?php if($logo_url) :?>
                     <tr>
-                        <td style="padding: 30px 30px 0; font-size: 28px; font-weight: 700;">
-                            <img src="<?php echo esc_url($logo_url); ?>" alt="" height="100"/>
+                        <td style="padding: 30px 30px 0; font-size: 28px; font-weight: 700; max-height: 100px;">
+                            <img src="<?php echo esc_url($logo_url[0]); ?>" 
+                            alt="" 
+                            width="<?php echo esc_attr($logo_url[1]); ?>"
+                            height="<?php echo esc_attr($logo_url[2]); ?>"/>
                         </td>
                     </tr>
                     <?php endif; ?>
@@ -516,12 +523,15 @@ class Utilities{
                                 <?php if( $is_admin ) :?>
                                 <tr>
 									<td style="font-size: 24px;">
-										<b><?php esc_html($admin_msg); ?></b>
+										<b><?php echo esc_html($admin_msg); ?></b>
 									</td>
 								</tr>
                                 <?php endif; ?>
 
                                 <?php if( !$is_admin && $entry_obj['form_type'] != 'quiz' ) :?>
+                                <tr>
+                                    <td style="padding: 0 30px 10px;"><?php echo esc_html($hello_user); ?></td>
+                                </tr>
                                 <tr>
 									<td style="font-size: 24px;">
                                         <b><?php 
@@ -537,6 +547,9 @@ class Utilities{
                                 <?php endif; ?>
 
                                 <?php if( !$is_admin && $entry_obj['form_type'] === 'quiz' ) :?>
+                                <tr>
+                                    <td style="padding: 0 30px 10px;"><?php echo esc_html($hello_user); ?></td>
+                                </tr>
 								<tr>
 									<td style="font-size: 24px;">
                                         <b><?php 
