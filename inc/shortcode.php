@@ -81,22 +81,16 @@ class CqfsShortcode {
 
         }
         
-        //check parameters and show form or result
-        if ( !isset($param['_cqfs_status']) || 
-        !isset($param['_cqfs_id']) || 
-        $param['_cqfs_status'] !== 'success' || 
-        $param['_cqfs_id'] !== $cqfs_build['id'] ) { 
-            //display the form
 
-            $classes = $cqfs_build['classname'];
-            $classes .= is_user_logged_in() ? ' ' . 'cqfs-logged-in' : '';
+        $classes = $cqfs_build['classname'];
+        $classes .= is_user_logged_in() ? ' ' . 'cqfs-logged-in' : '';
         ?>
         <!-- cqfs start -->
         <div id="cqfs-<?php echo esc_attr($cqfs_build['id']); ?>" class="cqfs <?php echo esc_attr($classes) ?>" data-cqfs-layout = <?php echo esc_attr($cqfs_build['layout']); ?>>
             <?php 
             if( $atts['title'] !== 'false' ){
                 printf(
-                    '<h2 class="cqfs--title">%s</h2>',
+                    '<h2 class="cqfs-title">%s</h2>',
                     esc_html( $cqfs_build['title'] )
                 );
             }
@@ -196,87 +190,7 @@ class CqfsShortcode {
             <div class="cqfs-error-msg hide"><?php esc_html_e('Please select an option.','cqfs'); ?></div>
         </div>
         <!-- cqfs end -->
-        <?php } elseif( $cqfs_build['type'] === 'quiz' && 
-            isset($param['_cqfs_status']) && 
-            isset($param['_cqfs_id']) && 
-            $param['_cqfs_status'] === 'success' && 
-            $param['_cqfs_id'] === $cqfs_build['id'] ) {
-
-            $entry_id = esc_attr($param['_cqfs_entry_id']);
-            $entry_email = esc_attr($param['_cqfs_email']);
-            
-            echo "<div id='cqfs-{$entry_id}' class='cqfs results {$cqfs_build['classname']}'>";
-            /**
-             * Result display
-             */
-            if( isset($param['_cqfs_entry_id']) && isset($param['_cqfs_email']) && !empty($param['_cqfs_entry_id']) && !empty($param['_cqfs_email']) ){
-
-                //get the entry array                
-                $entry = util::cqfs_entry_obj( $entry_id );
-
-                if( empty($entry) || is_null($entry) ){
-                    return esc_html__('Invalid Result','cqfs');
-                }
-
-                if( $entry_email == $entry['email'] ){
-                    
-                    //username. escaped.
-                    echo util::cqfs_display_uname( $entry['user_title'] );//escaped data
-                    //result div. escaped.
-                    echo util::cqfs_quiz_result( $cqfs_build['pass_percent'], $entry['percentage'], $cqfs_build['pass_msg'], $cqfs_build['fail_msg'] );//escaped data
-
-                    foreach( $entry['all_questions'] as $ent ){
-
-                        $you_ans = apply_filters('cqfs_result_you_answered', esc_html__('You answered&#58; ', 'cqfs'));
-                        $status = apply_filters('cqfs_result_ans_status', esc_html__('Status&#58; ', 'cqfs'));
-                        $note = apply_filters('cqfs_result_ans_note', esc_html__('Note&#58; ', 'cqfs'));
-
-                        printf(
-                            '<div class="cqfs-entry-qa">
-                                <h4>%s</h4>
-                                <p><label>%s</label>%s</p>
-                                <p><label>%s</label>%s</p>
-                                <details><summary>%s</summary><p>%s</p></details>
-                            </div>',
-                            esc_html( $ent['question'] ),
-                            $you_ans,
-                            esc_html( $ent['answer'] ),
-                            $status,
-                            esc_html( $ent['status'] ),
-                            $note,
-                            esc_html( $ent['note'] )
-                        );
-                    }
-
-
-                }else{
-                    return esc_html__('Invalid Result','cqfs');
-                }
-
-
-            }else{
-                return esc_html__('Invalid Result','cqfs');
-            }
-
-            echo '</div>';
-
-
-        }elseif( isset($param['_cqfs_status']) && 
-        isset($param['_cqfs_id']) && 
-        $param['_cqfs_status'] === 'success' && 
-        $param['_cqfs_id'] === $cqfs_build['id'] ){
-            /**
-             * Message for non quiz cqfs
-             */
-            $cqfs_thank_msg = apply_filters('cqfs_thankyou_message', esc_html__('Thank you for participating.', 'cqfs'));
-            printf(
-                '<div id="cqfs-%s" class="cqfs thankyou %s"><h4>%s</h4></div>',
-                esc_attr($param['_cqfs_id']),
-                esc_attr($cqfs_build['classname']),
-                esc_html( $cqfs_thank_msg )
-            );
-        } ?>
-        <?php
+        <?php 
         
         return ob_get_clean();
         

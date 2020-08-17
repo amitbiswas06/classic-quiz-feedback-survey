@@ -222,7 +222,7 @@ class Utilities{
             //fail message
             $default_fail_msg = apply_filters( 'cqfs_fail_msg', esc_html__('Sorry! You have failed.', 'cqfs'));
             return sprintf(
-                __('<div class="cqfs-fail-msg"><p class="cqfs-percentage">%s correct.</p><p>%s</p></div>', 'cqfs'),
+                __('<div class="cqfs-fail-msg"><p class="cqfs-percentage">%s correct.</p><p class="cqfs-remark">%s</p></div>', 'cqfs'),
                 esc_html($accPercentage) . esc_html__("&#37;", 'cqfs'),
                 $failMsg != '' ? esc_html( $failMsg ) : esc_html( $default_fail_msg )
             );
@@ -448,6 +448,35 @@ class Utilities{
     }
 
 
+    public static function cqfs_result_page_url( $email = '', $entry_id = '' ){
+
+        $home_url = home_url('/');
+        $result_page_obj = get_page_by_path(CQFS_RESULT);
+        $result_page_url = "";
+
+        if( !null == $result_page_obj ){
+
+            $queries = array(
+                'page_id'   => esc_attr( $result_page_obj->ID ),
+            );
+
+            // add email to the query if not empty
+            if( $email ){
+                $queries['_cqfs_email'] = urlencode( sanitize_email($email) );
+            }
+
+            // add entry ID to the query if not empty
+            if( $entry_id ){
+                $queries['_cqfs_entry_id'] = esc_attr($entry_id);
+            }
+
+            $result_page_url = add_query_arg( $queries, esc_url( $home_url ) );
+
+        }
+
+        return $result_page_url;
+    }
+
     public static function cqfs_mail_body( $cqfs_build_id, $cqfs_entry_id, $is_admin = false ){
 
         $build_obj = self::cqfs_build_obj( $cqfs_build_id );
@@ -455,19 +484,7 @@ class Utilities{
 
         // prepare email body
 
-        $home_url = home_url('/');
-        $result_page_obj = get_page_by_path(CQFS_RESULT);
-        $result_page_url = "";
-
-        if( !null == $result_page_obj ){
-            
-            $result_page_url = esc_url( $home_url ) . '?page_id=' . esc_attr( $result_page_obj->ID );
-            $result_page_url .= "&cqfs_entry=";
-            $result_page_url .= esc_attr($cqfs_entry_id);
-            $result_page_url .= "&email=";
-            $result_page_url .= urlencode( sanitize_email($entry_obj['email']) );
-
-        }
+        $result_page_url = self::cqfs_result_page_url( $entry_obj['email'], $cqfs_entry_id );
 
         $hello_user = sprintf(
             __('Hello %s,'),
@@ -505,7 +522,7 @@ class Utilities{
 				<table id="cqfs-table" align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border: 1px solid #cccccc; border-collapse: collapse;">
                     <?php if($logo_url) :?>
                     <tr>
-                        <td style="padding: 30px 30px 0; font-size: 28px; font-weight: 700; max-height: 100px;">
+                        <td style="padding: 30px 30px 0; max-height: 100px;">
                             <img src="<?php echo esc_url($logo_url[0]); ?>" 
                             alt="" 
                             width="<?php echo esc_attr($logo_url[1]); ?>"
@@ -513,9 +530,11 @@ class Utilities{
                         </td>
                     </tr>
                     <?php endif; ?>
+                    <?php if( ! $logo_url ) :?>
                     <tr>
-                        <td style="padding: 10px 10px 0;"><?php echo esc_html($blog_name); ?></td>
+                        <td style="padding: 30px 30px 0; font-size: 28px; font-weight: 700;"><?php echo esc_html($blog_name); ?></td>
                     </tr>
+                    <?php endif; ?>
 					<tr>
 						<td style="padding: 40px 30px 40px 30px;">
 							<table border="0" cellpadding="0" cellspacing="0" width="100%">

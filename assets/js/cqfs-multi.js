@@ -292,14 +292,16 @@ function afterResponse( obj ){
     //run on success and if quiz
     if( obj.success && obj.data.form_type === 'quiz' ){
 
+        html += '<div class="cqfs-entry-remarks">';
         html += `<h3 class="cqfs-uname">Hello ${obj.data.user_title}</h3>`;
-        html += `<div class="cqfs-pass-msg">
+        html += `<div class="cqfs-msg">
         <p class="cqfs-percentage">${obj.data.percentage}&#37; correct.</p>
-        <p>${obj.data.remarks}</p></div>`;
+        <p class="cqfs-remark">${obj.data.remarks}</p></div>`;
+        html += '</div><div class="cqfs-entry-qa">';
 
         html += obj.data.all_questions.map( q => {
             return `
-            <div class="cqfs-entry-qa">
+            <div class="cqfs-entry-qa__single">
                 <h4>${q.question}</h4>
                 <p><label>${_cqfs_lang.you_ans}</label>${q.answer}</p>
                 <p><label>${_cqfs_lang.status}</label>${q.status}</p>
@@ -307,6 +309,8 @@ function afterResponse( obj ){
             </div>
             `;
         }).join('');
+
+        html += "</div>";
 
     }else if( obj.success && obj.data.form_type !== 'quiz' ){
         //run if success and not quiz

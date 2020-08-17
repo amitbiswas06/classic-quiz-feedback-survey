@@ -52,7 +52,7 @@ class Cqfs_Submission {
         if( isset( $this->values['_wp_http_referer'] ) && !empty( $this->values['_wp_http_referer'] ) ){
             // set failure url
             $this->failure_url = esc_url_raw(
-                add_query_arg( $this->failure_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?') ) ) )
+                add_query_arg( $this->failure_args, esc_url( $this->values['_wp_http_referer'] ) )
             );
 
         }else{
@@ -139,11 +139,13 @@ class Cqfs_Submission {
 		if ( !isset( $this->values[$nonce_name] ) || ! wp_verify_nonce( $this->values[$nonce_name], $nonce_action ) ) {
 
             //send JSON response for ajax mode on failure
-            wp_send_json_error( $this->failure_args );
-
-            //safe redirect for php mode on failure
-            wp_safe_redirect( $this->failure_url );
-            // var_dump($this->failure_args);
+            if( $this->submit_mode === 'ajax_mode' ){
+                wp_send_json_error( $this->failure_args );
+            }else{
+                //safe redirect for php mode on failure
+                wp_safe_redirect( $this->failure_url );
+                // var_dump($this->failure_args);
+            }
             
 			exit();
 
@@ -367,14 +369,15 @@ class Cqfs_Submission {
             exit();
         }
         
-
+        // result page url
+        $result_page_url = Util::cqfs_result_page_url();
         if( $this->submit_mode === 'php_mode' ){
             /**
-             * Redirect the page and exit
+             * Redirect to the result page and exit
              */
             wp_safe_redirect(
                 esc_url_raw(
-                    add_query_arg( $redirect_args, wp_unslash( esc_url( strtok( $this->values['_wp_http_referer'], '?' ) ) ) )
+                    add_query_arg( $redirect_args, $result_page_url ? $result_page_url : home_url('/') )
                 )
             );
 

@@ -128,3 +128,8 @@
     height: 100px;
     background: red;
 }
+
+/* result page */
+.cqfs-result{
+    padding-bottom: 50px;
+}
