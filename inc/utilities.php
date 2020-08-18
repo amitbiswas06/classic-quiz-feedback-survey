@@ -84,7 +84,8 @@ class Utilities{
                 'numberposts'   => -1,
                 'post_type'     => 'cqfs_question',
                 'category'      => esc_attr($category),
-                'order'         => esc_attr($question_order)
+                // 'order'         => esc_attr($question_order),
+                'orderby'       => 'rand'
             )
         );
 

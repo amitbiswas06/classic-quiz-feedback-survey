@@ -128,10 +128,10 @@ class CqfsShortcode {
                                     $j = 1;
                                     foreach( $question['options'] as $optn ) {
                                         //unique id for each build question input
-                                        $inp_id = Util::cqfs_slug($optn) . '_' . $cqfs_build['id'];
+                                        $inp_id = Util::cqfs_slug($optn) . '_' . $cqfs_build['id'] . '_' . $question['id'];
                                     ?>
                                 <div class="input-wrap">
-                                    <input name="cqfs[option_<?php echo $i; ?>][]" type="<?php echo esc_attr($question['input_type']); ?>" id="<?php echo esc_attr($inp_id); ?>" value="<?php echo $j; ?>">
+                                    <input name="cqfs[<?php echo esc_attr($question['id']); ?>][]" type="<?php echo esc_attr($question['input_type']); ?>" id="<?php echo esc_attr($inp_id); ?>" value="<?php echo $j; ?>">
                                     <label for="<?php echo esc_attr($inp_id); ?>"><?php echo esc_html($optn); ?></label>
                                 </div>
                                 <?php $j++; }} ?>

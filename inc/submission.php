@@ -144,7 +144,7 @@ class Cqfs_Submission {
             }else{
                 //safe redirect for php mode on failure
                 wp_safe_redirect( $this->failure_url );
-                // var_dump($this->failure_args);
+                var_dump($this->failure_args);
             }
             
 			exit();
@@ -166,39 +166,46 @@ class Cqfs_Submission {
         //prepare answers
         $userAnswers = [];
         if(array_key_exists('cqfs', $this->values)){
-            $userAnswers = array_values( $this->values['cqfs'] );
+            $userAnswers = $this->values['cqfs'];
         }
         
         // var_dump($userAnswers);
         $answersArr = [];
 
         if($userAnswers){
-            $i = 0;
+            
             foreach( $cqfs_build['all_questions'] as $question ){
-                //push questions
-                $questionsArr[] = $question['question'];
-    
-                //check answers and return boolean
-                $compare = Util::cqfs_array_equality_check( $question['answers'], $userAnswers[$i] );
-                //push answer status
-                $ansStatus[] = $compare ? esc_html__('Correct Answer.', 'cqfs') : esc_html__('Wrong Answer.','cqfs');
-                //push true values
-                if($compare){
-                    $numCorrects[] = $compare;
+
+                foreach( $userAnswers as $k=>$v ){
+                    if($k == $question['id']){
+
+                        //push questions
+                        $questionsArr[] = $question['question'];
+
+                        //check answers and return boolean
+                        $compare = Util::cqfs_array_equality_check( $question['answers'], $v );
+                        //push answer status
+                        $ansStatus[] = $compare ? esc_html__('Correct Answer.', 'cqfs') : esc_html__('Wrong Answer.','cqfs');
+                        //push true values
+                        if($compare){
+                            $numCorrects[] = $compare;
+                        }
+
+                        //push answer string in array
+                        $answers = [];
+                        foreach($v as $ans){
+                            $answers[] = $question['options'][$ans-1];
+                        }
+
+                        //now implode to string and push
+                        $answersArr[] = sanitize_text_field(implode(" | ", $answers));
+
+                        //push the note for each question
+                        $notes[] = $question['note'] ? sanitize_text_field($question['note']) : esc_html__('Not Available.','cqfs');
+                    
+                    }
                 }
     
-                //push answer string in array
-                $answers = [];
-                foreach($userAnswers[$i] as $ans){
-                    $answers[] = $question['options'][$ans-1];
-                }
-                //now implode to string and push
-                $answersArr[] = sanitize_text_field(implode(" | ", $answers));
-    
-                //push the note for each question
-                $notes[] = $question['note'] ? sanitize_text_field($question['note']) : esc_html__('Not Available.','cqfs');
-    
-                $i++;
             }
     
         }
