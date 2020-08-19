@@ -56,7 +56,14 @@ class Utilities{
         $the_cqfs_build = [];
 
         $type = get_post_meta($cqfs_build_id, 'cqfs_build_type', true);//select
-        $category = get_post_meta($cqfs_build_id, 'cqfs_select_questions', true);//taxonomy, returns ID
+        $categories = get_the_category($cqfs_build_id);// category
+        $qst_cats = [];
+            if( $categories ){
+                foreach( $categories as $cat ){
+                    $qst_cats[] = $cat->term_id;
+                }
+            }
+        
         $question_order = get_post_meta($cqfs_build_id, 'cqfs_question_order', true);//ASC, DSC
         $layout = get_post_meta($cqfs_build_id, 'cqfs_layout_type', true);//select, multi/single
         $pass_percent = get_post_meta($cqfs_build_id, 'cqfs_pass_percentage', true);//pass percentage
@@ -69,7 +76,7 @@ class Utilities{
         //insert build data
         $the_cqfs_build['title'] = get_the_title($cqfs_build_id);
         $the_cqfs_build['type'] = $type;
-        $the_cqfs_build['qst_category'] = $category;
+        $the_cqfs_build['qst_category'] = implode(',', $qst_cats);
         $the_cqfs_build['qst_order'] = $question_order;
         $the_cqfs_build['layout'] = $layout;
         $the_cqfs_build['pass_percent'] = $pass_percent;
@@ -83,9 +90,9 @@ class Utilities{
             array(
                 'numberposts'   => -1,
                 'post_type'     => 'cqfs_question',
-                'category'      => esc_attr($category),
-                // 'order'         => esc_attr($question_order),
-                'orderby'       => 'rand'
+                'category'      => esc_attr(implode(',', $qst_cats)),
+                'order'         => esc_attr($question_order),
+                // 'orderby'       => 'rand'
             )
         );
 

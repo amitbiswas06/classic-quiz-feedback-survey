@@ -23,6 +23,9 @@ class Build {
 		//save
 		add_action('save_post', [ $this, 'cqfs_build__group_save']);
 
+		// delete meta field as it is not in use anymore
+		// delete_post_meta_by_key('cqfs_select_questions');
+
     }
 
     /**
@@ -79,6 +82,9 @@ class Build {
      */
 	public function cqfs_build__group_html($post){
 
+		// categories
+		$categories = get_the_category($post->ID);
+
 		//meta fields
 
 		//build type | select
@@ -88,10 +94,13 @@ class Build {
 		$layout = get_post_meta($post->ID, 'cqfs_layout_type', true);
 
 		//build-question category | category select
-		$build_question_cat = get_post_meta($post->ID, 'cqfs_select_questions', true);
+		// $build_question_cat = get_post_meta($post->ID, 'cqfs_select_questions', true);
 
 		//build question order | select
 		$question_order = get_post_meta($post->ID, 'cqfs_question_order', true);
+
+		//build question orderby | select
+		$question_orderby = get_post_meta($post->ID, 'cqfs_question_orderby', true);
 
 		//build pass percentage | Number
 		$pass_percentage = get_post_meta($post->ID, 'cqfs_pass_percentage', true);
@@ -105,6 +114,28 @@ class Build {
 		?>
 		<div class="cqfs-hidden"><?php wp_nonce_field( self::BuildNonce, '_cqfs_build_nonce'); ?></div>
 		<div class="cqfs-fields">
+
+			<div class="cqfs-field">
+				<div class="cqfs-info <?php echo !$categories ? esc_attr('alert-warnning') : esc_attr('alert-ok'); ?>">
+					<div class="cqfs-label">
+						<label><?php echo esc_html__('Questions by Categories','cqfs'); ?></label>
+						<p class="description"><?php echo esc_html__('You have selected the following categories for questions.','cqfs'); ?></p>
+					</div>
+					<p class="cqfs-info-text"><?php 
+						$cat_list = [];
+						if( $categories ){
+							foreach( $categories as $cat ){
+								$cat_list[] = ucwords($cat->name);
+							}
+						}else{
+							$cat_list[] = esc_html__('No categories are selected. Please select a category.', 'cqfs');
+						}
+
+						echo esc_html( implode(', ', $cat_list));
+
+					?></p>
+				</div>
+			</div>
 
 			<div class="cqfs-field half cqfs-required">
 				<div class="cqfs-label">
@@ -163,29 +194,6 @@ class Build {
 
 			<div class="cqfs-field half cqfs-required">
 				<div class="cqfs-label">
-					<label for="cqfs-build-question-category"><?php echo esc_html__('Select Questions by Category','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
-					<p class="description"><?php echo esc_html__('Select a Category.','cqfs'); ?></p>
-				</div>
-				<div class="cqfs-input">
-					<select name="cqfs[build-question-category]" id="cqfs-build-question-category" required>
-						<option value=""><?php echo esc_html__('Please Select...', 'cqfs'); ?></option>
-						<?php
-						$categories = get_categories();
-						foreach( $categories as $cat ){
-							printf(
-								'<option value="%s" %s>%s</option>',
-								sanitize_key($cat->term_id),
-								$cat->term_id == $build_question_cat ? 'selected' : '',
-								esc_html($cat->name)
-							);
-						}
-						?>
-					</select>
-				</div>
-			</div>
-
-			<div class="cqfs-field half cqfs-required">
-				<div class="cqfs-label">
 					<label for="cqfs-build-qst-order"><?php echo esc_html__('Question Order','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
 					<p class="description"><?php echo esc_html__('Select the order of the questions.','cqfs'); ?></p>
 				</div>
@@ -193,7 +201,6 @@ class Build {
 					<select name="cqfs[build-qst-order]" id="cqfs-build-qst-order" required>
 						<?php
 						$options = array(
-							''		=> esc_html__('Please Select...', 'cqfs'),
 							'asc'	=> esc_html__('Ascending', 'cqfs'),
 							'desc'	=> esc_html__('Descending', 'cqfs'),
 						);
@@ -211,10 +218,39 @@ class Build {
 				</div>
 			</div>
 
-			<div class="cqfs-field cqfs-conditional-required hidden-by-conditional-logic">
+			<div class="cqfs-field half cqfs-required">
+				<div class="cqfs-label">
+					<label for="cqfs-build-qst-orderby"><?php echo esc_html__('Orderby','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<p class="description"><?php echo esc_html__('Select the orderby of the questions.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<select name="cqfs[build-qst-orderby]" id="cqfs-build-qst-orderby" required>
+						<?php
+						$options = array(
+							'date'	=> esc_html__('Date', 'cqfs'),
+							'ID'	=> esc_html__('ID', 'cqfs'),
+							'title'	=> esc_html__('Title', 'cqfs'),
+							'rand'	=> esc_html__('Random', 'cqfs'),
+							'none'	=> esc_html__('No Order', 'cqfs'),
+						);
+
+						foreach( $options as $key => $val ){
+							printf(
+								'<option value="%s" %s>%s</option>',
+								sanitize_key($key),
+								$key == $question_orderby ? 'selected' : '',
+								$val
+							);
+						}
+						?>
+					</select>
+				</div>
+			</div>
+
+			<div class="cqfs-field cqfs-required">
 				<div class="cqfs-label">
 					<label for="cqfs-build-pass-percentage"><?php echo esc_html__('Pass Percentage','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
-					<p class="description"><?php echo esc_html__('Set a percentage for pass mark.','cqfs'); ?></p>
+					<p class="description"><?php echo esc_html__('Set a percentage for pass mark. It is needed for all types as it will help us to assess things better.','cqfs'); ?></p>
 				</div>
 				<div class="cqfs-input">
 					<div class="cqfs-input-append"><?php esc_html_e('&#37;','cqfs'); ?></div>
@@ -297,18 +333,18 @@ class Build {
 				sanitize_text_field($this->values['cqfs']['build-layout'])
 			);
 
-			//save/update build question category
-			update_post_meta(
-				esc_attr($post_id),
-				sanitize_key('cqfs_select_questions'),
-				sanitize_text_field($this->values['cqfs']['build-question-category'])
-			);
-
 			//save/update build question order
 			update_post_meta(
 				esc_attr($post_id),
 				sanitize_key('cqfs_question_order'),
 				sanitize_text_field($this->values['cqfs']['build-qst-order'])
+			);
+
+			//save/update build question orderby
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_question_orderby'),
+				sanitize_text_field($this->values['cqfs']['build-qst-orderby'])
 			);
 
 			//save/update build pass percentage

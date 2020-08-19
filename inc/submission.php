@@ -193,8 +193,12 @@ class Cqfs_Submission {
 
                         //push answer string in array
                         $answers = [];
-                        foreach($v as $ans){
-                            $answers[] = $question['options'][$ans-1];
+                        if($v != ""){
+                            foreach($v as $ans){
+                                $answers[] = $question['options'][$ans-1];
+                            }
+                        }else{
+                            $answers[] = esc_html__('You have skipped this question.','cqfs');
                         }
 
                         //now implode to string and push

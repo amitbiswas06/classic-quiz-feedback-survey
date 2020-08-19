@@ -91,7 +91,6 @@ class Admin_Columns {
     
             if ($key == 'date') {// Put the Name column before the date column
                 $new['build_type'] = __('Build Type', 'cqfs');
-                $new['build_category'] = __('Question Category', 'cqfs');
                 $new['build_shortcode'] = __('Shortcode', 'cqfs');
             }
     
@@ -120,13 +119,6 @@ class Admin_Columns {
                     $link,
                     esc_html( ucfirst($build_type) )
                 );
-    
-            break;
-    
-            case 'build_category':
-                
-                $build_category = get_post_meta($post_ID, 'cqfs_select_questions', true);//taxonomy
-                echo wp_kses( get_the_category_by_ID( $build_category ), 'post' );
     
             break;
     

@@ -123,7 +123,7 @@ class CqfsShortcode {
                                 
                             ?>
                             <div class="options">
-                        
+                                <input type="hidden" name="cqfs[<?php echo esc_attr($question['id']); ?>]" value="">
                                 <?php if( $question['options'] ) {
                                     $j = 1;
                                     foreach( $question['options'] as $optn ) {

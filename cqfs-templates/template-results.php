@@ -41,7 +41,7 @@ use CQFS\INC\UTIL\Utilities as Util;
                 $proceed = false;
             }
 
-            if( $proceed && $entry_obj['form_type'] === 'quiz' ){
+            if( $proceed && $entry_obj['form_type'] === 'quiz' ){ var_dump($entry_obj);
                 // show quiz result
                 ?>
                 <h2 class="cqfs-title"><?php echo esc_html($build_title); ?></h2>
@@ -86,6 +86,7 @@ use CQFS\INC\UTIL\Utilities as Util;
                 </div>
                 <div class="cqfs-entry-qa">
                     <?php if( $entry_obj['all_questions'] ) {
+                        // var_dump($entry_obj['all_questions']);
                         foreach( $entry_obj['all_questions'] as $ent ){
 
                             $you_ans = apply_filters('cqfs_result_you_answered', esc_html__('You answered&#58; ', 'cqfs'));

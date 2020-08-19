@@ -53,19 +53,6 @@ function fadeOut(el){
 
 }
 
-/* let show = document.getElementById('show')
-let hide = document.getElementById('hide')
-let redbox = document.getElementById('redbox')
-
-show.onclick = (e) => {
-    e.preventDefault();
-    fadeIn(redbox)
-}
-hide.onclick = (e) => {
-    e.preventDefault();
-    fadeOut(redbox)
-} */
-
 /**
  * Disable input, buttons etc
  * 
@@ -337,7 +324,8 @@ function formSubmitEvent(e, processingDiv, cqfs){
     //form data for ajax submit
     const formData = new FormData(e.target);
     //validate form inputs
-    let inpValidation = form_input_validation( cqfs, e );
+    // let inpValidation = form_input_validation( cqfs, e );
+    let inpValidation = true;
 
     const loginClass = cqfs.classList.contains('cqfs-logged-in');
     const allowGuest = _cqfs.allow_guest;
@@ -465,20 +453,6 @@ let initialize_CqfsMulti = function( cqfs ){
                     }
                 } );
             }
-
-            //for the last set of answers option
-            //disable the next button and enable the submit button
-            /* if( i == arr.length -1 ){
-                q.addEventListener('click', (e) => {
-                    let checked = allOptions[i].map( v => v.checked || v.type === 'text' || v.type === 'email' );
-                    console.log(checked);
-                    if( checked.includes(true) ){
-                        enableMe(submit);
-                    }else{
-                        disableMe(submit);
-                    }
-                } );
-            } */
 
         });
 

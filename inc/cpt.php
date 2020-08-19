@@ -101,6 +101,7 @@ class Cqfs_Cpts{
             'label'                 => esc_html__( 'Build', 'cqfs' ),
             'labels'                => $labels,
             'supports'              => array( 'title', 'author', 'revisions' ),
+            'taxonomies'            => array( 'category' ),
             'show_ui'               => true,
             'show_in_menu'          => 'cqfs-post-types',
             'show_in_nav_menus'     => true,

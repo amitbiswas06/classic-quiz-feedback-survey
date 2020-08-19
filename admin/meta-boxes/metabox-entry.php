@@ -167,7 +167,7 @@ class Entry {
 			<div class="cqfs-field half">
 				<div class="cqfs-label">
 					<label for="cqfs-entry-result"><?php echo esc_html__('Result','cqfs'); ?></label>
-					<p class="description"><?php echo esc_html__('The Quiz result.','cqfs'); ?></p>
+					<p class="description"><?php echo esc_html__('The result.','cqfs'); ?></p>
 				</div>
 				<div class="cqfs-input">
 					<ul id="cqfs-entry-result" class="cqfs-radio-list horizontal">
@@ -192,7 +192,7 @@ class Entry {
 			<div class="cqfs-field half">
 				<div class="cqfs-label">
 					<label for="cqfs-entry-percent"><?php echo esc_html__('Percentage','cqfs'); ?></label>
-					<p class="description"><?php echo esc_html__('Percentage obtained in quiz.','cqfs'); ?></p>
+					<p class="description"><?php echo esc_html__('Percentage obtained.','cqfs'); ?></p>
 				</div>
 				<div class="cqfs-input">
 					<input type="number" 

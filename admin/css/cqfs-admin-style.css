@@ -45,6 +45,21 @@
     }
 }
 
+.alert-warnning{
+    border: 2px solid #ffb900;
+}
+.alert-ok{
+    border: 2px solid #46b450;
+}
+.cqfs-fields .cqfs-info {
+    background: #ffffff;
+    padding: 15px;
+}
+
+.cqfs-fields .cqfs-info-text {
+    font-size: 16px;
+    margin-bottom: 0;
+}
 
 .cqfs-fields,
 .cqfs-field,
