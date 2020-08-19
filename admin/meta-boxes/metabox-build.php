@@ -102,6 +102,12 @@ class Build {
 		//build question orderby | select
 		$question_orderby = get_post_meta($post->ID, 'cqfs_question_orderby', true);
 
+		//build question requirement | select
+		$question_required = get_post_meta($post->ID, 'cqfs_question_required', true);
+
+		//build question per page | Number
+		$per_page = get_post_meta($post->ID, 'cqfs_question_per_page', true);
+
 		//build pass percentage | Number
 		$pass_percentage = get_post_meta($post->ID, 'cqfs_pass_percentage', true);
 
@@ -247,6 +253,45 @@ class Build {
 				</div>
 			</div>
 
+			<div class="cqfs-field half">
+				<div class="cqfs-label">
+					<label for="cqfs-build-qst-required"><?php echo esc_html__('Required','cqfs'); ?></label>
+					<p class="description"><?php echo esc_html__('Select if the questions are required or not.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<select name="cqfs[build-qst-required]" id="cqfs-build-qst-required">
+						<?php
+						$options = array(
+							'none'	=> esc_html__('Required None', 'cqfs'),
+							'all'	=> esc_html__('Required All', 'cqfs'),
+						);
+
+						foreach( $options as $key => $val ){
+							printf(
+								'<option value="%s" %s>%s</option>',
+								sanitize_key($key),
+								$key == $question_required ? 'selected' : '',
+								$val
+							);
+						}
+						?>
+					</select>
+				</div>
+			</div>
+
+			<div class="cqfs-field half">
+				<div class="cqfs-label">
+					<label for="cqfs-build-per-page"><?php echo esc_html__('Questions per page','cqfs'); ?></label>
+					<p class="description"><?php echo esc_html__('Set questions per page (1-100). Leave blank for no pagination.','cqfs'); ?></p>
+				</div>
+				<div class="cqfs-input">
+					<input type="number" 
+					name="cqfs[build-per-page]" 
+					value="<?php echo esc_attr($per_page); ?>"
+					id="cqfs-build-per-page">
+				</div>
+			</div>
+
 			<div class="cqfs-field cqfs-required">
 				<div class="cqfs-label">
 					<label for="cqfs-build-pass-percentage"><?php echo esc_html__('Pass Percentage','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
@@ -345,6 +390,20 @@ class Build {
 				esc_attr($post_id),
 				sanitize_key('cqfs_question_orderby'),
 				sanitize_text_field($this->values['cqfs']['build-qst-orderby'])
+			);
+
+			//save/update build question required
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_question_required'),
+				sanitize_text_field($this->values['cqfs']['build-qst-required'])
+			);
+
+			//save/update build question per page
+			update_post_meta(
+				esc_attr($post_id),
+				sanitize_key('cqfs_question_per_page'),
+				sanitize_text_field($this->values['cqfs']['build-per-page'])
 			);
 
 			//save/update build pass percentage

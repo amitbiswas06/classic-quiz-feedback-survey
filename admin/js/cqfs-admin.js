@@ -197,6 +197,7 @@
         const form = document.querySelector('form[name=post]');//main form
         const buildType = document.querySelector('#cqfs-build-type');//build type
         const cqfsRequired = Array.from(document.querySelectorAll('.cqfs-required input, .cqfs-required select, .cqfs-required textarea'));//required fields
+        const per_page = document.querySelector('#cqfs-build-per-page');
         const percentage = document.querySelector('#cqfs-build-pass-percentage');
         const hiddenConditional = Array.from(document.querySelectorAll('.hidden-by-conditional-logic'));
         const shortcode = document.querySelector('#cqfs-build-shortcode');
@@ -226,7 +227,8 @@
 
             const errDiv = document.querySelectorAll('.selection-error-label');
             const errClassDiv = document.querySelectorAll('.cqfs-selection-error');
-            const check = numberRange(percentage.value);
+            const per_page_check = numberRange(per_page.value);
+            const percentage_check = numberRange(percentage.value);
 
             //if error div found, remove it
             if(errDiv.length){
@@ -242,15 +244,20 @@
                 }
             }
 
-            //validate percentage field. required but conditionally hidden.
-            if( buildType.value == "quiz" ){
-                if( !percentage.value || !check ){
-                    e.preventDefault();
-                    percentage.parentElement.classList.add('cqfs-selection-error');
-                    percentage.parentElement.appendChild(create_err_div(cqfs_admin_obj.err_msg));
-                }
+            //validate per page field.
+            if( per_page.value && !per_page_check ){
+                e.preventDefault();
+                per_page.parentElement.classList.add('cqfs-selection-error');
+                per_page.parentElement.appendChild(create_err_div(cqfs_admin_obj.err_msg));
             }
 
+            //validate percentage field. required.
+            if( !percentage.value || !percentage_check ){
+                e.preventDefault();
+                percentage.parentElement.classList.add('cqfs-selection-error');
+                percentage.parentElement.appendChild(create_err_div(cqfs_admin_obj.err_msg));
+            }
+            
             //validate the required fields that are not conditionally hidden
             cqfsRequired.map( el => {
                 if( !el.value ){

@@ -664,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //initialize the cqfs multi page block
     multiPageInstances.forEach( cqfs => {
-        initialize_CqfsMulti( cqfs );
+        // initialize_CqfsMulti( cqfs );
     });
 
 
@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //initialize the cqfs single page block
     singlePageInstances.forEach( cqfs => {
-        initialize_CqfsSingle( cqfs );
+        // initialize_CqfsSingle( cqfs );
     });
 
 })
