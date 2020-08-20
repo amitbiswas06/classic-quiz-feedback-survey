@@ -24,7 +24,7 @@ class Build {
 		add_action('save_post', [ $this, 'cqfs_build__group_save']);
 
 		// delete meta field as it is not in use anymore
-		// delete_post_meta_by_key('cqfs_select_questions');
+		// delete_post_meta_by_key('cqfs_layout_type');
 
     }
 
@@ -90,12 +90,6 @@ class Build {
 		//build type | select
 		$build_type = get_post_meta($post->ID, 'cqfs_build_type', true);
 
-		//build layout | select
-		$layout = get_post_meta($post->ID, 'cqfs_layout_type', true);
-
-		//build-question category | category select
-		// $build_question_cat = get_post_meta($post->ID, 'cqfs_select_questions', true);
-
 		//build question order | select
 		$question_order = get_post_meta($post->ID, 'cqfs_question_order', true);
 
@@ -143,7 +137,7 @@ class Build {
 				</div>
 			</div>
 
-			<div class="cqfs-field half cqfs-required">
+			<div class="cqfs-field cqfs-required">
 				<div class="cqfs-label">
 					<label for="cqfs-build-type"><?php echo esc_html__('Build Type','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
 					<p class="description"><?php echo esc_html__('Select a build type.','cqfs'); ?></p>
@@ -171,36 +165,9 @@ class Build {
 				</div>
 			</div>
 
-			<div class="cqfs-field half cqfs-required">
+			<div class="cqfs-field half">
 				<div class="cqfs-label">
-					<label for="cqfs-build-layout"><?php echo esc_html__('Layout Type','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
-					<p class="description"><?php echo esc_html__('Select a layout type.','cqfs'); ?></p>
-				</div>
-				<div class="cqfs-input">
-					<select name="cqfs[build-layout]" id="cqfs-build-layout" required>
-						<?php
-						$options = array(
-							''		=> esc_html__('Please Select...', 'cqfs'),
-							'multi'	=> esc_html__('Multi Page Questions', 'cqfs'),
-							'single'=> esc_html__('Single Page Questions', 'cqfs'),
-						);
-
-						foreach( $options as $key => $val ){
-							printf(
-								'<option value="%s" %s>%s</option>',
-								sanitize_key($key),
-								$key == $layout ? 'selected' : '',
-								$val
-							);
-						}
-						?>
-					</select>
-				</div>
-			</div>
-
-			<div class="cqfs-field half cqfs-required">
-				<div class="cqfs-label">
-					<label for="cqfs-build-qst-order"><?php echo esc_html__('Question Order','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<label for="cqfs-build-qst-order"><?php echo esc_html__('Question Order','cqfs'); ?></label>
 					<p class="description"><?php echo esc_html__('Select the order of the questions.','cqfs'); ?></p>
 				</div>
 				<div class="cqfs-input">
@@ -224,9 +191,9 @@ class Build {
 				</div>
 			</div>
 
-			<div class="cqfs-field half cqfs-required">
+			<div class="cqfs-field half">
 				<div class="cqfs-label">
-					<label for="cqfs-build-qst-orderby"><?php echo esc_html__('Orderby','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
+					<label for="cqfs-build-qst-orderby"><?php echo esc_html__('Orderby','cqfs'); ?></label>
 					<p class="description"><?php echo esc_html__('Select the orderby of the questions.','cqfs'); ?></p>
 				</div>
 				<div class="cqfs-input">
@@ -369,13 +336,6 @@ class Build {
 				esc_attr($post_id),
 				sanitize_key('cqfs_build_type'),
 				sanitize_text_field($this->values['cqfs']['build-type'])
-			);
-
-			//save/update layout type
-			update_post_meta(
-				esc_attr($post_id),
-				sanitize_key('cqfs_layout_type'),
-				sanitize_text_field($this->values['cqfs']['build-layout'])
 			);
 
 			//save/update build question order

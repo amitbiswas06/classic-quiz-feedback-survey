@@ -84,9 +84,15 @@ class CqfsShortcode {
 
         $classes = $cqfs_build['classname'];
         $classes .= is_user_logged_in() ? ' ' . 'cqfs-logged-in' : '';
+        
+        $layout = $cqfs_build['layout'];
         ?>
         <!-- cqfs start -->
-        <div id="cqfs-<?php echo esc_attr($cqfs_build['id']); ?>" class="cqfs <?php echo esc_attr($classes) ?>" data-cqfs-layout = <?php echo esc_attr($cqfs_build['layout']); ?>>
+        <div id="cqfs-<?php echo esc_attr($cqfs_build['id']); ?>" class="cqfs <?php echo esc_attr($classes) ?>" 
+        data-cqfs-layout = <?php echo esc_attr($layout); ?>
+        data-cqfs-required = <?php echo esc_attr($cqfs_build['qst_required']); ?>
+        data-cqfs-perpage = <?php echo esc_attr($cqfs_build['qst_per_page']); ?>>
+
             <?php 
             if( $atts['title'] !== 'false' ){
                 printf(
@@ -99,7 +105,7 @@ class CqfsShortcode {
             do_action('cqfs_after_title');
             ?>
             <form id="cqfs-form-<?php echo esc_attr($cqfs_build['id']); ?>" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
-            <div class="cqfs--questions" >
+            <div class="cqfs--questions">
                 <?php 
                  
                     if( $cqfs_build['all_questions'] ){
@@ -108,7 +114,7 @@ class CqfsShortcode {
 
                             $show_first = $i == 1 ? 'show' : 'hide';
                         ?>
-                        <div class="question <?php echo $cqfs_build['layout'] === 'multi' ? esc_attr($show_first) : ''; ?>">
+                        <div class="question <?php //echo $cqfs_build['layout'] === 'multi' ? esc_attr($show_first) : ''; ?>">
                             <?php
                                 printf(
                                     '<h3 class="question--title">%s %s</h3>',
@@ -145,8 +151,9 @@ class CqfsShortcode {
                         //allow guest checkbox value - boolean
                         $allow_guest = esc_attr( get_option('_cqfs_allow_all') );
                         //if not logged in, display user info form
-                        Util::cqfs_user_info_form( $cqfs_build['id'], $cqfs_build['layout'], $allow_guest );
+                        Util::cqfs_user_info_form( $cqfs_build['id'], $layout, $allow_guest );
 
+                        echo '<div class="cqfs-hidden">';
                         //insert form ID in a hidden field
                         printf(
                             '<input type="hidden" name="_cqfs_id" value="%s">',
@@ -161,6 +168,8 @@ class CqfsShortcode {
                         $nonce_name = esc_attr('_cqfs_nonce_') . esc_attr($cqfs_build['id']);
                         wp_nonce_field( $nonce_action, $nonce_name );
 
+                        echo "</div>";
+
                     }
                 ?>
             </div><?php //var_dump(plugin_dir_url(__FILE__)); ?>
@@ -172,8 +181,8 @@ class CqfsShortcode {
                 $prev_txt = apply_filters( 'cqfs_prev_text', esc_html__('Prev','cqfs') );
                 $submit_txt = apply_filters( 'cqfs_submit_text', esc_html__('Submit','cqfs') );
 
-                if( $cqfs_build['layout'] === 'multi' ) { ?>
-                    <button class="cqfs--next disabled" disabled><?php echo esc_html( $next_txt ); ?></button>
+                if( $layout === 'multi' ) { ?>
+                    <button class="cqfs--next"><?php echo esc_html( $next_txt ); ?></button>
                     <button class="cqfs--prev disabled" disabled><?php echo esc_html( $prev_txt ); ?></button>
                     <button class="cqfs--submit disabled" type="submit" disabled><?php echo esc_html( $submit_txt ); ?></button>
                 <?php }else{ ?>
@@ -187,7 +196,7 @@ class CqfsShortcode {
             do_action('cqfs_after_form');
             ?>
             <div class="cqfs--processing hide"><?php esc_html_e('Processing...','cqfs'); ?></div>
-            <div class="cqfs-error-msg hide"><?php esc_html_e('Please select an option.','cqfs'); ?></div>
+            <div class="cqfs-error-msg hide"><?php esc_html_e('One or more field is required. Please check again.','cqfs'); ?></div>
         </div>
         <!-- cqfs end -->
         <?php 

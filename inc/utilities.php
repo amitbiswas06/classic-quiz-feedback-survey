@@ -65,10 +65,28 @@ class Utilities{
             }
         
         $question_order = get_post_meta($cqfs_build_id, 'cqfs_question_order', true);//ASC, DSC
-        $layout = get_post_meta($cqfs_build_id, 'cqfs_layout_type', true);//select, multi/single
+        $question_orderby = get_post_meta($cqfs_build_id, 'cqfs_question_orderby', true);
+        //build question requirement | select
+		$question_required = get_post_meta($cqfs_build_id, 'cqfs_question_required', true);
+
+		//build question per page | Number
+        $per_page = get_post_meta($cqfs_build_id, 'cqfs_question_per_page', true);
         $pass_percent = get_post_meta($cqfs_build_id, 'cqfs_pass_percentage', true);//pass percentage
         $pass_msg = get_post_meta($cqfs_build_id, 'cqfs_pass_message', true);//pass message
         $fail_msg = get_post_meta($cqfs_build_id, 'cqfs_fail_message', true);//fail message
+
+        //get questions by category
+        $questions = get_posts(
+            array(
+                'numberposts'   => -1,
+                'post_type'     => 'cqfs_question',
+                'category'      => esc_attr(implode(',', $qst_cats)),
+                'order'         => esc_attr($question_order),
+                'orderby'       => esc_attr($question_orderby),
+            )
+        );
+
+        $layout = $per_page && count($questions) > $per_page ? 'multi' : 'single';//select, multi/single
 
         $class = $type;
         $class .= ' ' . $layout;
@@ -78,23 +96,15 @@ class Utilities{
         $the_cqfs_build['type'] = $type;
         $the_cqfs_build['qst_category'] = implode(',', $qst_cats);
         $the_cqfs_build['qst_order'] = $question_order;
+        $the_cqfs_build['qst_orderby'] = $question_orderby;
+        $the_cqfs_build['qst_required'] = $question_required;
+        $the_cqfs_build['qst_per_page'] = $per_page;
         $the_cqfs_build['layout'] = $layout;
         $the_cqfs_build['pass_percent'] = $pass_percent;
         $the_cqfs_build['pass_msg'] = $pass_msg;
         $the_cqfs_build['fail_msg'] = $fail_msg;
         $the_cqfs_build['classname'] = $class;
         $the_cqfs_build['id'] = $cqfs_build_id;
-
-        //get questions by category
-        $questions = get_posts(
-            array(
-                'numberposts'   => -1,
-                'post_type'     => 'cqfs_question',
-                'category'      => esc_attr(implode(',', $qst_cats)),
-                'order'         => esc_attr($question_order),
-                // 'orderby'       => 'rand'
-            )
-        );
 
         //insert question array now
         if($questions){
@@ -281,7 +291,7 @@ class Utilities{
      * @param string $legal         The custom text/html invoked. wp_kses filtered
      * @return html                 string escaped.
      */
-    public static function cqfs_user_info_form( $id, $layout_type = "multi", $guest = false, $legal = "" ){
+    public static function cqfs_user_info_form( $id, $layout_type, $guest = false, $legal = "" ){
 
             if( $layout_type === 'multi' ){
                 echo '<div class="cqfs-user-form hide">';

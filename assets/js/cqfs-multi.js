@@ -101,6 +101,27 @@ function hideMe(el){
     }
 }
 
+/**
+ * Slice array into chunks for pagination
+ * 
+ * @param {Array} arr 
+ * @param {Number} size 
+ */
+function cqfs_chunk(arr, size) {
+    // This prevents infinite loops
+    if ( parseInt(size) < 1 ) {
+        throw new Error('Size must be positive');
+    }
+  
+    let result = [];
+    for ( let i = 0; i < arr.length; i += parseInt(size) ) {
+        result.push( arr.slice(i, i + parseInt(size)) );
+    }
+
+    return result;
+
+}
+
 
 /**
  * Remove CQFS shortcode objects with same ID and keeps the first entry
@@ -124,12 +145,12 @@ function unique_build( cqfs_NodeArray ){
         for( let k = 1; k < all_dup.length; k++ ){
             all_dup[k].remove();
         }
-        console.log(all_dup);
+        // console.log(all_dup);
 
         uniq.push(all_dup[0]);
     }
 
-    console.log(uniq);
+    // console.log(uniq);
     return uniq;
 
 }
@@ -199,29 +220,41 @@ function form_name_email_validation( cqfs, event ){
  * @param {cqfs instance} cqfs 
  * @param {event} event 
  */
-function form_input_validation( cqfs, event ){
+function form_input_validation( event, cqfs ){
+
+    const data_required = cqfs.getAttribute("data-cqfs-required");
+
+    // req message div
+    const req_msg = cqfs.querySelector('.cqfs-error-msg');
+
+    hideMe(req_msg);
 
     //return value
     let returnVal = true;
 
-    //option sets
-    const form_options_div = Array.from( cqfs.querySelectorAll('form .question .options') );
-    const form_options = form_options_div.map( node => node.querySelectorAll('input') ).map( inp => Array.from(inp) );
+    if( data_required === 'all' ){
 
-    form_options_div.forEach( (opt, idx) => {
+        //option sets
+        const form_options_div = Array.from( cqfs.querySelectorAll('form .question .options') );
+        const form_options = form_options_div.map( node => node.querySelectorAll('input') ).map( inp => Array.from(inp) );
 
-        const val = validateInput(form_options[idx]);
-        opt.classList.remove('cqfs-error');
+        form_options_div.forEach( (opt, idx) => {
 
-        //validation run for input fields and prevent submit
-        if( ! val ){
-            opt.classList.add('cqfs-error');
-            opt.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-            event.preventDefault();
-            returnVal = false;
-        }
+            const val = validateInput(form_options[idx]);
+            opt.classList.remove('cqfs-error');
 
-    });
+            //validation run for input fields and prevent submit
+            if( ! val ){
+                opt.classList.add('cqfs-error');
+                opt.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+                showMe(req_msg);
+                event.preventDefault();
+                returnVal = false;
+            }
+
+        });
+
+    }
 
     return returnVal;
 
@@ -319,13 +352,17 @@ function afterResponse( obj ){
  * @param {node}    processingDiv   Processing div which is hidden default and shown while processing
  * @param {node}    cqfs            Main CQFS node
  */
-function formSubmitEvent(e, processingDiv, cqfs){
+function formSubmitEvent(e, cqfs){
+
+    //processing overlay div
+    const processingDiv = cqfs.querySelector('.cqfs--processing');
 
     //form data for ajax submit
     const formData = new FormData(e.target);
+
     //validate form inputs
-    // let inpValidation = form_input_validation( cqfs, e );
-    let inpValidation = true;
+    let inpValidation = form_input_validation(e, cqfs);
+    // let inpValidation = true;
 
     const loginClass = cqfs.classList.contains('cqfs-logged-in');
     const allowGuest = _cqfs.allow_guest;
@@ -392,108 +429,79 @@ function formSubmitEvent(e, processingDiv, cqfs){
 /********************** end of utility functions ***********************/
 
 /**
- * Main node array for multi page layout
- * 
- * @param {node array} cqfs 
+ * new code for pagination and requirements
  */
-
-let initialize_CqfsMulti = function( cqfs ){
-    //code start for the cqfs instance
+let Init_Cqfs = function ( cqfs ){
+    
+    // data
+    const data_perpage = cqfs.getAttribute("data-cqfs-perpage");
 
     //check the layout type
     const layoutType = cqfs.getAttribute("data-cqfs-layout");
+    console.log(layoutType + ' ' + cqfs.getAttribute('id'))
+
+    // questions, nonce, user form container
+    const qstContainer = cqfs.querySelector('.cqfs--questions');
+
+    //container div for questions
+    const userForm = cqfs.querySelector('.cqfs-user-form');
+
+    //next button
+    const nxt = cqfs.querySelector('.cqfs--next');
+
+    //previous button
+    const prv = cqfs.querySelector('.cqfs--prev');
+
+    //form
+    const form = cqfs.querySelector('form');
+
+    //submit button
+    const submit = cqfs.querySelector('.cqfs--submit');
+    // console.log(submit)
+
+    //Question Object
+    let questions = Array.from( cqfs.querySelectorAll('.question') );
 
     if( layoutType === 'multi' ){
 
-        //run if layout is a multi page
-
-        //container div for questions
-        const userForm = cqfs.querySelector('.cqfs-user-form');
-
-        //processing overlay div
-        const processingDiv = cqfs.querySelector('.cqfs--processing');
-
-        //next button
-        const nxt = cqfs.querySelector('.cqfs--next');
-
-        //previous button
-        const prv = cqfs.querySelector('.cqfs--prev');
-
-        //form
-        const form = cqfs.querySelector('form');
-
-        //submit button
-        const submit = cqfs.querySelector('.cqfs--submit');
-
-        //Question Object
-        let questions = Array.from( cqfs.querySelectorAll('.question') );
-        if(userForm){
-            questions.push(userForm);
-        }
-        
-        //Select and store answer sets for each question
-        const allOptions = questions.map( q => Array.from(q.querySelectorAll('input')));
-
-        console.log(allOptions);
-
-        //event listner for each answer option
-        questions.forEach( (q, i, arr) => {
-
-            //for each sets of answer options except the last set
-            //enable next button
-            if( i != arr.length -1 ){
-                q.addEventListener('click', (e) => {
-                    //store checked properties with bollean val
-                    let checked = allOptions[i].map( v => v.checked );
-                    //check if atleast one is checked = true
-                    if( checked.includes(true) ){
-                        enableMe(nxt);
-                    }else{
-                        disableMe(nxt);
-                    }
-                } );
+        const qst_chunks = cqfs_chunk(questions, data_perpage);
+        let x = qst_chunks.map( towrap => towrap.reduce( (acc, el) => (acc.appendChild(el),acc) , document.createElement('div') ))
+        .forEach( (el, i) => {
+            el.className = "cqfs-qst-page";
+            if( i == 0 ){
+                el.classList.add('show');
+            }else{
+                el.classList.add('hide');
             }
 
+            qstContainer.insertBefore(el, userForm);
+
+            // console.log(el)
         });
 
-        /**
-         * Add event listners to the following buttons
-         * 1. Next button
-         * 2. Previous button
-         * 3. Submit button
-         */
-        nxt.addEventListener('click', next);
-        prv.addEventListener('click', prev);
+        const qst_page = Array.from(cqfs.querySelectorAll('.cqfs-qst-page'));
+        qst_page.push(userForm); // push the user form div into the page
+        // console.log(qst_page);
 
-        //Add a counter variable for navigation
         let count = 0;
-
-        /**
-         * @callback function `next`
-         * @param {event} e 
-         */
-        function next(e){
-
+        nxt.addEventListener('click', e => {
             //prevent default
             e.preventDefault();
-
-            //disble target
-            disableMe(e.target);
 
             //enable previous button
             enableMe(prv);
 
             //hide previous question-answer set
-            hideMe( questions[count] );
+            hideMe( qst_page[count] );
 
             //show next question-answer set
-            showMe( questions[count].nextElementSibling );
+            showMe( qst_page[count].nextElementSibling );
 
             //increament counter
             count++;
 
             //check if count is last element
-            if( count == questions.length -1 ){
+            if( count == qst_page.length -1 ){
                 //disable target which is next button
                 disableMe(e.target);
 
@@ -503,15 +511,9 @@ let initialize_CqfsMulti = function( cqfs ){
             }
 
             //console.log(count)
+        });
 
-        }
-
-        /**
-         * @callback function `prev`
-         * @param {event} e 
-         */
-        function prev(e){
-
+        prv.addEventListener('click', e => {
             //prevent default
             e.preventDefault();
 
@@ -522,10 +524,10 @@ let initialize_CqfsMulti = function( cqfs ){
             disableMe(submit);
 
             //hide next question-answer set
-            hideMe( questions[count] );
+            hideMe( qst_page[count] );
 
             //show previous question-answe set
-            showMe( questions[count].previousElementSibling );
+            showMe( qst_page[count].previousElementSibling );
 
             //decrement counter
             count--;
@@ -541,46 +543,15 @@ let initialize_CqfsMulti = function( cqfs ){
             }
 
             //console.log(count)
-            
-        }
+        });
 
-        /**
-         * Form submit event
-         */
-        form.addEventListener( 'submit', e => formSubmitEvent(e, processingDiv, cqfs) );
-
-    }//layout check
-
-
-}
-
-/********************* end of initialize_CqfsMulti ********************/
-
-/**
- * cqfs single page forms
- */
-
-let initialize_CqfsSingle = function ( cqfs ){
-
-    //processing div, default hide
-    const processingDiv = cqfs.querySelector('.cqfs--processing');
-    
-    //check the layout type
-    const layoutType = cqfs.getAttribute("data-cqfs-layout");
-
-    if( layoutType === 'single' ){
-        //run if layout is a single page
-
-        //the form
-        const form = cqfs.querySelector('form');
-
-        //form submit validation
-        // form.addEventListener( 'submit', e => formSubmitEvent(e, processingDiv, cqfs) );
-
-        form.addEventListener('submit', e => formSubmitEvent(e, processingDiv, cqfs) );
 
     }
 
+    // form submission
+    form.addEventListener('submit', e => formSubmitEvent(e, cqfs) );
+
+    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -593,7 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userForms = Array.from(document.querySelectorAll('.cqfs-user-form'));
     const cqfsDivs = Array.from(document.querySelectorAll('.cqfs'));
     const cqfsNonce = Array.from( document.querySelectorAll('input[name^=_cqfs_nonce_]') );
-    console.log(cqfsNonce);
+    // console.log(cqfsNonce);
     
     // run if login modal is available
     if( loginModal ){
@@ -652,32 +623,21 @@ document.addEventListener('DOMContentLoaded', () => {
             } )
             .catch( err => console.log(err) );
 
-
         });
 
     }
     
 
-    //multi page instances
-    const cqfs_MultiPage = Array.from(document.querySelectorAll('.cqfs.multi'));
-    const multiPageInstances = unique_build( cqfs_MultiPage );//retruns unique
+    //cqfs instances
+    const CQFS = Array.from(document.querySelectorAll('.cqfs'));
+    const cqfsInstances = unique_build( CQFS );//retruns unique
 
-    //initialize the cqfs multi page block
-    multiPageInstances.forEach( cqfs => {
-        // initialize_CqfsMulti( cqfs );
+    //initialize the cqfs block
+    cqfsInstances.forEach( cqfs => {
+        Init_Cqfs( cqfs );
     });
 
-
-    //single page instances
-    const cqfs_SinglePage = Array.from(document.querySelectorAll('.cqfs.single'));
-    const singlePageInstances = unique_build( cqfs_SinglePage );//retruns unique
-
-    //initialize the cqfs single page block
-    singlePageInstances.forEach( cqfs => {
-        // initialize_CqfsSingle( cqfs );
-    });
-
-})
+});
 
 
 })();//end of main function wrapper
