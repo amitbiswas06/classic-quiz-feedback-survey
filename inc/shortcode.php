@@ -38,6 +38,8 @@ class CqfsShortcode {
             array(
                 'id'    => '',
                 'title' => 1,
+                'ajax'  => '',
+                'guest' => '',
             ), $atts
         );
 
@@ -89,9 +91,11 @@ class CqfsShortcode {
         ?>
         <!-- cqfs start -->
         <div id="cqfs-<?php echo esc_attr($cqfs_build['id']); ?>" class="cqfs <?php echo esc_attr($classes) ?>" 
-        data-cqfs-layout = <?php echo esc_attr($layout); ?>
-        data-cqfs-required = <?php echo esc_attr($cqfs_build['qst_required']); ?>
-        data-cqfs-perpage = <?php echo esc_attr($cqfs_build['qst_per_page']); ?>>
+        data-cqfs-layout = "<?php echo esc_attr($layout); ?>"
+        data-cqfs-required = "<?php echo esc_attr($cqfs_build['qst_required']); ?>"
+        data-cqfs-perpage = "<?php echo esc_attr($cqfs_build['qst_per_page']); ?>"
+        data-cqfs-guest = "<?php echo $atts['guest'] === 'true' ? 1 : 0; ?>"
+        data-cqfs-ajax = "<?php echo $atts['ajax'] === 'true' ? 1 : 0; ?>">
 
             <?php 
             if( $atts['title'] !== 'false' ){
@@ -149,7 +153,9 @@ class CqfsShortcode {
                         endforeach;
 
                         //allow guest checkbox value - boolean
-                        $allow_guest = esc_attr( get_option('_cqfs_allow_all') );
+                        // $allow_guest = esc_attr( get_option('_cqfs_allow_all') );
+                        $allow_guest = $atts['guest'] === 'true' ? true : false;
+
                         //if not logged in, display user info form
                         Util::cqfs_user_info_form( $cqfs_build['id'], $layout, $allow_guest );
 
@@ -158,6 +164,11 @@ class CqfsShortcode {
                         printf(
                             '<input type="hidden" name="_cqfs_id" value="%s">',
                             esc_attr( $cqfs_build['id'] )
+                        );
+
+                        printf(
+                            '<input type="hidden" name="_cqfs_ajax" value="%s">',
+                            $atts['guest'] === 'true' ? true : false
                         );
 
                         //insert hidden action input

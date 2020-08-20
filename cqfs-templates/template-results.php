@@ -37,11 +37,14 @@ use CQFS\INC\UTIL\Utilities as Util;
             $proceed = true;
             // bail early if sequence mismatch
             if( $param['_cqfs_email'] != $entry_obj['email'] ){
-                echo '<h2 class="cqfs-title">' . esc_html__('Invalid Result','cqfs') . '</h2>';
+                printf(
+                    '<h2 class="cqfs-title">%s</h2>',
+                    esc_html__('Invalid Result.','cqfs')
+                );
                 $proceed = false;
             }
 
-            if( $proceed && $entry_obj['form_type'] === 'quiz' ){ var_dump($entry_obj);
+            if( $proceed && $entry_obj['form_type'] === 'quiz' ){
                 // show quiz result
                 ?>
                 <h2 class="cqfs-title"><?php echo esc_html($build_title); ?></h2>
@@ -152,11 +155,18 @@ use CQFS\INC\UTIL\Utilities as Util;
 
 
         }else{
-            
-            echo '<h2 class="cqfs-title">' . esc_html__('Invalid Result','cqfs') . '</h2>';
-            
+            printf(
+                '<h2 class="cqfs-title">%s</h2>',
+                esc_html__('Invalid Result.','cqfs')
+            );
         }
             
+    }elseif( isset($param['_cqfs_status']) && $param['_cqfs_status'] === 'failure' ){
+
+        printf(
+            '<p class="cqfs-msg">%s</p>',
+            esc_html__('Sorry, something went terribly wrong. Please try again.','cqfs')
+        );
     }
     ?>
     </div>

@@ -357,6 +357,12 @@ function formSubmitEvent(e, cqfs){
     //processing overlay div
     const processingDiv = cqfs.querySelector('.cqfs--processing');
 
+    // ajax submit
+    const ajax = cqfs.getAttribute("data-cqfs-ajax");
+
+    // guest form
+    const guest = cqfs.getAttribute("data-cqfs-guest");
+
     //form data for ajax submit
     const formData = new FormData(e.target);
 
@@ -372,11 +378,11 @@ function formSubmitEvent(e, cqfs){
     if( ! loginClass ){
 
         //for ajax submit mode
-        if( !_cqfs.form_handle || _cqfs.form_handle === 'ajax_mode' ){
+        if( ajax == true ){
             e.preventDefault();
 
             let emailValidation = true;
-            if( allowGuest ){
+            if( guest == true ){
                 emailValidation = form_name_email_validation( cqfs, e );
             }else{
                 emailValidation = false;
@@ -395,7 +401,7 @@ function formSubmitEvent(e, cqfs){
                 } );
                 
             }
-        }else if( allowGuest ){
+        }else if( guest == true ){
             //for php submit mode
             form_name_email_validation( cqfs, e );
         }else{
@@ -404,7 +410,7 @@ function formSubmitEvent(e, cqfs){
         }
         
 
-    }else if( !_cqfs.form_handle || _cqfs.form_handle === 'ajax_mode' ){
+    }else if( ajax == true ){
 
         //ajax submit
 
@@ -432,6 +438,14 @@ function formSubmitEvent(e, cqfs){
  * new code for pagination and requirements
  */
 let Init_Cqfs = function ( cqfs ){
+
+    // ajax submit
+    // const ajax = cqfs.getAttribute("data-cqfs-ajax");
+
+    // // guest form
+    // const guest = cqfs.getAttribute("data-cqfs-guest");
+
+    // console.log(ajax, guest)
     
     // data
     const data_perpage = cqfs.getAttribute("data-cqfs-perpage");

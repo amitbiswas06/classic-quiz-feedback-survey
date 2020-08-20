@@ -15,7 +15,7 @@ use WP_Query; //for custom email check
 class Cqfs_Submission {
 
     // this will store form submit mode
-    protected $submit_mode;
+    protected $ajax;
 
     // this will store post variables
     protected $values;
@@ -28,15 +28,17 @@ class Cqfs_Submission {
 
     public function __construct(){
 
-        // set the submit mode
-        $this->submit_mode = sanitize_text_field( get_option('_cqfs_form_handle') );
-
         //sanitize the global POST var. XSS ok.
         //all form inputs and security inputs
 		//hidden keys (_cqfs_id, action, _cqfs_nonce, _wp_http_referer)
         $this->values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
-
+        // set the submit mode
+        $this->ajax = false;
+        if( isset( $this->values['_cqfs_ajax'] ) && $this->values['_cqfs_ajax'] ){
+            $this->ajax = rest_sanitize_boolean( $this->values['_cqfs_ajax'] );
+        }
+        
         // prepare failure url args
         if( isset( $this->values['_cqfs_id'] ) && !empty( $this->values['_cqfs_id'] ) ){
             $this->failure_args = [
@@ -139,12 +141,12 @@ class Cqfs_Submission {
 		if ( !isset( $this->values[$nonce_name] ) || ! wp_verify_nonce( $this->values[$nonce_name], $nonce_action ) ) {
 
             //send JSON response for ajax mode on failure
-            if( $this->submit_mode === 'ajax_mode' ){
+            if( $this->ajax ){
                 wp_send_json_error( $this->failure_args );
             }else{
                 //safe redirect for php mode on failure
                 wp_safe_redirect( $this->failure_url );
-                var_dump($this->failure_args);
+                // var_dump($this->failure_args);
             }
             
 			exit();
@@ -365,12 +367,12 @@ class Cqfs_Submission {
         // var_dump($redirect_args);//urlencode array
 
         //send JSON response for ajax mode
-        if( !$cqfs_entry_id && $this->submit_mode === 'ajax_mode'){
+        if( !$cqfs_entry_id && $this->ajax ){
             
             wp_send_json_error( $redirect_args );
             exit();
 
-        }else if( $this->submit_mode === 'ajax_mode' ){
+        }else if( $this->ajax ){
             //prepare args
             // $redirect_args[] = $post_array;
             $entry = util::cqfs_entry_obj($cqfs_entry_id);
@@ -382,7 +384,7 @@ class Cqfs_Submission {
         
         // result page url
         $result_page_url = Util::cqfs_result_page_url();
-        if( $this->submit_mode === 'php_mode' ){
+        if( !$this->ajax ){
             /**
              * Redirect to the result page and exit
              */

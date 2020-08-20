@@ -71,8 +71,12 @@ class Build {
 			<div class="cqfs-input"><input 
 			type="text" 
 			id="cqfs-build-shortcode" 
-			value="<?php echo "&#91;cqfs id=". esc_attr($post->ID) ."&#93;"; ?>"
+			value='<?php echo '&#91;cqfs id="'. esc_attr($post->ID) .'"&#93;'; ?>'
 			readonly></div>
+			<div class="cqfs-additional-info">
+				<p><?php echo esc_html__('Available attributes are "title", "guest", "ajax". Example -','cqfs'); ?></p>
+				<p><?php echo '&#91;cqfs id="'. esc_attr($post->ID) .'" title="true" ajax="true" guest="true"&#93;'; ?></p>
+			</div>
 		</div>
 		<?php
 	}
