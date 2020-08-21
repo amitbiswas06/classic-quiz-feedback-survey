@@ -328,15 +328,26 @@ class Cqfs_Submission {
 
         //on successful `cqfs_entry` post creation
         if( $cqfs_entry_id ){
+            
+            //email to admin "checkbox"
+            $email_to_admin = esc_attr( get_option('_cqfs_mail_admin') );
 
-            $body = Util::cqfs_mail_body($cqfsID, $cqfs_entry_id);
-            $body_admin = Util::cqfs_mail_body($cqfsID, $cqfs_entry_id, true);
-            $admin_email = get_bloginfo('admin_email');
-            // fire email to user
-            $send_email = Util::cqfs_mail( sanitize_email($user_emailID), esc_html($cqfs_build['title']), $body );
+            //email to admin "checkbox"
+            $email_to_user = esc_attr( get_option('_cqfs_mail_user') );
 
-            // fire email to admin
-            $send_email_admin = Util::cqfs_mail( sanitize_email($admin_email), esc_html($cqfs_build['title']), $body_admin );
+            if($email_to_user){
+                $body = Util::cqfs_mail_body($cqfsID, $cqfs_entry_id);
+                // fire email to user
+                $send_email_user = Util::cqfs_mail( sanitize_email($user_emailID), esc_html($cqfs_build['title']), $body );
+            }
+            
+            if($email_to_admin){
+                $body_admin = Util::cqfs_mail_body($cqfsID, $cqfs_entry_id, true);
+                $admin_email_id = get_bloginfo('admin_email');
+                // fire email to admin
+                $send_email_admin = Util::cqfs_mail( sanitize_email($admin_email_id), esc_html($cqfs_build['title']), $body_admin );
+            }
+            
 
             //add form id
             $redirect_args['_cqfs_id'] = urlencode($cqfsID);

@@ -197,7 +197,6 @@
         const form = document.querySelector('form[name=post]');//main form
         const buildType = document.querySelector('#cqfs-build-type');//build type
         const cqfsRequired = Array.from(document.querySelectorAll('.cqfs-required input, .cqfs-required select, .cqfs-required textarea'));//required fields
-        const per_page = document.querySelector('#cqfs-build-per-page');
         const percentage = document.querySelector('#cqfs-build-pass-percentage');
         const hiddenConditional = Array.from(document.querySelectorAll('.hidden-by-conditional-logic'));
         const shortcode = document.querySelector('#cqfs-build-shortcode');
@@ -227,7 +226,6 @@
 
             const errDiv = document.querySelectorAll('.selection-error-label');
             const errClassDiv = document.querySelectorAll('.cqfs-selection-error');
-            const per_page_check = numberRange(per_page.value);
             const percentage_check = numberRange(percentage.value);
 
             //if error div found, remove it
@@ -242,13 +240,6 @@
                 for( let i = 0; i < errClassDiv.length; i++ ){
                     errClassDiv[i].classList.remove('cqfs-selection-error');
                 }
-            }
-
-            //validate per page field.
-            if( per_page.value && !per_page_check ){
-                e.preventDefault();
-                per_page.parentElement.classList.add('cqfs-selection-error');
-                per_page.parentElement.appendChild(create_err_div(cqfs_admin_obj.err_msg));
             }
 
             //validate percentage field. required.
@@ -306,7 +297,8 @@
         const all_cqfs_metabox = Array.from( document.querySelectorAll('#title, .cqfs-input input[type="number"], .cqfs-input input[type="text"], .cqfs-input input[type="radio"], .cqfs-input input[type="email"], .cqfs-input textarea'));
         const enableBtn = document.querySelector('#cqfs-entry-enable');//enable btn
         const disableBtn = document.querySelector('#cqfs-entry-disable');//disable btn
-        const emailAdmin = document.querySelector('#cqfs-entry-email-admin');//email to admin btn
+
+        const email_metabox = document.querySelector('#cqfs_entry_email_btn');
         const emailUser = document.querySelector('#cqfs-entry-email-user');//email to user btn
         const publishBtn = document.querySelector('input#publish');//WP publish/update button
 
@@ -337,19 +329,21 @@
             //disable 'email to user' button if the form type is not quiz
             if( cqfs_admin_obj.entry_type !== 'quiz' ){
                 emailUser.disabled = true;
-                emailUser.setAttribute("style", "display: none;");
+                email_metabox.setAttribute("style", "display: none;");
             }
 
-            [emailAdmin, emailUser].map( v => v.addEventListener('click', (e) => e.preventDefault() ));
+            [emailUser].map( v => v.addEventListener('click', (e) => e.preventDefault() ));
 
         }else if(cqfs_admin_obj.action === 'add'){
             /**
              * run on add new page
              */
-            [enableBtn, disableBtn, emailAdmin, emailUser].map( v => {
+            [enableBtn, disableBtn, emailUser].map( v => {
                 v.disabled = true;
                 v.addEventListener('click', (e) => e.preventDefault() );
             } );
+            
+            email_metabox.setAttribute("style", "display: none;");
 
         }
 

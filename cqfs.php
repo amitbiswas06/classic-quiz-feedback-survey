@@ -194,6 +194,9 @@ class CQFS {
 		// add login form for CQFS use
 		add_action( 'wp_footer', [ 'CQFS\INC\UTIL\Utilities', 'cqfs_login_submit_form'] );
 
+		// add send email form for cqfs_entry admin footer
+		add_action('admin_footer', ['CQFS\INC\UTIL\Utilities', 'cqfs_entry_send_email_html']);
+
 	}
 
 

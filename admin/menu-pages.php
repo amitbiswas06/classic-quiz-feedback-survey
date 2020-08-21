@@ -36,16 +36,10 @@ class MenuPages {
     public function cqfs_register_settings() {
         //register cqfs settings
 
-        // form handle mode
-        register_setting( 'cqfs-settings-group', '_cqfs_form_handle', array(
-            'type'      => 'array',
-            'default'   => 'php_mode',
-        ) );
-
-        // enable non logged in users to submit on front end forms
-        register_setting( 'cqfs-settings-group', '_cqfs_allow_all', array(
-            'type'      => 'boolean',
-            'default'   => false,
+        // send email to admin when a user submits a form
+        register_setting( 'cqfs-settings-group', '_cqfs_sender_email', array(
+            'type'      => 'string',
+            'default'   => sanitize_email(get_bloginfo('admin_email')),
         ) );
 
         // send email to admin when a user submits a form
@@ -74,7 +68,7 @@ class MenuPages {
         // additional notes in email
         register_setting( 'cqfs-settings-group', '_cqfs_mail_footer', array(
             'type'      => 'string',
-            'default'   => wp_kses( $footer, Util::$allowed_in_table ),
+            'default'   => wp_kses( $footer, 'post' ),
         ) );
 
     }
@@ -123,7 +117,6 @@ class MenuPages {
             <div class="content">
                 <h1 class="page-title"><?php echo esc_html__('Welcome to CQFS Settings', 'cqfs'); ?></h1>
                 <?php
-                    self::form_all_settings();
                     self::form_mail_settings();
                 ?>
             </div><!-- .content end -->
@@ -138,102 +131,25 @@ class MenuPages {
 
 
     /**
-     * Settings page "all settings" form
-     */
-    private static function form_all_settings(){
-        //get options
-
-        //form mode value
-        $form_mode = esc_attr( get_option('_cqfs_form_handle') );
-
-        //allow guest checkbox value
-        $allow_guest = esc_attr( get_option('_cqfs_allow_all') );
-
-        ?>
-        <div class="form-wrap">
-            <h2 class="cqfs-form-title"><?php echo esc_html__('All Settings', 'cqfs'); ?></h2>
-            <form name="cqfs-general-settings" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-
-                <div class="cqfs-hidden"><?php 
-                    wp_nonce_field( 'cqfs_admin_settings', '_cqfs_admin_nonce');
-                    //insert hidden action input
-                    printf('<input type="hidden" name="action" value="%s">', esc_attr('cqfs_admin_response'));
-                ?></div>
-
-                <div class="cqfs-fields">
-
-                    <div class="cqfs-field">
-                        <div class="cqfs-label">
-                            <label for="cqfs-form-handle-mode"><?php echo esc_html__('Form handle mode','cqfs'); ?></label>
-                            <p class="description"><?php echo esc_html__('Set default mode for front end form submission.','cqfs'); ?></p>
-                        </div>
-                        <div class="cqfs-input">
-                            <ul id="cqfs-form-handle-mode" class="cqfs-radio-list horizontal">
-                                <?php
-                                $list = array(
-                                    'php_mode'  => esc_html__('PHP', 'cqfs'),
-                                    'ajax_mode' => esc_html__('AJAX', 'cqfs'),
-                                );
-                                foreach( $list as $key => $val ){
-                                    printf(
-                                        '<li><label><input name="_cqfs[form-handle]" type="radio" value="%s" %s>%s</label></li>',
-                                        esc_attr($key),
-                                        $key == $form_mode ? esc_attr('checked') : '',
-                                        esc_html($val)
-                                    );
-                                }
-                                ?>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="cqfs-field checkbox">
-                        <div class="cqfs-label">
-                            <label for="cqfs-allow-all"><?php echo esc_html__('Allow guest users.','cqfs'); ?></label>
-                            <p class="description"><?php 
-                            echo esc_html__('Allow guest users to participate. Email ID will be required.','cqfs'); 
-                            ?></p>
-                        </div>
-                        <div class="cqfs-input">
-                            <input type="checkbox" 
-                            name="_cqfs[allow-all]" 
-                            id="cqfs-allow-all" <?php 
-                            if($allow_guest) { echo esc_attr('checked'); } ?>>
-                        </div>
-                    </div>
-
-                </div>
-
-                <?php 
-
-                //submit button
-                submit_button();
-
-                ?>
-
-            </form>
-        </div>
-        <?php
-    }
-
-
-    /**
      * Settings page "mail settings" form
      */
     private static function form_mail_settings(){
         // get options
 
-        //email to admin "checkbox"
-        $email_admin = esc_attr( get_option('_cqfs_mail_admin') );
+        //sender email id
+        $sender_email = sanitize_email( get_option('_cqfs_sender_email') );
 
         //email to admin "checkbox"
-        $email_user = esc_attr( get_option('_cqfs_mail_user') );
+        $email_to_admin = esc_attr( get_option('_cqfs_mail_admin') );
+
+        //email to admin "checkbox"
+        $email_to_user = esc_attr( get_option('_cqfs_mail_user') );
 
         //email additional notes
-        $email_notes = wp_kses( get_option('_cqfs_mail_notes'), Util::$allowed_in_table );
+        $email_notes = wp_kses( get_option('_cqfs_mail_notes'), 'post' );
 
         //email footer content
-        $email_footer = wp_kses( get_option('_cqfs_mail_footer'), Util::$allowed_in_table );
+        $email_footer = wp_kses( get_option('_cqfs_mail_footer'), 'post' );
 
         ?>
         <div class="form-wrap">
@@ -242,22 +158,34 @@ class MenuPages {
                 <div class="cqfs-hidden"><?php 
                     wp_nonce_field( 'cqfs_mail_settings', '_cqfs_mail_settings_nonce');
                     //insert hidden action input
-                    printf('<input type="hidden" name="action" value="%s">', esc_attr('cqfs_mail_settings_response'));
+                    printf('<input type="hidden" name="action" value="%s">', esc_attr('cqfs_mail_settings_action'));
                 ?></div>
                 <div class="cqfs-fields">
+
+                    <div class="cqfs-field">
+                        <div class="cqfs-label">
+                            <label for="cqfs-sender-email"><?php echo esc_html__('Sender Email ID (from)','cqfs'); ?></label>
+                            <p class="description"><?php 
+                            echo esc_html__('If not set, administrator email will be used. Try to use email id same as domain.','cqfs'); 
+                            ?></p>
+                        </div>
+                        <div class="cqfs-input">
+                            <input type="email" name="_cqfs[mail-sender-email]" id="cqfs-sender-email" value="<?php echo $sender_email; ?>">
+                        </div>
+                    </div>
 
                     <div class="cqfs-field checkbox">
                         <div class="cqfs-label">
                             <label for="cqfs-mail-admin"><?php echo esc_html__('Email to admin.','cqfs'); ?></label>
                             <p class="description"><?php 
-                            echo esc_html__('Send email to admin when a form is submitted by a user.','cqfs'); 
+                            echo esc_html__('Send email to admin when a form is submitted by a user. Administrator email will be used.','cqfs'); 
                             ?></p>
                         </div>
                         <div class="cqfs-input">
                             <input type="checkbox" 
                             name="_cqfs[mail-admin]" 
                             id="cqfs-mail-admin" <?php 
-                            if($email_admin) { echo esc_attr('checked'); } ?>>
+                            if($email_to_admin) { echo esc_attr('checked'); } ?>>
                         </div>
                     </div>
 
@@ -272,7 +200,7 @@ class MenuPages {
                             <input type="checkbox" 
                             name="_cqfs[mail-user]" 
                             id="cqfs-mail-user" <?php 
-                            if($email_user) { echo esc_attr('checked'); } ?>>
+                            if($email_to_user) { echo esc_attr('checked'); } ?>>
                         </div>
                     </div>
 
@@ -280,7 +208,7 @@ class MenuPages {
                         <div class="cqfs-label">
                             <label for="cqfs-mail-additional"><?php echo esc_html__('Additional Notes','cqfs'); ?></label>
                             <p class="description"><?php 
-                            echo esc_html__('Add any additional notes in the email. It will appear above the footer. Allowed Html br, b, em, a, span. Inline style allowed.','cqfs'); 
+                            echo esc_html__('Add any additional notes in the email. It will appear above the footer. HTML allowed as post.','cqfs'); 
                             ?></p>
                         </div>
                         <div class="cqfs-input">
@@ -294,7 +222,7 @@ class MenuPages {
                         <div class="cqfs-label">
                             <label for="cqfs-mail-footer"><?php echo esc_html__('Email Footer','cqfs'); ?></label>
                             <p class="description"><?php 
-                            echo esc_html__('Add custom footer content for the email. Allowed Html br, b, em, a, span. Inline style allowed.','cqfs'); 
+                            echo esc_html__('Add custom footer content for the email. HTML allowed as post.','cqfs'); 
                             ?></p>
                         </div>
                         <div class="cqfs-input">
@@ -311,7 +239,7 @@ class MenuPages {
                 submit_button();
                 $custom_logo_id = get_theme_mod( 'custom_logo' );
                 $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
-                var_dump(Util::$allowed_in_table);
+                // var_dump(Util::$allowed_in_table);
                 ?>
             </form>
         </div>

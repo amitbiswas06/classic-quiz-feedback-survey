@@ -46,7 +46,7 @@ class Utilities{
      * @param int $cqfs_build_id    The cqfs_build post ID
      * @return array                Array of the build post
      */
-    public static function cqfs_build_obj( $cqfs_build_id ){
+    public static function cqfs_build_obj( $cqfs_build_id, $perpage = '', $order = 'DESC', $orderby = 'date', $required = '' ){
 
         if( !$cqfs_build_id || is_null($cqfs_build_id) || get_post_status( $cqfs_build_id ) === false ){
             return null;
@@ -64,13 +64,13 @@ class Utilities{
                 }
             }
         
-        $question_order = get_post_meta($cqfs_build_id, 'cqfs_question_order', true);//ASC, DSC
-        $question_orderby = get_post_meta($cqfs_build_id, 'cqfs_question_orderby', true);
+        // $question_order = get_post_meta($cqfs_build_id, 'cqfs_question_order', true);//ASC, DSC
+        // $question_orderby = get_post_meta($cqfs_build_id, 'cqfs_question_orderby', true);
         //build question requirement | select
-		$question_required = get_post_meta($cqfs_build_id, 'cqfs_question_required', true);
+		// $question_required = get_post_meta($cqfs_build_id, 'cqfs_question_required', true);
 
 		//build question per page | Number
-        $per_page = get_post_meta($cqfs_build_id, 'cqfs_question_per_page', true);
+        // $per_page = get_post_meta($cqfs_build_id, 'cqfs_question_per_page', true);
         $pass_percent = get_post_meta($cqfs_build_id, 'cqfs_pass_percentage', true);//pass percentage
         $pass_msg = get_post_meta($cqfs_build_id, 'cqfs_pass_message', true);//pass message
         $fail_msg = get_post_meta($cqfs_build_id, 'cqfs_fail_message', true);//fail message
@@ -81,12 +81,12 @@ class Utilities{
                 'numberposts'   => -1,
                 'post_type'     => 'cqfs_question',
                 'category'      => esc_attr(implode(',', $qst_cats)),
-                'order'         => esc_attr($question_order),
-                'orderby'       => esc_attr($question_orderby),
+                'order'         => esc_attr($order),
+                'orderby'       => esc_attr($orderby),
             )
         );
 
-        $layout = $per_page && count($questions) > $per_page ? 'multi' : 'single';//select, multi/single
+        $layout = $perpage && count($questions) > $perpage ? 'multi' : 'single';//select, multi/single
 
         $class = $type;
         $class .= ' ' . $layout;
@@ -95,10 +95,10 @@ class Utilities{
         $the_cqfs_build['title'] = get_the_title($cqfs_build_id);
         $the_cqfs_build['type'] = $type;
         $the_cqfs_build['qst_category'] = implode(',', $qst_cats);
-        $the_cqfs_build['qst_order'] = $question_order;
-        $the_cqfs_build['qst_orderby'] = $question_orderby;
-        $the_cqfs_build['qst_required'] = $question_required;
-        $the_cqfs_build['qst_per_page'] = $per_page;
+        $the_cqfs_build['qst_order'] = $order;
+        $the_cqfs_build['qst_orderby'] = $orderby;
+        $the_cqfs_build['qst_required'] = $required === 'true' ? true : false;
+        $the_cqfs_build['qst_per_page'] = $perpage;
         $the_cqfs_build['layout'] = $layout;
         $the_cqfs_build['pass_percent'] = $pass_percent;
         $the_cqfs_build['pass_msg'] = $pass_msg;
@@ -430,6 +430,11 @@ class Utilities{
 
     }
 
+    
+	public static function cqfs_entry_send_email_html(){
+		echo 'hello there';
+	}
+
 
     /**
      * Fires Email
@@ -442,7 +447,9 @@ class Utilities{
     public static function cqfs_mail( $to, $subject = '', $body = '' ){
 
         $blog_name = apply_filters( 'cqfs_email_site_name', esc_html(get_bloginfo('name')) );
-        $admin_email = apply_filters( 'cqfs_email_admin_email', sanitize_email(get_bloginfo('admin_email')) );
+        //sender email id
+        $sender_email = sanitize_email( get_option('_cqfs_sender_email') );
+        $admin_email_from = $sender_email ? $sender_email : sanitize_email(get_bloginfo('admin_email'));
         $status = false;
 
         if( $to ){
@@ -454,7 +461,7 @@ class Utilities{
             }
             
             $headers = array();
-            $headers[] = "From: " . esc_html($blog_name) . " <" . sanitize_email($admin_email) . ">";
+            $headers[] = "From: " . esc_html($blog_name) . " <" . sanitize_email($admin_email_from) . ">";
             $headers[] = "Content-Type: text/html; charset=UTF-8";
  
             $status = wp_mail( sanitize_email($to), esc_html($subject), $body, $headers );
@@ -525,10 +532,10 @@ class Utilities{
         $admin_msg = apply_filters('cqfs_email_admin_msg', $admin_msgs );
 
         //email additional notes
-        $email_notes = wp_kses( get_option('_cqfs_mail_notes'), self::$allowed_in_table );
+        $email_notes = wp_kses( get_option('_cqfs_mail_notes'), 'post' );
 
         //email footer content
-        $email_footer = wp_kses( get_option('_cqfs_mail_footer'), self::$allowed_in_table );
+        $email_footer = wp_kses( get_option('_cqfs_mail_footer'), 'post' );
 
         ob_start();
         ?>
@@ -616,7 +623,7 @@ class Utilities{
                                 <?php if( !empty($email_notes) ) :?>
                                 <tr>
                                     <td>
-                                        <?php echo wp_kses( $email_notes, self::$allowed_in_table ); ?>
+                                        <?php echo wp_kses( $email_notes, 'post' ); ?>
                                     </td>
                                 </tr>
                                 <?php endif; ?>
@@ -625,7 +632,7 @@ class Utilities{
 					</tr>      
 					<tr>
                         <td bgcolor="#dddddd" style="padding: 30px 30px 30px 30px; font-size: 14px;">
-							<?php echo wp_kses( $email_footer, self::$allowed_in_table ); ?>
+							<?php echo wp_kses( $email_footer, 'post' ); ?>
 						</td>
 					</tr>
 				</table>

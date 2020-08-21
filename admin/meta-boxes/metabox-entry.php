@@ -6,6 +6,7 @@
 
 //define namespaces
 namespace CQFS\ADMIN\METABOXES\ENTRY;
+use CQFS\INC\UTIL\Utilities as Util;
 
 class Entry {
 
@@ -55,7 +56,7 @@ class Entry {
 			//email buttons
 			add_meta_box(
 				'cqfs_entry_email_btn',
-				esc_html__('Email Options', 'cqfs'),
+				esc_html__('Entry Options', 'cqfs'),
 				[ $this, 'cqfs_entry__email_btn_metabox' ],
                 $screen,
                 'side'
@@ -85,12 +86,15 @@ class Entry {
      */
 	public function cqfs_entry__email_btn_metabox($post){
 
+		$user_email = get_post_meta($post->ID, 'cqfs_entry_user_email', true);
+
 		printf(
 			'<div class="cqfs-metabox">
-				<button id="cqfs-entry-email-admin" class="button button-secondary button-large">%s</button>
+				<a href="%s" target="_blank" id="cqfs-entry-result-link" class="button button-secondary button-large">%s</a>
 				<button id="cqfs-entry-email-user" class="button button-secondary button-large">%s</button>
 			</div>',
-			esc_html__('Email to admin', 'cqfs'),
+			esc_url(Util::cqfs_result_page_url( $user_email, $post->ID) ),
+			esc_html__('View Result', 'cqfs'),
 			esc_html__('Email to user', 'cqfs')
 		);
 	}

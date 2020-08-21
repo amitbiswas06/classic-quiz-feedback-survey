@@ -232,7 +232,7 @@ function form_input_validation( event, cqfs ){
     //return value
     let returnVal = true;
 
-    if( data_required === 'all' ){
+    if( data_required == true ){
 
         //option sets
         const form_options_div = Array.from( cqfs.querySelectorAll('form .question .options') );

@@ -24,7 +24,10 @@ class Build {
 		add_action('save_post', [ $this, 'cqfs_build__group_save']);
 
 		// delete meta field as it is not in use anymore
-		// delete_post_meta_by_key('cqfs_layout_type');
+		delete_post_meta_by_key('cqfs_question_order');
+		delete_post_meta_by_key('cqfs_question_orderby');
+		delete_post_meta_by_key('cqfs_question_required');
+		delete_post_meta_by_key('cqfs_question_per_page');
 
     }
 
@@ -95,16 +98,16 @@ class Build {
 		$build_type = get_post_meta($post->ID, 'cqfs_build_type', true);
 
 		//build question order | select
-		$question_order = get_post_meta($post->ID, 'cqfs_question_order', true);
+		// $question_order = get_post_meta($post->ID, 'cqfs_question_order', true);
 
 		//build question orderby | select
-		$question_orderby = get_post_meta($post->ID, 'cqfs_question_orderby', true);
+		// $question_orderby = get_post_meta($post->ID, 'cqfs_question_orderby', true);
 
 		//build question requirement | select
-		$question_required = get_post_meta($post->ID, 'cqfs_question_required', true);
+		// $question_required = get_post_meta($post->ID, 'cqfs_question_required', true);
 
 		//build question per page | Number
-		$per_page = get_post_meta($post->ID, 'cqfs_question_per_page', true);
+		// $per_page = get_post_meta($post->ID, 'cqfs_question_per_page', true);
 
 		//build pass percentage | Number
 		$pass_percentage = get_post_meta($post->ID, 'cqfs_pass_percentage', true);
@@ -169,100 +172,6 @@ class Build {
 				</div>
 			</div>
 
-			<div class="cqfs-field half">
-				<div class="cqfs-label">
-					<label for="cqfs-build-qst-order"><?php echo esc_html__('Question Order','cqfs'); ?></label>
-					<p class="description"><?php echo esc_html__('Select the order of the questions.','cqfs'); ?></p>
-				</div>
-				<div class="cqfs-input">
-					<select name="cqfs[build-qst-order]" id="cqfs-build-qst-order" required>
-						<?php
-						$options = array(
-							'asc'	=> esc_html__('Ascending', 'cqfs'),
-							'desc'	=> esc_html__('Descending', 'cqfs'),
-						);
-
-						foreach( $options as $key => $val ){
-							printf(
-								'<option value="%s" %s>%s</option>',
-								sanitize_key($key),
-								$key == $question_order ? 'selected' : '',
-								$val
-							);
-						}
-						?>
-					</select>
-				</div>
-			</div>
-
-			<div class="cqfs-field half">
-				<div class="cqfs-label">
-					<label for="cqfs-build-qst-orderby"><?php echo esc_html__('Orderby','cqfs'); ?></label>
-					<p class="description"><?php echo esc_html__('Select the orderby of the questions.','cqfs'); ?></p>
-				</div>
-				<div class="cqfs-input">
-					<select name="cqfs[build-qst-orderby]" id="cqfs-build-qst-orderby" required>
-						<?php
-						$options = array(
-							'date'	=> esc_html__('Date', 'cqfs'),
-							'ID'	=> esc_html__('ID', 'cqfs'),
-							'title'	=> esc_html__('Title', 'cqfs'),
-							'rand'	=> esc_html__('Random', 'cqfs'),
-							'none'	=> esc_html__('No Order', 'cqfs'),
-						);
-
-						foreach( $options as $key => $val ){
-							printf(
-								'<option value="%s" %s>%s</option>',
-								sanitize_key($key),
-								$key == $question_orderby ? 'selected' : '',
-								$val
-							);
-						}
-						?>
-					</select>
-				</div>
-			</div>
-
-			<div class="cqfs-field half">
-				<div class="cqfs-label">
-					<label for="cqfs-build-qst-required"><?php echo esc_html__('Required','cqfs'); ?></label>
-					<p class="description"><?php echo esc_html__('Select if the questions are required or not.','cqfs'); ?></p>
-				</div>
-				<div class="cqfs-input">
-					<select name="cqfs[build-qst-required]" id="cqfs-build-qst-required">
-						<?php
-						$options = array(
-							'none'	=> esc_html__('Required None', 'cqfs'),
-							'all'	=> esc_html__('Required All', 'cqfs'),
-						);
-
-						foreach( $options as $key => $val ){
-							printf(
-								'<option value="%s" %s>%s</option>',
-								sanitize_key($key),
-								$key == $question_required ? 'selected' : '',
-								$val
-							);
-						}
-						?>
-					</select>
-				</div>
-			</div>
-
-			<div class="cqfs-field half">
-				<div class="cqfs-label">
-					<label for="cqfs-build-per-page"><?php echo esc_html__('Questions per page','cqfs'); ?></label>
-					<p class="description"><?php echo esc_html__('Set questions per page (1-100). Leave blank for no pagination.','cqfs'); ?></p>
-				</div>
-				<div class="cqfs-input">
-					<input type="number" 
-					name="cqfs[build-per-page]" 
-					value="<?php echo esc_attr($per_page); ?>"
-					id="cqfs-build-per-page">
-				</div>
-			</div>
-
 			<div class="cqfs-field cqfs-required">
 				<div class="cqfs-label">
 					<label for="cqfs-build-pass-percentage"><?php echo esc_html__('Pass Percentage','cqfs'); ?><span class="cqfs-required"><?php esc_html_e('&#42;','cqfs'); ?></span></label>
@@ -275,7 +184,7 @@ class Build {
 						name="cqfs[build-pass-percentage]" 
 						class="cqfs-is-appended"
 						value="<?php echo esc_attr($pass_percentage); ?>"
-						id="cqfs-build-pass-percentage">
+						id="cqfs-build-pass-percentage" required>
 					</div>
 				</div>
 			</div>
@@ -340,34 +249,6 @@ class Build {
 				esc_attr($post_id),
 				sanitize_key('cqfs_build_type'),
 				sanitize_text_field($this->values['cqfs']['build-type'])
-			);
-
-			//save/update build question order
-			update_post_meta(
-				esc_attr($post_id),
-				sanitize_key('cqfs_question_order'),
-				sanitize_text_field($this->values['cqfs']['build-qst-order'])
-			);
-
-			//save/update build question orderby
-			update_post_meta(
-				esc_attr($post_id),
-				sanitize_key('cqfs_question_orderby'),
-				sanitize_text_field($this->values['cqfs']['build-qst-orderby'])
-			);
-
-			//save/update build question required
-			update_post_meta(
-				esc_attr($post_id),
-				sanitize_key('cqfs_question_required'),
-				sanitize_text_field($this->values['cqfs']['build-qst-required'])
-			);
-
-			//save/update build question per page
-			update_post_meta(
-				esc_attr($post_id),
-				sanitize_key('cqfs_question_per_page'),
-				sanitize_text_field($this->values['cqfs']['build-per-page'])
 			);
 
 			//save/update build pass percentage

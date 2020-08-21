@@ -36,10 +36,15 @@ class CqfsShortcode {
         
         $atts = shortcode_atts(
             array(
-                'id'    => '',
-                'title' => 1,
-                'ajax'  => '',
-                'guest' => '',
+                'id'        => '',
+                'title'     => 1,
+                'ajax'      => '',
+                'guest'     => '',
+                'per_page'  => '',
+                'order'     => esc_attr('ASC'),
+                'orderby'   => esc_attr('date'),
+                'required'  => '',
+                'class'     => '',
             ), $atts
         );
 
@@ -49,7 +54,7 @@ class CqfsShortcode {
         }
         
         //main build object array
-        $cqfs_build = Util::cqfs_build_obj( $atts['id'] );
+        $cqfs_build = Util::cqfs_build_obj( $atts['id'], $atts['per_page'], $atts['order'], $atts['orderby'], $atts['order'], $atts['required'] );
         // var_dump( $cqfs_build );
 
         //get parameters
@@ -86,14 +91,15 @@ class CqfsShortcode {
 
         $classes = $cqfs_build['classname'];
         $classes .= is_user_logged_in() ? ' ' . 'cqfs-logged-in' : '';
+        $classes .= $atts['class'] ? ' ' . esc_attr($atts['class']) : '';
         
         $layout = $cqfs_build['layout'];
         ?>
         <!-- cqfs start -->
         <div id="cqfs-<?php echo esc_attr($cqfs_build['id']); ?>" class="cqfs <?php echo esc_attr($classes) ?>" 
         data-cqfs-layout = "<?php echo esc_attr($layout); ?>"
-        data-cqfs-required = "<?php echo esc_attr($cqfs_build['qst_required']); ?>"
-        data-cqfs-perpage = "<?php echo esc_attr($cqfs_build['qst_per_page']); ?>"
+        data-cqfs-required = "<?php echo $atts['required'] === 'true' ? 1 : 0; ?>"
+        data-cqfs-perpage = "<?php echo esc_attr($atts['per_page']); ?>"
         data-cqfs-guest = "<?php echo $atts['guest'] === 'true' ? 1 : 0; ?>"
         data-cqfs-ajax = "<?php echo $atts['ajax'] === 'true' ? 1 : 0; ?>">
 
@@ -116,9 +122,8 @@ class CqfsShortcode {
                         $i = 1;
                         foreach( $cqfs_build['all_questions']  as $question ) :
 
-                            $show_first = $i == 1 ? 'show' : 'hide';
                         ?>
-                        <div class="question <?php //echo $cqfs_build['layout'] === 'multi' ? esc_attr($show_first) : ''; ?>">
+                        <div class="question">
                             <?php
                                 printf(
                                     '<h3 class="question--title">%s %s</h3>',
