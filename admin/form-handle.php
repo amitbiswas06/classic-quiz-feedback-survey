@@ -11,6 +11,9 @@ use CQFS\INC\UTIL\Utilities as Util;
 
 class FormHandle {
 
+    // cqfs-entry email to user nonce
+    const ENTRY_EMAIL_NONCE = 'cqfs_entry_email_user_nonce';
+
     // admin settings form nonce
     const Mail_Settings_Nonce = 'cqfs_mail_settings';
 
@@ -28,6 +31,12 @@ class FormHandle {
 
     // success url
     protected $success_url;
+
+    // failure url for cqfs_entry
+    protected $failure_url_entry;
+
+    // success url entry
+    protected $success_url_entry;
 
     public function __construct() {
 
@@ -57,10 +66,28 @@ class FormHandle {
             add_query_arg( $this->success_args, admin_url('admin.php') )
         );
 
+        // failure url cqfs_entry
+        $this->failure_url_entry = esc_url_raw(
+            add_query_arg( array(
+                'cqfs-email-to-user' => urlencode('failure'),
+            ), isset($this->values['_wp_http_referer']) ? $this->values['_wp_http_referer'] : admin_url() )
+        );
+
+        // success url cqfs_entry
+        $this->success_url_entry = esc_url_raw(
+            add_query_arg( array(
+                'cqfs-email-to-user' => urlencode('success'),
+            ), isset($this->values['_wp_http_referer']) ? $this->values['_wp_http_referer'] : admin_url() )
+        );
+
         //hooks goes here
         //Authenticated action for the CQFS form. action value `cqfs_response`
         add_action( 'admin_post_cqfs_mail_settings_action', [$this, 'cqfs_mail_settings_action'] );//php req
     
+        // action for the cqfs entry edit page, send email to user
+        add_action('admin_post_cqfs_entry_action', [$this, 'cqfs_entry_email_to_user']); // php fallback
+        add_action('wp_ajax_cqfs_entry_action', [$this, 'cqfs_entry_email_to_user']); // ajax
+
     }
 
 
@@ -150,6 +177,113 @@ class FormHandle {
         
         //exit immediately
         exit();
+
+    }
+
+
+    public function cqfs_entry_email_to_user(){
+        // var_dump($this->values);
+        // check nonce
+		if ( !isset( $this->values['_cqfs_entry_nonce'] ) || !wp_verify_nonce( $this->values['_cqfs_entry_nonce'], self::ENTRY_EMAIL_NONCE )){
+            
+            if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                //failure return
+                wp_send_json_error([
+                    'email'     => false,
+                    'message'   => esc_html__('Security check unsuccessful.','cqfs')
+                ]);
+            }else{
+                //php fallback
+                wp_safe_redirect( $this->failure_url_entry );
+            }
+
+            //exit immediately
+			exit();
+		}
+
+		// Check the user's permissions.
+        if ( ! current_user_can( 'manage_options' ) ) {
+
+            if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                //failure return
+                wp_send_json_error([
+                    'email'     => false,
+                    'message'   => esc_html__('Permission Denied.','cqfs')
+                ]);
+            }else{
+                //php fallback
+                wp_safe_redirect( $this->failure_url_entry );
+            }
+            
+            //exit immediately
+			exit();
+        }
+
+        /**************************************************************/
+        // run if nonce and user permission is ok
+
+        if( array_key_exists( 'cqfs_entry', $this->values ) ){
+
+            $email_id = '';
+            $build_id = '';
+            $entry_id = '';
+
+            if( isset($this->values['cqfs_entry']['email-id']) ){
+                $email_id = sanitize_email( $this->values['cqfs_entry']['email-id'] );
+            }
+            
+            if( isset($this->values['cqfs_entry']['build-id']) ){
+                $build_id = sanitize_text_field( $this->values['cqfs_entry']['build-id'] );
+            }
+            
+            if( isset($this->values['cqfs_entry']['entry-id']) ){
+                $entry_id = sanitize_text_field( $this->values['cqfs_entry']['entry-id'] );
+            }
+            
+        
+            $title = Util::cqfs_build_obj($build_id)['title'];
+            $title .= esc_html__('&#91;Duplicate copy&#93;','cqfs');
+
+            $body = Util::cqfs_mail_body($build_id, $entry_id);
+
+            // fire email to user
+            $send_email_user = Util::cqfs_mail( $email_id, esc_html($title), $body );
+
+            if( $send_email_user ){
+
+                if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                    //success return json for ajax
+                    wp_send_json_success([
+                        'email'     => true,
+                        'message'   => esc_html__('Mail successfully sent.','cqfs')
+                    ]);
+                }else{
+                    //php fallback
+                    wp_safe_redirect( $this->success_url_entry );
+                }
+                
+                exit();
+
+            }else{
+
+                if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                    //failure return json
+                    wp_send_json_error([
+                        'email'     => false,
+                        'message'   => esc_html__('Mail not send. Please try again.','cqfs')
+                    ]);
+                    
+                }else{
+                    //php fallback
+                    wp_safe_redirect( $this->failure_url_entry );
+                }
+
+            }
+        
+        }
+
+        exit();
+
 
     }
 

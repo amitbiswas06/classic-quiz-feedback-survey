@@ -608,6 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // prevent default
             e.preventDefault();
             const formData = new FormData(e.target);
+            formData.append('ajax_request', 1);
 
             postData( _cqfs.ajaxurl, formData )
             .then(response => response.json() )

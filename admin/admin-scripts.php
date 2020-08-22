@@ -84,7 +84,7 @@ class Scripts {
 					'cqfs_admin_script',
 					'cqfs_admin_obj',
 					[
-						'url' 			=> admin_url('admin-ajax.php'),
+						'ajax_url' 		=> esc_url(admin_url('admin-ajax.php')),
 						'post_type'		=> esc_html( $screen->post_type ),
 						'base'			=> esc_html( $screen->base ),
 						'entry_type'	=> esc_html( $cqfs_entry_form_type ),//only for cqfs_entry

@@ -393,7 +393,7 @@ class Utilities{
                     <h3><?php echo esc_html__('Please login to submit','cqfs'); ?></h3>
                 </div>
                 <div class="cqfs-modal-body">
-                    <form name="cqfs-login-form" action="<?php echo esc_url( admin_url('admin-ajax.php') ); ?>" method="post">
+                    <form name="cqfs-login-form" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
                         <div class="hidden-fields">
                             <?php
                             // insert hidden action input
@@ -432,7 +432,63 @@ class Utilities{
 
     
 	public static function cqfs_entry_send_email_html(){
-		echo 'hello there';
+        
+        //grab the current post ID
+		$post_id = filter_input(INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT);
+        //grab "action=edit" screen
+		$action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
+        $screen = get_current_screen();
+
+        // verify admin screen object
+		if ( is_object( $screen ) ) {
+            if ( in_array( $screen->post_type, ['cqfs_entry'] ) ) {
+
+				//set only for cqfs_entry edit screen
+				if( $screen->post_type === 'cqfs_entry' && isset($post_id) && isset($action) && $action === 'edit' ){
+                    // var_dump($post_id);
+                    $user_email = self::cqfs_entry_obj($post_id)['email'];
+                    $build_id = self::cqfs_entry_obj($post_id)['form_id'];
+                    ?>
+                    <div id="cqfs-email-user" class="cqfs-modal cqfs-display-none cqfs-transition">
+                        <div class="cqfs-modal-content">
+                            <div class="cqfs-modal-header">
+                                <span class="cqfs-close"><?php echo esc_html__('&times;','cqfs'); ?></span>
+                                <h3><?php echo esc_html__('Please confirm','cqfs'); ?></h3>
+                            </div>
+                            <div class="cqfs-modal-body">
+                                <form name="cqfs-email-user-form" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
+                                    <?php 
+                                    printf(
+                                        __('<p>Send result to <b>%s</b>&#63;</p>','cqfs'),
+                                        sanitize_email($user_email)
+                                    );
+                                    ?>
+                                    <div class="hidden-fields">
+                                    <?php
+                                        // the email field
+                                        printf('<input type="hidden" name="cqfs_entry[email-id]" value="%s">', sanitize_email($user_email));
+                                        // the build id field
+                                        printf('<input type="hidden" name="cqfs_entry[build-id]" value="%s">', esc_attr($build_id));
+                                        // the build id field
+                                        printf('<input type="hidden" name="cqfs_entry[entry-id]" value="%s">', esc_attr($post_id));
+                                        // insert hidden action input
+                                        printf('<input type="hidden" name="action" value="%s">', esc_attr('cqfs_entry_action'));
+                                        // create nonce field
+                                        wp_nonce_field( 'cqfs_entry_email_user_nonce', '_cqfs_entry_nonce' );
+                                    ?>
+                                    </div>
+                                    <button type="submit" class="button button-primary button-large"><?php echo esc_html__('Send Email','cqfs'); ?></button>
+                                </form>
+                                <div class="cqfs-alert-message cqfs-display-none transition"></div>
+                            </div>
+                            <div class="cqfs-modal-footer">
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                }
+            }
+        }
 	}
 
 

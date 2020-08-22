@@ -316,3 +316,110 @@ li#toplevel_page_cqfs-post-types ul li:last-child{
     padding-bottom: 0;
     border-bottom: none;
 }
+
+/*
+* CQFS Modal Styles
+*/
+/* The Modal (background) */
+.cqfs-modal {
+    position: fixed;
+    z-index: 100;
+    padding-top: 100px;
+    margin-left: 160px;
+    left: 0;
+    top: 0;
+    width: calc(100% - 160px);
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+  
+/* Modal Content */
+.cqfs-modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 60%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.6s;
+    animation-name: animatetop;
+    animation-duration: 0.6s
+}
+
+.folded .cqfs-modal{
+    margin-left: 36px;
+    width: calc(100% - 36px);
+}
+
+@media (max-width: 960px){
+    .auto-fold .cqfs-modal {
+        margin-left: 36px;
+        width: calc(100% - 36px);
+    }
+}
+
+@media (max-width: 782px){
+    .auto-fold .cqfs-modal {
+        margin-left: 0;
+        width: 100%;
+    }
+    .cqfs-modal-content {
+        width: 80%;
+    }
+}
+
+  
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+  
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+  
+/* The Modal style */
+.cqfs-close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+  
+.cqfs-close:hover,
+.cqfs-close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+  
+.cqfs-modal-header {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+  
+.cqfs-modal-body {
+    padding: 2px 16px;
+}
+  
+.cqfs-modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+/* utilities */
+.cqfs-transition {
+    -webkit-transition: all ease 0.5s;
+    transition: all ease 0.5s;
+}
+.cqfs-display-none{
+    display: none;
+}

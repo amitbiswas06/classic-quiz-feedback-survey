@@ -71,7 +71,9 @@ class Cqfs_Submission {
         add_action( 'wp_ajax_cqfs_response', [$this, 'cqfs_form_submission'] );//AJAX req
         
         // login function
+        add_action( 'admin_post_nopriv_cqfs_login', [$this, 'cqfs_login'] );//php req fallback
         add_action( 'wp_ajax_nopriv_cqfs_login', [$this, 'cqfs_login'] );//AJAX req
+
 
     }
 
@@ -80,10 +82,15 @@ class Cqfs_Submission {
         //bail early if found suspecious with nonce verification.
 		if ( !isset( $this->values['_cqfs_login_nonce'] ) || ! wp_verify_nonce( $this->values['_cqfs_login_nonce'], 'cqfs_login' ) ) {
         
-            wp_send_json_error([
-                'login'     => false,
-                'message'   => esc_html__('Security check unsuccessful.','cqfs')
-            ]);
+            if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                wp_send_json_error([
+                    'login'     => false,
+                    'message'   => esc_html__('Security check unsuccessful.','cqfs')
+                ]);
+            }else{
+                //php fallback
+                wp_safe_redirect( $this->failure_url );
+            }
 
             exit();
         
@@ -100,18 +107,40 @@ class Cqfs_Submission {
             $user = wp_signon( $creds, false );
          
             if ( is_wp_error( $user ) ) {
-                wp_send_json_error([
-                    'login'     => false,
-                    'message'   => wp_kses($user->get_error_message(), 'post')
-                ]);
+
+                if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                    wp_send_json_error([
+                        'login'     => false,
+                        'message'   => wp_kses($user->get_error_message(), 'post')
+                    ]);
+                }else{
+                    //php fallback
+                    wp_safe_redirect( $this->failure_url );
+                }
+
+                exit();
+
             }else{
                 wp_set_current_user($user->ID);
-                wp_send_json_success([
-                    'login'     => true,
-                    'message'   => esc_html__('Login Successful.', 'cqfs'),
-                    'status'    => esc_html__('You are logged in.', 'cqfs'),
-                    'nonce'     => wp_create_nonce('_cqfs_post_'),
-                ]);
+
+                if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                    wp_send_json_success([
+                        'login'     => true,
+                        'message'   => esc_html__('Login Successful.', 'cqfs'),
+                        'status'    => esc_html__('You are logged in.', 'cqfs'),
+                        'nonce'     => wp_create_nonce('_cqfs_post_'),
+                    ]);
+                
+                }else{
+                    //php fallback
+                    wp_safe_redirect( esc_url_raw(
+                        add_query_arg( array(
+                            'login' => urlencode('success'),
+                        ), $this->values['_wp_http_referer'] )
+                    ));
+
+                }  
+
             }
             
         }

@@ -4,6 +4,58 @@
  */
     "use strict";
 
+    /**
+     * Fadein function
+     * 
+     * @param {node} el 
+     */
+    function fadeIn(el){
+
+        el.style.display = "block";
+        el.style.opacity = 0;
+        el.classList.remove('display-none');
+
+        setTimeout( () => {
+            el.style.opacity = 1
+        }, 200 );
+
+    }
+
+    function fadeOut(el){
+
+        el.style.opacity = 0;
+
+        setTimeout( () => {
+            el.style.display = "none";
+        }, 200 );
+
+    }
+
+    /**
+     * Ajax POST method implementation:
+     * 
+     * @param {post url} url 
+     * @param {post data} data 
+     */
+    async function postData( url = '', data ) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Accept': 'application/json'
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'same-origin', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: data
+        });
+
+        return response;
+
+    }
+
     // global submit check
     let isSubmit = false;
 
@@ -332,7 +384,76 @@
                 email_metabox.setAttribute("style", "display: none;");
             }
 
-            [emailUser].map( v => v.addEventListener('click', (e) => e.preventDefault() ));
+
+            /**
+             * Email to user
+             */
+            // login modal
+            const email_to_Modal = document.getElementById('cqfs-email-user');
+            const closeBtn = document.querySelector('.cqfs-close');
+            const alertMsg = document.querySelector('.cqfs-alert-message');
+            const email_to_form = document.querySelector('form[name="cqfs-email-user-form"]');
+            console.log(email_to_form)
+
+            // run only if form is available
+            if(email_to_Modal){
+
+                emailUser.addEventListener('click', e => {
+                    e.preventDefault();
+                    fadeIn(email_to_Modal);
+                });
+
+                // When the user clicks on <span> (x), close the modal
+                closeBtn.onclick = function() {
+                    fadeOut(email_to_Modal)
+                }
+
+                // When the user clicks anywhere outside of the modal, close it
+                window.onclick = function(event) {
+                    if ( event.target == email_to_Modal ) {
+                        fadeOut(email_to_Modal)
+                    }
+                }
+
+                email_to_form.addEventListener('submit', (e) => {
+
+                    // prevent default
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    formData.append('ajax_request', 1);
+        
+                    postData( cqfs_admin_obj.ajax_url, formData )
+                    .then(response => response.json() )
+                    .then( obj => {
+                        // return obj;
+                        console.log(obj);
+                        /* if( obj.data.login ){
+                            e.target.style.display = 'none';
+                            alertMsg.classList.remove('display-none');
+                            alertMsg.innerHTML = obj.data.message;
+        
+                            // setTimeout( () => {
+                            //     fadeOut(loginModal);
+                            //     // console.log(userForms)
+                            //     userForms.map( el => el.innerHTML = obj.data.status );
+                            //     cqfsDivs.map( el => el.classList.add('cqfs-logged-in'));
+                            //     cqfsNonce.map( inp => inp.value = obj.data.nonce);
+                            // }, 1500 );
+        
+                        }
+        
+                        if( !obj.data.login ){
+                            alertMsg.classList.remove('display-none');
+                            alertMsg.innerHTML = obj.data.message;
+                        } */
+        
+                    } )
+                    .catch( err => console.log(err) );
+        
+                });
+
+            }
+
 
         }else if(cqfs_admin_obj.action === 'add'){
             /**
@@ -383,7 +504,8 @@
     if( cqfs_admin_obj.base === 'toplevel_page_cqfs-settings' ){
         // alert('I am at settings page')
 
-        const form = document.querySelector('form[name=cqfs-general-settings]');
+        // mail settings form
+        const form = document.querySelector('form[name=cqfs-mail-settings]');
 
         form.addEventListener('submit', (e) => {
 
