@@ -301,8 +301,8 @@ class Utilities{
 
             if( is_user_logged_in() ){
                 printf(
-                    __('<p class="logged-in-msg">%s</p>', 'cqfs'),
-                    esc_html__('You are logged in.', 'cqfs')
+                    __('<p class="cqfs-return-msg success"><span class="cqfs-icon success-icon"></span>%s</p>','cqfs'),
+                    esc_html__('You are now logged in.','cqfs')
                 );
             }
 
@@ -417,11 +417,7 @@ class Utilities{
                     </form>
                     <div class="cqfs-alert-message display-none transition"></div>
                 </div>
-                <div class="cqfs-modal-footer">
-                    <p class="cqfs-forget-password">
-                        <a href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php echo esc_html__('Forgot password? Click here.','cqfs'); ?></a>
-                    </p>
-                </div>
+                
             </div>
             
         </div>
@@ -480,8 +476,6 @@ class Utilities{
                                     <button type="submit" class="button button-primary button-large"><?php echo esc_html__('Send Email','cqfs'); ?></button>
                                 </form>
                                 <div class="cqfs-alert-message cqfs-display-none transition"></div>
-                            </div>
-                            <div class="cqfs-modal-footer">
                             </div>
                         </div>
                     </div>

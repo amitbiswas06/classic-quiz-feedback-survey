@@ -189,7 +189,6 @@ class FormHandle {
             if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                 //failure return
                 wp_send_json_error([
-                    'email'     => false,
                     'message'   => esc_html__('Security check unsuccessful.','cqfs')
                 ]);
             }else{
@@ -207,7 +206,6 @@ class FormHandle {
             if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                 //failure return
                 wp_send_json_error([
-                    'email'     => false,
                     'message'   => esc_html__('Permission Denied.','cqfs')
                 ]);
             }else{
@@ -242,7 +240,7 @@ class FormHandle {
             
         
             $title = Util::cqfs_build_obj($build_id)['title'];
-            $title .= esc_html__('&#91;Duplicate copy&#93;','cqfs');
+            $title .= esc_html__(' [Duplicate copy]','cqfs');
 
             $body = Util::cqfs_mail_body($build_id, $entry_id);
 
@@ -254,8 +252,10 @@ class FormHandle {
                 if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                     //success return json for ajax
                     wp_send_json_success([
-                        'email'     => true,
-                        'message'   => esc_html__('Mail successfully sent.','cqfs')
+                        'message'   => sprintf(
+                            __('<p class="cqfs-return-msg success"><span class="cqfs-icon success-icon"></span>%s</p>','cqfs'),
+                            esc_html__('Mail successfully sent.','cqfs')
+                        ),
                     ]);
                 }else{
                     //php fallback
@@ -269,8 +269,10 @@ class FormHandle {
                 if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                     //failure return json
                     wp_send_json_error([
-                        'email'     => false,
-                        'message'   => esc_html__('Mail not send. Please try again.','cqfs')
+                        'message'   => sprintf(
+                            __('<p class="cqfs-return-msg failure"><span class="cqfs-icon failure-icon"></span>%s</p>','cqfs'),
+                            esc_html__('Mail not send. Please try again.','cqfs')
+                        ),
                     ]);
                     
                 }else{

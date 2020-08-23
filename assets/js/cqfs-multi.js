@@ -615,9 +615,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .then( obj => {
                 // return obj;
                 console.log(obj);
-                if( obj.data.login ){
+                if( obj.success ){
                     e.target.style.display = 'none';
                     alertMsg.classList.remove('display-none');
+                    alertMsg.classList.add('success');
                     alertMsg.innerHTML = obj.data.message;
 
                     setTimeout( () => {
@@ -626,12 +627,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         userForms.map( el => el.innerHTML = obj.data.status );
                         cqfsDivs.map( el => el.classList.add('cqfs-logged-in'));
                         cqfsNonce.map( inp => inp.value = obj.data.nonce);
-                    }, 1500 );
+                    }, 2000 );
 
                 }
 
-                if( !obj.data.login ){
+                if( !obj.success ){
                     alertMsg.classList.remove('display-none');
+                    alertMsg.classList.add('failure');
                     alertMsg.innerHTML = obj.data.message;
                 }
 

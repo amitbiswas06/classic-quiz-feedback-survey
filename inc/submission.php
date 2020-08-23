@@ -84,7 +84,6 @@ class Cqfs_Submission {
         
             if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                 wp_send_json_error([
-                    'login'     => false,
                     'message'   => esc_html__('Security check unsuccessful.','cqfs')
                 ]);
             }else{
@@ -110,7 +109,6 @@ class Cqfs_Submission {
 
                 if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                     wp_send_json_error([
-                        'login'     => false,
                         'message'   => wp_kses($user->get_error_message(), 'post')
                     ]);
                 }else{
@@ -125,9 +123,14 @@ class Cqfs_Submission {
 
                 if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                     wp_send_json_success([
-                        'login'     => true,
-                        'message'   => esc_html__('Login Successful.', 'cqfs'),
-                        'status'    => esc_html__('You are logged in.', 'cqfs'),
+                        'message'   => sprintf(
+                            __('<p class="cqfs-return-msg success"><span class="cqfs-icon success-icon"></span>%s</p>','cqfs'),
+                            esc_html__('Login Successful.','cqfs')
+                        ),
+                        'status'    => sprintf(
+                            __('<p class="cqfs-return-msg success"><span class="cqfs-icon success-icon"></span>%s</p>','cqfs'),
+                            esc_html__('You are now logged in.','cqfs')
+                        ),
                         'nonce'     => wp_create_nonce('_cqfs_post_'),
                     ]);
                 

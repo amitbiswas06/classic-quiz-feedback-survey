@@ -173,7 +173,7 @@ class CqfsShortcode {
 
                         printf(
                             '<input type="hidden" name="_cqfs_ajax" value="%s">',
-                            $atts['guest'] === 'true' ? true : false
+                            $atts['ajax'] === 'true' ? true : false
                         );
 
                         //insert hidden action input
@@ -212,7 +212,7 @@ class CqfsShortcode {
             do_action('cqfs_after_form');
             ?>
             <div class="cqfs--processing hide"><?php esc_html_e('Processing...','cqfs'); ?></div>
-            <div class="cqfs-error-msg hide"><?php esc_html_e('One or more field is required. Please check again.','cqfs'); ?></div>
+            <div class="cqfs-error-msg hide"><?php esc_html_e('One or more fields are required. Please check again.','cqfs'); ?></div>
         </div>
         <!-- cqfs end -->
         <?php 

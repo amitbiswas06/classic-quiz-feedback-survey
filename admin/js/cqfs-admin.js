@@ -427,25 +427,22 @@
                     .then( obj => {
                         // return obj;
                         console.log(obj);
-                        /* if( obj.data.login ){
+                        if( obj.success ){
                             e.target.style.display = 'none';
-                            alertMsg.classList.remove('display-none');
+                            alertMsg.classList.remove('cqfs-display-none');
+                            alertMsg.classList.add('success');
                             alertMsg.innerHTML = obj.data.message;
-        
-                            // setTimeout( () => {
-                            //     fadeOut(loginModal);
-                            //     // console.log(userForms)
-                            //     userForms.map( el => el.innerHTML = obj.data.status );
-                            //     cqfsDivs.map( el => el.classList.add('cqfs-logged-in'));
-                            //     cqfsNonce.map( inp => inp.value = obj.data.nonce);
-                            // }, 1500 );
-        
+
+                            setTimeout( () => {
+                                fadeOut(email_to_Modal);
+                            }, 2000 );
                         }
-        
-                        if( !obj.data.login ){
-                            alertMsg.classList.remove('display-none');
+
+                        if( !obj.success ){
+                            alertMsg.classList.remove('cqfs-display-none');
+                            alertMsg.classList.add('failed');
                             alertMsg.innerHTML = obj.data.message;
-                        } */
+                        }
         
                     } )
                     .catch( err => console.log(err) );
