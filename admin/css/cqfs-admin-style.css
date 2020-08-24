@@ -3,7 +3,32 @@
  * @since 1.0
  */
 
-/* admin */
+/* loading/working/sending/busy animation */
+.cqfs-loader {
+    box-sizing: border-box;
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid #3498db;
+    width: 26px;
+    height: 26px;
+    -webkit-animation: spin 1s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+}
+  
+/* Safari */
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+  
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* loading/working/sending/busy animation */
+
+/* admin settings page */
 .cqfs-admin .cqfs-fields{
     margin: 0;
 }
@@ -23,7 +48,21 @@
     border-bottom: 2px solid #ffffff;
 }
 
-/* -- admin -- */
+.cqfs-admin .result-page-status .cqfs-return-msg{
+    margin-top: 0;
+}
+.cqfs-admin .result-page-status p{
+    font-size: 16px;
+}
+.cqfs-admin .cqfs-submission{
+    margin-top: 30px;
+}
+.cqfs-admin .cqfs-submission .cqfs-loader{
+    margin: 0 20px;
+    border-color: #ffffff;
+    border-top: 3px solid #3498db;
+}
+/* -- admin settings -- */
 
 .cqfs-fields{
     display: flex;
@@ -349,7 +388,7 @@ li#toplevel_page_cqfs-post-types ul li:last-child{
     margin: auto;
     padding: 0;
     border: 1px solid #888;
-    width: 60%;
+    width: 50%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.6s;
@@ -456,15 +495,24 @@ li#toplevel_page_cqfs-post-types ul li:last-child{
     margin: 2px 5px 0 0;
 }
 
-.cqfs-return-msg.success {
+.cqfs-return-msg{
     margin-top: 20px;
+}
+
+.cqfs-return-msg p:first-child{
+    margin-top: 0;
+}
+.cqfs-return-msg p:last-child{
+    margin-bottom: 0;
+}
+
+.cqfs-return-msg.success {
     padding: 15px;
     background: white;
     border: 2px solid green;
 }
 
 .cqfs-return-msg.failure {
-    margin-top: 20px;
     padding: 15px;
     background: white;
     border: 2px solid red;
@@ -507,10 +555,22 @@ li#toplevel_page_cqfs-post-types ul li:last-child{
 }
 
 /* utilities */
-.cqfs-transition {
+.transition {
     -webkit-transition: all ease 0.5s;
     transition: all ease 0.5s;
 }
-.cqfs-display-none{
-    display: none;
+.display-none{
+    display: none !important;
+}
+.inline-block{
+    display: inline-block;
+}
+
+.cqfs-submission {
+    display: flex;
+    align-items: center;
+}
+
+.cqfs-submission .cqfs-loader{
+    margin: 0 10px;
 }

@@ -393,10 +393,13 @@
             const closeBtn = document.querySelector('.cqfs-close');
             const alertMsg = document.querySelector('.cqfs-alert-message');
             const email_to_form = document.querySelector('form[name="cqfs-email-user-form"]');
-            console.log(email_to_form)
+            // console.log(email_to_form)
 
             // run only if form is available
             if(email_to_Modal){
+
+                const loader = email_to_Modal.querySelector('.cqfs-loader');
+                const submitBtn = email_to_Modal.querySelector('button[type="submit"]');
 
                 emailUser.addEventListener('click', e => {
                     e.preventDefault();
@@ -419,6 +422,8 @@
 
                     // prevent default
                     e.preventDefault();
+                    loader.classList.remove('display-none');
+                    submitBtn.disabled = true;
                     const formData = new FormData(e.target);
                     formData.append('ajax_request', 1);
         
@@ -426,10 +431,10 @@
                     .then(response => response.json() )
                     .then( obj => {
                         // return obj;
-                        console.log(obj);
+                        // console.log(obj);
                         if( obj.success ){
-                            e.target.style.display = 'none';
-                            alertMsg.classList.remove('cqfs-display-none');
+                            e.target.remove();
+                            alertMsg.classList.remove('display-none');
                             alertMsg.classList.add('success');
                             alertMsg.innerHTML = obj.data.message;
 
@@ -439,7 +444,9 @@
                         }
 
                         if( !obj.success ){
-                            alertMsg.classList.remove('cqfs-display-none');
+                            loader.classList.add('display-none');
+                            submitBtn.disabled = false;
+                            alertMsg.classList.remove('display-none');
                             alertMsg.classList.add('failed');
                             alertMsg.innerHTML = obj.data.message;
                         }
@@ -502,21 +509,58 @@
         // alert('I am at settings page')
 
         // mail settings form
-        const form = document.querySelector('form[name=cqfs-mail-settings]');
+        const form_mail_settings = document.querySelector('form[name=cqfs-mail-settings]');
+        // recreate result page form
+        const form_recreate_resultpage = document.querySelector('form[name="recreate-result-page-form"]');
 
-        form.addEventListener('submit', (e) => {
+        if( form_recreate_resultpage ){
+
+            // main container
+            const container = document.querySelector('.result-page-status');
+            const loader = form_recreate_resultpage.querySelector('.cqfs-loader');
+            const submitBtn = form_recreate_resultpage.querySelector('input[type="submit"]');
+
+            form_recreate_resultpage.addEventListener('submit', e => {
+                // prevent default
+                e.preventDefault();
+                loader.classList.remove('display-none');
+                submitBtn.disabled = true;
+                const formData = new FormData(e.target);
+                formData.append('ajax_request', 1);
+
+                postData( cqfs_admin_obj.ajax_url, formData )
+                .then(response => response.json() )
+                .then( obj => {
+                    
+                    if( obj.success ){
+                        e.target.remove();
+                        loader.classList.add('display-none');
+                        container.innerHTML = obj.data.message;
+                    }
+
+                    if( !obj.success ){
+                        loader.classList.add('display-none');
+                        container.innerHTML = obj.data.message;
+                    }
+    
+                } )
+                .catch( err => console.log(err) );
+
+            });
+        }
+
+        form_mail_settings.addEventListener('submit', (e) => {
 
             //set submit is true
             isSubmit = true;
         });
 
-
         // event listner for window object `beforeunload`
-        const initForm = storeFormData( form );
+        const initForm = storeFormData( form_mail_settings );
         window.addEventListener("beforeunload", function (e) {
 
             // new form data store before unload event
-            const newForm = storeFormData( form );
+            const newForm = storeFormData( form_mail_settings );
 
             // bail early if form is submitting
             if( isSubmit ){

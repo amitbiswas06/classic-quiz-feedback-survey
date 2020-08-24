@@ -204,6 +204,7 @@ class CqfsShortcode {
                 <?php }else{ ?>
                     <button class="cqfs--submit" type="submit"><?php echo esc_html( $submit_txt ); ?></button>
                 <?php } ?>
+                <span class="cqfs-loader inline-block hide transition"></span>
             </div>
             </form>
 

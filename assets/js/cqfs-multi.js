@@ -357,6 +357,9 @@ function formSubmitEvent(e, cqfs){
     //processing overlay div
     const processingDiv = cqfs.querySelector('.cqfs--processing');
 
+    const loader = cqfs.querySelector('.cqfs-loader');
+    const submitBtn = cqfs.querySelector('.cqfs--submit');
+
     // ajax submit
     const ajax = cqfs.getAttribute("data-cqfs-ajax");
 
@@ -371,7 +374,7 @@ function formSubmitEvent(e, cqfs){
     // let inpValidation = true;
 
     const loginClass = cqfs.classList.contains('cqfs-logged-in');
-    const allowGuest = _cqfs.allow_guest;
+    // const allowGuest = _cqfs.allow_guest;
 
     //run for not logged in users
     //validate the name and email field
@@ -390,11 +393,13 @@ function formSubmitEvent(e, cqfs){
             }
 
             if( inpValidation && emailValidation ){
-                showMe( processingDiv );
+                showMe(processingDiv);
+                showMe(loader);
+                submitBtn.disabled = true;
                 postData( _cqfs.ajaxurl, formData )
                 .then(response => response.json() )
                 .then( obj => {
-                    hideMe( processingDiv );
+                    hideMe(processingDiv);
                     e.target.remove();
                     cqfs.insertAdjacentHTML( 'beforeend', afterResponse( obj ));
                     console.log(obj);
@@ -416,11 +421,13 @@ function formSubmitEvent(e, cqfs){
 
         if( inpValidation ){
             e.preventDefault();
-            showMe( processingDiv );
+            showMe(processingDiv);
+            showMe(loader);
+            submitBtn.disabled = true;
             postData( _cqfs.ajaxurl, formData )
             .then(response => response.json() )
             .then( obj => {
-                hideMe( processingDiv );
+                hideMe(processingDiv);
                 e.target.remove();
                 cqfs.insertAdjacentHTML( 'beforeend', afterResponse( obj ));
                 console.log(obj);
@@ -584,6 +591,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if( loginModal ){
 
         const loginForm = loginModal.querySelector('form[name="cqfs-login-form"]');
+        const loader = loginModal.querySelector('.cqfs-loader');
+        const submitBtn = loginModal.querySelector('button[type="submit"]');
 
         // When the user clicks the button, open the modal 
         openModalLinks.map( el => el.addEventListener('click', (e) => {
@@ -607,6 +616,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // prevent default
             e.preventDefault();
+            loader.classList.remove('display-none');
+            submitBtn.disabled = true;
             const formData = new FormData(e.target);
             formData.append('ajax_request', 1);
 
@@ -616,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // return obj;
                 console.log(obj);
                 if( obj.success ){
-                    e.target.style.display = 'none';
+                    e.target.remove();
                     alertMsg.classList.remove('display-none');
                     alertMsg.classList.add('success');
                     alertMsg.innerHTML = obj.data.message;
@@ -632,6 +643,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if( !obj.success ){
+                    loader.classList.add('display-none');
+                    submitBtn.disabled = false;
                     alertMsg.classList.remove('display-none');
                     alertMsg.classList.add('failure');
                     alertMsg.innerHTML = obj.data.message;

@@ -117,6 +117,7 @@ class MenuPages {
             <div class="content">
                 <h1 class="page-title"><?php echo esc_html__('Welcome to CQFS Settings', 'cqfs'); ?></h1>
                 <?php
+                    self::result_page_check();
                     self::form_mail_settings();
                 ?>
             </div><!-- .content end -->
@@ -129,6 +130,41 @@ class MenuPages {
         <?php
     }
 
+    /**
+     * Result page existence check
+     */
+    private static function result_page_check(){
+        ?>
+        <div class="form-wrap result-page-status">
+        <?php 
+        if( null === get_page_by_path(CQFS_RESULT) ){
+            printf(
+                __('<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>','cqfs'),
+                esc_html__('Result page is missing.','cqfs')
+            );
+
+            ?>
+            <form name="recreate-result-page-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+                <div class="cqfs-hidded">
+                    <input type="hidden" name="action" value="cqfs-recreate-result-page">
+                    <?php wp_nonce_field( 'cqfs_recreate_resultpage', '_cqfs_recreate_resultpage_nonce'); ?>
+                </div>
+                <div class="cqfs-submission">
+                    <?php submit_button( esc_html__('Create Result Page','cqfs'),'primary','submit',false ); ?>
+                    <span class="cqfs-loader inline-block display-none transition"></span>
+                </div>
+            </form>
+            <?php
+
+        }else{
+            printf(
+                __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
+                esc_html__('Great! Result page exists.','cqfs')
+            );
+        } ?>
+        </div>
+        <?php
+    }
 
     /**
      * Settings page "mail settings" form
@@ -239,7 +275,7 @@ class MenuPages {
                 submit_button();
                 $custom_logo_id = get_theme_mod( 'custom_logo' );
                 $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
-                // var_dump(Util::$allowed_in_table);
+                // var_dump(get_permalink(get_page_by_path(CQFS_RESULT)->ID));
                 ?>
             </form>
         </div>

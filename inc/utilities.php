@@ -64,13 +64,6 @@ class Utilities{
                 }
             }
         
-        // $question_order = get_post_meta($cqfs_build_id, 'cqfs_question_order', true);//ASC, DSC
-        // $question_orderby = get_post_meta($cqfs_build_id, 'cqfs_question_orderby', true);
-        //build question requirement | select
-		// $question_required = get_post_meta($cqfs_build_id, 'cqfs_question_required', true);
-
-		//build question per page | Number
-        // $per_page = get_post_meta($cqfs_build_id, 'cqfs_question_per_page', true);
         $pass_percent = get_post_meta($cqfs_build_id, 'cqfs_pass_percentage', true);//pass percentage
         $pass_msg = get_post_meta($cqfs_build_id, 'cqfs_pass_message', true);//pass message
         $fail_msg = get_post_meta($cqfs_build_id, 'cqfs_fail_message', true);//fail message
@@ -301,7 +294,7 @@ class Utilities{
 
             if( is_user_logged_in() ){
                 printf(
-                    __('<p class="cqfs-return-msg success"><span class="cqfs-icon success-icon"></span>%s</p>','cqfs'),
+                    __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
                     esc_html__('You are now logged in.','cqfs')
                 );
             }
@@ -412,7 +405,11 @@ class Utilities{
                                 <label for="cqfs_login_password"><?php echo esc_html__('Password', 'cqfs'); ?></label>
                                 <input type="password" name="cqfs_password" id="cqfs_login_password" required>
                             </div>
-                            <button type="submit"><?php echo esc_html__('Login','cqfs'); ?></button>
+                            <div class="cqfs-submission">
+                                <button type="submit"><?php echo esc_html__('Login','cqfs'); ?></button>
+                                <span class="cqfs-loader inline-block display-none transition"></span>
+                            </div>
+                            
                         </fieldset>
                     </form>
                     <div class="cqfs-alert-message display-none transition"></div>
@@ -445,7 +442,7 @@ class Utilities{
                     $user_email = self::cqfs_entry_obj($post_id)['email'];
                     $build_id = self::cqfs_entry_obj($post_id)['form_id'];
                     ?>
-                    <div id="cqfs-email-user" class="cqfs-modal cqfs-display-none cqfs-transition">
+                    <div id="cqfs-email-user" class="cqfs-modal display-none transition">
                         <div class="cqfs-modal-content">
                             <div class="cqfs-modal-header">
                                 <span class="cqfs-close"><?php echo esc_html__('&times;','cqfs'); ?></span>
@@ -455,7 +452,7 @@ class Utilities{
                                 <form name="cqfs-email-user-form" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
                                     <?php 
                                     printf(
-                                        __('<p>Send result to <b>%s</b>&#63;</p>','cqfs'),
+                                        __('<p>Send result &#40;copy&#41; to <b>%s</b>&#63;</p>','cqfs'),
                                         sanitize_email($user_email)
                                     );
                                     ?>
@@ -473,7 +470,10 @@ class Utilities{
                                         wp_nonce_field( 'cqfs_entry_email_user_nonce', '_cqfs_entry_nonce' );
                                     ?>
                                     </div>
-                                    <button type="submit" class="button button-primary button-large"><?php echo esc_html__('Send Email','cqfs'); ?></button>
+                                    <div class="cqfs-submission">
+                                        <button type="submit" class="button button-primary button-large"><?php echo esc_html__('Send Email','cqfs'); ?></button>
+                                        <span class="cqfs-loader inline-block display-none transition"></span>
+                                    </div>
                                 </form>
                                 <div class="cqfs-alert-message cqfs-display-none transition"></div>
                             </div>
@@ -525,15 +525,14 @@ class Utilities{
 
     public static function cqfs_result_page_url( $email = '', $entry_id = '' ){
 
-        $home_url = home_url('/');
         $result_page_obj = get_page_by_path(CQFS_RESULT);
         $result_page_url = "";
 
         if( !null == $result_page_obj ){
 
-            $queries = array(
-                'page_id'   => esc_attr( $result_page_obj->ID ),
-            );
+            $result_url = get_permalink( $result_page_obj->ID );
+
+            $queries = array();
 
             // add email to the query if not empty
             if( $email ){
@@ -545,7 +544,7 @@ class Utilities{
                 $queries['_cqfs_entry_id'] = esc_attr($entry_id);
             }
 
-            $result_page_url = add_query_arg( $queries, esc_url( $home_url ) );
+            $result_page_url = add_query_arg( $queries, esc_url( $result_url ) );
 
         }
 

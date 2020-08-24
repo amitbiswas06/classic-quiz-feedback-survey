@@ -17,6 +17,9 @@ class FormHandle {
     // admin settings form nonce
     const Mail_Settings_Nonce = 'cqfs_mail_settings';
 
+    // admin settings recreate result nonce
+    const RECREATE_RESULT = 'cqfs_recreate_resultpage';
+
     // this will store post variables
     protected $values;
 
@@ -87,6 +90,10 @@ class FormHandle {
         // action for the cqfs entry edit page, send email to user
         add_action('admin_post_cqfs_entry_action', [$this, 'cqfs_entry_email_to_user']); // php fallback
         add_action('wp_ajax_cqfs_entry_action', [$this, 'cqfs_entry_email_to_user']); // ajax
+
+        // admin settings recreate result page
+        add_action('admin_post_cqfs-recreate-result-page', [$this, 'recreate_result_page']); // php fallback
+        add_action('wp_ajax_cqfs-recreate-result-page', [$this, 'recreate_result_page']); // ajax call
 
     }
 
@@ -240,7 +247,10 @@ class FormHandle {
             
         
             $title = Util::cqfs_build_obj($build_id)['title'];
-            $title .= esc_html__(' [Duplicate copy]','cqfs');
+            $title .= sprintf(
+                __('[Duplicate #%s]','cqfs'),
+                esc_attr($entry_id)
+            );
 
             $body = Util::cqfs_mail_body($build_id, $entry_id);
 
@@ -253,7 +263,7 @@ class FormHandle {
                     //success return json for ajax
                     wp_send_json_success([
                         'message'   => sprintf(
-                            __('<p class="cqfs-return-msg success"><span class="cqfs-icon success-icon"></span>%s</p>','cqfs'),
+                            __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
                             esc_html__('Mail successfully sent.','cqfs')
                         ),
                     ]);
@@ -270,7 +280,7 @@ class FormHandle {
                     //failure return json
                     wp_send_json_error([
                         'message'   => sprintf(
-                            __('<p class="cqfs-return-msg failure"><span class="cqfs-icon failure-icon"></span>%s</p>','cqfs'),
+                            __('<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>','cqfs'),
                             esc_html__('Mail not send. Please try again.','cqfs')
                         ),
                     ]);
@@ -286,6 +296,102 @@ class FormHandle {
 
         exit();
 
+    }
+
+
+    public function recreate_result_page(){
+        // var_dump($this->values);
+        // check nonce
+		if ( !isset( $this->values['_cqfs_recreate_resultpage_nonce'] ) || !wp_verify_nonce( $this->values['_cqfs_recreate_resultpage_nonce'], self::RECREATE_RESULT )){
+            
+            if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                //failure return
+                wp_send_json_error([
+                    'message'   => esc_html__('Security check unsuccessful.','cqfs')
+                ]);
+            }else{
+                //php fallback
+                wp_safe_redirect( $this->failure_url );
+            }
+
+            //exit immediately
+			exit();
+		}
+
+		// Check the user's permissions.
+        if ( ! current_user_can( 'manage_options' ) ) {
+
+            if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                //failure return
+                wp_send_json_error([
+                    'message'   => esc_html__('Permission Denied.','cqfs')
+                ]);
+            }else{
+                //php fallback
+                wp_safe_redirect( $this->failure_url );
+            }
+            
+            //exit immediately
+			exit();
+        }
+
+        /**************************************************************/
+        // run if nonce and user permission is ok
+
+        $create = false;
+        if ( null === get_page_by_path(CQFS_RESULT) ) {
+           
+            $current_user = wp_get_current_user();
+            
+            // create post object
+            $result_page = array(
+                'post_title'  => esc_html__( 'Cqfs Result','cqfs' ),
+                'post_name'   => esc_attr(CQFS_RESULT),
+                'post_content'=> esc_html__('This page displays CQFS results. Please do not delete this page.','cqfs'),
+                'post_status' => 'publish',
+                'post_author' => esc_attr($current_user->ID),
+                'post_type'   => 'page',
+            );
+            
+            // insert the post into the database
+            $create = wp_insert_post( $result_page );
+
+        }
+
+        if( $create ){
+            if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                //success return json for ajax
+                wp_send_json_success([
+                    'message'   => sprintf(
+                        __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
+                        esc_html__('Result page created successfully.','cqfs')
+                    ),
+                ]);
+            }else{
+                //php fallback
+                wp_safe_redirect( $this->success_url );
+            }
+
+            exit();
+        }else{
+            if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
+                //failure return json
+                wp_send_json_error([
+                    'message'   => sprintf(
+                        __('<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>','cqfs'),
+                        esc_html__('Cannot create result page. Please refresh and check.','cqfs')
+                    ),
+                ]);
+                
+            }else{
+                //php fallback
+                wp_safe_redirect( $this->failure_url );
+            }
+        }
+
+
+        // exit immediately
+        exit();
 
     }
 

@@ -124,11 +124,11 @@ class Cqfs_Submission {
                 if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                     wp_send_json_success([
                         'message'   => sprintf(
-                            __('<p class="cqfs-return-msg success"><span class="cqfs-icon success-icon"></span>%s</p>','cqfs'),
+                            __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
                             esc_html__('Login Successful.','cqfs')
                         ),
                         'status'    => sprintf(
-                            __('<p class="cqfs-return-msg success"><span class="cqfs-icon success-icon"></span>%s</p>','cqfs'),
+                            __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
                             esc_html__('You are now logged in.','cqfs')
                         ),
                         'nonce'     => wp_create_nonce('_cqfs_post_'),

@@ -167,6 +167,11 @@ use CQFS\INC\UTIL\Utilities as Util;
             '<p class="cqfs-msg">%s</p>',
             esc_html__('Sorry, something went terribly wrong. Please try again.','cqfs')
         );
+    }else{
+        printf(
+            '<h2 class="cqfs-title">%s</h2>',
+            esc_html__('No results found.','cqfs')
+        );
     }
     ?>
     </div>
