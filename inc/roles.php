@@ -5,12 +5,18 @@
 
 class Cqfs_Roles {
 
+    /**
+     * Custom capabilities of cqfs post types
+     */
     private static $customCaps = array(
         [ 'singular' => 'cqfs_question', 'plural' => 'cqfs_questions' ],
         [ 'singular' => 'cqfs_build', 'plural' => 'cqfs_builds' ],
         [ 'singular' => 'cqfs_entry', 'plural' => 'cqfs_entries' ]
     );
 
+    /**
+     * Add custom CQFS capabilities from admin on deactivation
+     */
     public static function add_caps_admin() {
 
         $role = get_role( 'administrator' );
@@ -38,6 +44,9 @@ class Cqfs_Roles {
 
     }
 
+    /**
+     * Remove custom CQFS capabilities from admin on deactivation
+     */
     public static function remove_caps_admin() {
 
         $role = get_role( 'administrator' );
@@ -66,6 +75,9 @@ class Cqfs_Roles {
     }
 
 
+    /**
+     * Create result page on plugin activation
+     */
     public static function cqfs_result_page() {
   
         if ( ! current_user_can( 'activate_plugins' ) ) {

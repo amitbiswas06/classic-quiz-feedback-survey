@@ -37,7 +37,7 @@ class CqfsShortcode {
         $atts = shortcode_atts(
             array(
                 'id'        => '',
-                'title'     => 1,
+                'title'     => '',
                 'ajax'      => '',
                 'guest'     => '',
                 'per_page'  => '',
@@ -54,8 +54,14 @@ class CqfsShortcode {
         }
         
         //main build object array
-        $cqfs_build = Util::cqfs_build_obj( $atts['id'], $atts['per_page'], $atts['order'], $atts['orderby'], $atts['order'], $atts['required'] );
-        // var_dump( $cqfs_build );
+        $cqfs_build = Util::cqfs_build_obj( 
+            esc_attr($atts['id']), 
+            esc_attr($atts['per_page']), 
+            esc_attr($atts['order']), 
+            esc_attr($atts['orderby']), 
+            esc_attr($atts['order']), 
+            esc_attr($atts['required']) 
+        );
 
         //get parameters
         $param = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
@@ -104,7 +110,7 @@ class CqfsShortcode {
         data-cqfs-ajax = "<?php echo $atts['ajax'] === 'true' ? 1 : 0; ?>">
 
             <?php 
-            if( $atts['title'] !== 'false' ){
+            if( $atts['title'] === 'true' ){
                 printf(
                     '<h2 class="cqfs-title">%s</h2>',
                     esc_html( $cqfs_build['title'] )
@@ -127,7 +133,7 @@ class CqfsShortcode {
                             <?php
                                 printf(
                                     '<h3 class="question--title">%s %s</h3>',
-                                    esc_html($i) . '&#46; ',
+                                    esc_html($i) . esc_html__('&#46; ','cqfs'),
                                     esc_html( $question['question'] )
                                 );
 
@@ -158,7 +164,6 @@ class CqfsShortcode {
                         endforeach;
 
                         //allow guest checkbox value - boolean
-                        // $allow_guest = esc_attr( get_option('_cqfs_allow_all') );
                         $allow_guest = $atts['guest'] === 'true' ? true : false;
 
                         //if not logged in, display user info form
@@ -188,7 +193,7 @@ class CqfsShortcode {
 
                     }
                 ?>
-            </div><?php //var_dump(plugin_dir_url(__FILE__)); ?>
+            </div>
             
             <div class="cqfs--navigation">
                 <?php 
@@ -208,12 +213,14 @@ class CqfsShortcode {
             </div>
             </form>
 
-            <?php
-            //do action `cqfs_after_form`
-            do_action('cqfs_after_form');
-            ?>
             <div class="cqfs--processing hide"><?php esc_html_e('Processing...','cqfs'); ?></div>
             <div class="cqfs-error-msg hide"><?php esc_html_e('One or more fields are required. Please check again.','cqfs'); ?></div>
+
+            <?php
+            //do action `cqfs_before_end`
+            do_action('cqfs_before_end');
+            ?>
+            
         </div>
         <!-- cqfs end -->
         <?php 

@@ -374,7 +374,6 @@ function formSubmitEvent(e, cqfs){
     // let inpValidation = true;
 
     const loginClass = cqfs.classList.contains('cqfs-logged-in');
-    // const allowGuest = _cqfs.allow_guest;
 
     //run for not logged in users
     //validate the name and email field

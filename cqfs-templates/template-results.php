@@ -20,7 +20,6 @@ use CQFS\INC\UTIL\Utilities as Util;
     <?php
     //get parameters
     $param = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
-    // var_dump($param);
 
     if( isset($param['_cqfs_email']) && 
     isset($param['_cqfs_entry_id']) &&
@@ -28,7 +27,6 @@ use CQFS\INC\UTIL\Utilities as Util;
     !empty($param['_cqfs_entry_id']) ){
             
         $entry_obj = Util::cqfs_entry_obj( esc_attr($param['_cqfs_entry_id']) );
-        // var_dump($entry_obj);
 
         if( $entry_obj ){
 
@@ -89,7 +87,7 @@ use CQFS\INC\UTIL\Utilities as Util;
                 </div>
                 <div class="cqfs-entry-qa">
                     <?php if( $entry_obj['all_questions'] ) {
-                        // var_dump($entry_obj['all_questions']);
+                        
                         foreach( $entry_obj['all_questions'] as $ent ){
 
                             $you_ans = apply_filters('cqfs_result_you_answered', esc_html__('You answered&#58; ', 'cqfs'));

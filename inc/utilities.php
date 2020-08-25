@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Utilities{
 
+    /**
+     * allowed html with wp_kses use
+     */
     public static $allowed_in_table = array(
         'br'    => array(),
         'a'     => array(
@@ -25,6 +28,7 @@ class Utilities{
             'style' => array(),
         ),
     );
+
 
     /**
      * prepare the clean slug for use
@@ -44,6 +48,10 @@ class Utilities{
      * Array of the main CQFS build post
      * 
      * @param int $cqfs_build_id    The cqfs_build post ID
+     * @param int $perpage          Per page for pagination
+     * @param string $order         Question order, ASC or DESC
+     * @param string $orderby       Question orderby, default 'date'
+     * @param boolean|string        If all questions are required to be answered
      * @return array                Array of the build post
      */
     public static function cqfs_build_obj( $cqfs_build_id, $perpage = '', $order = 'DESC', $orderby = 'date', $required = '' ){
@@ -370,6 +378,12 @@ class Utilities{
     }
 
 
+    /**
+     * CQFS login form with modal
+     * hooked in footer
+     * 
+     * @return HTML form template
+     */
     public static function cqfs_login_submit_form(){
 
         // if user is logged in, return immediately
@@ -424,6 +438,12 @@ class Utilities{
     }
 
     
+    /**
+     * CQFS entry post type
+     * hooked in admin-footer
+     * 
+     * @return HTML form in modal view
+     */
 	public static function cqfs_entry_send_email_html(){
         
         //grab the current post ID
@@ -489,10 +509,10 @@ class Utilities{
     /**
      * Fires Email
      * 
-     * @param string|array $to
-     * @param string $subject
-     * @param string $body
-     * @return bool
+     * @param string|array $to  Send to a user
+     * @param string $subject   Email subject
+     * @param string $body      Email body
+     * @return bool             Return true on success, false on failure
      */
     public static function cqfs_mail( $to, $subject = '', $body = '' ){
 
@@ -523,6 +543,14 @@ class Utilities{
     }
 
 
+    /**
+     * Result page url for CQFS submission
+     * Return URL
+     * 
+     * @param string $email     Email Id of the user
+     * @param int    $entry_id  cqfs_entry post id
+     * @return URL              The final result page url
+     */
     public static function cqfs_result_page_url( $email = '', $entry_id = '' ){
 
         $result_page_obj = get_page_by_path(CQFS_RESULT);
@@ -551,6 +579,15 @@ class Utilities{
         return $result_page_url;
     }
 
+
+    /**
+     * CQFS email body html
+     * 
+     * @param int   $cqfs_build_id  The build id
+     * @param int   $cqfs_entry_id  The entry id
+     * @param bool  $is_admin       Boolean if email body is for admin
+     * @return HTML                 Returns HTML body content for the email
+     */
     public static function cqfs_mail_body( $cqfs_build_id, $cqfs_entry_id, $is_admin = false ){
 
         $build_obj = self::cqfs_build_obj( $cqfs_build_id );

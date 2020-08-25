@@ -1,4 +1,8 @@
 <?php
+/**
+ * Custom admin columns for CQFS post types
+ * @since 1.0.0
+ */
 
 //define namespaces
 namespace CQFS\INC\ADMINCOLUMNS;
@@ -41,7 +45,7 @@ class Admin_Columns {
         foreach($defaults as $key => $title) {
     
             if ($key == 'date') {// Put the Name column before the date column
-                $new['answer_type'] = __('Answer Type', 'cqfs');
+                $new['answer_type'] = esc_html__('Answer Type', 'cqfs');
             }
     
             $new[$key] = $title;
@@ -90,8 +94,8 @@ class Admin_Columns {
         foreach($defaults as $key => $title) {
     
             if ($key == 'date') {// Put the Name column before the date column
-                $new['build_type'] = __('Build Type', 'cqfs');
-                $new['build_shortcode'] = __('Shortcode', 'cqfs');
+                $new['build_type'] = esc_html__('Build Type', 'cqfs');
+                $new['build_shortcode'] = esc_html__('Shortcode', 'cqfs');
             }
     
             $new[$key] = $title;
@@ -152,10 +156,10 @@ class Admin_Columns {
         foreach($defaults as $key => $title) {
     
             if ($key == 'date') {// Put the Name column before the date column
-                $new['form_id'] = __('Form ID (cqfs build)', 'cqfs');
-                $new['form_type'] = __('Form Type (cqfs build)', 'cqfs');
-                $new['result'] = __('Result', 'cqfs');
-                $new['email'] = __('Email', 'cqfs');
+                $new['form_id'] = esc_html__('Form ID (cqfs build)', 'cqfs');
+                $new['form_type'] = esc_html__('Form Type (cqfs build)', 'cqfs');
+                $new['result'] = esc_html__('Result', 'cqfs');
+                $new['email'] = esc_html__('Email', 'cqfs');
             }
     
             $new[$key] = $title;

@@ -6,7 +6,7 @@
 
 //define namespaces
 namespace CQFS\ADMIN\MENUPAGES;
-
+use CQFS\ROOT\CQFS as CQFS;
 use CQFS\INC\UTIL\Utilities as Util;
 
 class MenuPages {
@@ -36,7 +36,7 @@ class MenuPages {
     public function cqfs_register_settings() {
         //register cqfs settings
 
-        // send email to admin when a user submits a form
+        // sender email id for form submission, input type - email
         register_setting( 'cqfs-settings-group', '_cqfs_sender_email', array(
             'type'      => 'string',
             'default'   => sanitize_email(get_bloginfo('admin_email')),
@@ -123,7 +123,87 @@ class MenuPages {
             </div><!-- .content end -->
 
             <div class="sidebar">
-
+                <div class="sidebar-content">
+                    <h2 class="cqfs-title"><?php echo esc_html__('Classic Quiz Feedback Survey','cqfs'); ?></h2>
+                    <span class="cqfs-version"><?php echo esc_html(CQFS::CQFS_VERSION); ?></span>
+                    <div class="cqfs-donate">
+                        <p><?php echo esc_html__('This plugin is a free open source project. If this plugin is useful to you, please support me and keep this alive.','cqfs'); ?></p>
+                        <?php
+                            printf(
+                                '<a href="%s" target="_blank" class="paypal-me">%s</a>',
+                                esc_url('https://paypal.me/amitbiswas06?locale.x=en_GB'),
+                                esc_html__('Donate via PayPal','cqfs')
+                            ); 
+                        ?>
+                    </div>
+                    <div class="cqfs-help">
+                        <h2 class="cqfs-title"><?php echo esc_html__('Full Documentation', 'cqfs'); ?></h2>
+                        <ul>
+                            <li>
+                            <?php
+                                printf(
+                                    '<a href="%s" target="_blank">%s</a>',
+                                    esc_url('https://templateartist.com/cqfs/'),
+                                    esc_html__('Overview','cqfs')
+                                ); 
+                            ?>
+                            </li>
+                            <li>
+                            <?php
+                                printf(
+                                    '<a href="%s" target="_blank">%s</a>',
+                                    esc_url('https://templateartist.com/cqfs/getting-started/'),
+                                    esc_html__('Getting Started','cqfs')
+                                ); 
+                            ?>
+                            </li>
+                            <li>
+                            <?php
+                                printf(
+                                    '<a href="%s" target="_blank">%s</a>',
+                                    esc_url('https://templateartist.com/cqfs/shortcode/'),
+                                    esc_html__('CQFS shortcode','cqfs')
+                                ); 
+                            ?>
+                            </li>
+                            <li>
+                            <?php
+                                printf(
+                                    '<a href="%s" target="_blank">%s</a>',
+                                    esc_url('https://templateartist.com/cqfs/action-hooks/'),
+                                    esc_html__('Action Hooks','cqfs')
+                                ); 
+                            ?>
+                            </li>
+                            <li>
+                            <?php
+                                printf(
+                                    '<a href="%s" target="_blank">%s</a>',
+                                    esc_url('https://templateartist.com/cqfs/filter-hooks/'),
+                                    esc_html__('Filter Hooks','cqfs')
+                                ); 
+                            ?>
+                            </li>
+                            <li>
+                            <?php
+                                printf(
+                                    '<a href="%s" target="_blank">%s</a>',
+                                    esc_url('https://templateartist.com/cqfs/demos/'),
+                                    esc_html__('Live Demos','cqfs')
+                                ); 
+                            ?>
+                            </li>
+                        </ul>
+                    </div>
+                    <h2 class="cqfs-title"><?php echo esc_html__('Github Repositiroy', 'cqfs'); ?></h2>
+                    <?php
+                        printf(
+                            '<a href="%s" target="_blank">%s</a>',
+                            esc_url('https://github.com/amitbiswas06/classic-quiz-feedback-survey'),
+                            esc_html__('classic quiz feedback survey','cqfs')
+                        ); 
+                    ?>
+                </div>
             </div><!-- .sidebar end -->
                     
         </div>
@@ -139,7 +219,7 @@ class MenuPages {
         <?php 
         if( null === get_page_by_path(CQFS_RESULT) ){
             printf(
-                __('<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>','cqfs'),
+                '<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>',
                 esc_html__('Result page is missing.','cqfs')
             );
 
@@ -158,7 +238,7 @@ class MenuPages {
 
         }else{
             printf(
-                __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
+                '<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>',
                 esc_html__('Great! Result page exists.','cqfs')
             );
         } ?>
@@ -269,20 +349,16 @@ class MenuPages {
                     </div>
 
                 </div>
-                <?php 
-
-                //submit button
-                submit_button();
-                $custom_logo_id = get_theme_mod( 'custom_logo' );
-                $image = wp_get_attachment_image_src( $custom_logo_id , 'full' );
-                // var_dump(get_permalink(get_page_by_path(CQFS_RESULT)->ID));
-                ?>
+                
             </form>
         </div>
         <?php
     }
 
 
+    /**
+     * Insert the 'add new' links to the submenu
+     */
     public function cqfs_submenu_items(){
 
         add_submenu_page(
@@ -324,6 +400,3 @@ class MenuPages {
 if( is_admin() ){
     $menu_pages = new MenuPages;
 }
-
-
-

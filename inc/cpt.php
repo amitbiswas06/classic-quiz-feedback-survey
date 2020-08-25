@@ -1,4 +1,9 @@
 <?php
+/**
+ * Create custom post types for CQFS
+ * @since 1.0.0
+ */
+
 //define namespaces
 namespace CQFS\INC\CPT;
 
@@ -211,6 +216,7 @@ class Cqfs_Cpts{
 
         }
 
+        
         /**
          * CPT cqfs_entry
          */

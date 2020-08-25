@@ -23,12 +23,6 @@ class Build {
 		//save
 		add_action('save_post', [ $this, 'cqfs_build__group_save']);
 
-		// delete meta field as it is not in use anymore
-		delete_post_meta_by_key('cqfs_question_order');
-		delete_post_meta_by_key('cqfs_question_orderby');
-		delete_post_meta_by_key('cqfs_question_required');
-		delete_post_meta_by_key('cqfs_question_per_page');
-
     }
 
     /**
@@ -77,8 +71,35 @@ class Build {
 			value='<?php echo '&#91;cqfs id="'. esc_attr($post->ID) .'"&#93;'; ?>'
 			readonly></div>
 			<div class="cqfs-additional-info">
-				<p><?php echo esc_html__('Available attributes are "title", "guest", "ajax". Example -','cqfs'); ?></p>
-				<p><?php echo '&#91;cqfs id="'. esc_attr($post->ID) .'" title="true" ajax="true" guest="true"&#93;'; ?></p>
+				
+				<?php
+				$atts = array(
+					[esc_html__('Enable title', 'cqfs'), esc_attr('title="true"')],
+					[esc_html__('Enable ajax', 'cqfs'), esc_attr('ajax="true"')],
+					[esc_html__('Enable guest', 'cqfs'), esc_attr('guest="true"')],
+					[esc_html__('Enable required', 'cqfs'), esc_attr('required="true"')],
+					[esc_html__('Enable pagination', 'cqfs'), esc_attr('per_page="2"')],
+					[esc_html__('Custom class', 'cqfs'), esc_attr('class="myclass"')],
+					[esc_html__('Order', 'cqfs'), esc_attr('order="ASC"')],
+					[esc_html__('Orderby', 'cqfs'), esc_attr('orderby="rand"')],
+				);
+				?>
+				<h4><?php echo esc_html__('Available attributes and example use:','cqfs'); ?></h4>
+				<table>
+				<?php foreach($atts as $v) { ?>
+					<tr>
+						<td><b><?php echo $v[0]; ?></b></td>
+						<td style="padding: 2px 10px;"><?php echo $v[1]; ?></td>
+					</tr>
+				<?php }?>
+				</table>
+				<?php
+					printf(
+						'<p><a href="%s" target="_blank">%s</a></p>',
+						esc_url('https://templateartist.com/cqfs/'),
+						esc_html__('Full documentation is here','cqfs')
+					); 
+				?>
 			</div>
 		</div>
 		<?php
@@ -96,18 +117,6 @@ class Build {
 
 		//build type | select
 		$build_type = get_post_meta($post->ID, 'cqfs_build_type', true);
-
-		//build question order | select
-		// $question_order = get_post_meta($post->ID, 'cqfs_question_order', true);
-
-		//build question orderby | select
-		// $question_orderby = get_post_meta($post->ID, 'cqfs_question_orderby', true);
-
-		//build question requirement | select
-		// $question_required = get_post_meta($post->ID, 'cqfs_question_required', true);
-
-		//build question per page | Number
-		// $per_page = get_post_meta($post->ID, 'cqfs_question_per_page', true);
 
 		//build pass percentage | Number
 		$pass_percentage = get_post_meta($post->ID, 'cqfs_pass_percentage', true);

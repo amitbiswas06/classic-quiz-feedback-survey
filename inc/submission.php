@@ -30,7 +30,6 @@ class Cqfs_Submission {
 
         //sanitize the global POST var. XSS ok.
         //all form inputs and security inputs
-		//hidden keys (_cqfs_id, action, _cqfs_nonce, _wp_http_referer)
         $this->values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
         // set the submit mode
@@ -40,27 +39,23 @@ class Cqfs_Submission {
         }
         
         // prepare failure url args
+        $this->failure_args = '';
         if( isset( $this->values['_cqfs_id'] ) && !empty( $this->values['_cqfs_id'] ) ){
             $this->failure_args = [
                 '_cqfs_status'  => urlencode(sanitize_text_field('failure')),
                 '_cqfs_id'      => urlencode(sanitize_text_field($this->values['_cqfs_id']))
             ];
-        }else{
-            $this->failure_args = '';
         }
         
-
         // check if we are at admin-post.php or not
+        $this->failure_url = "";
         if( isset( $this->values['_wp_http_referer'] ) && !empty( $this->values['_wp_http_referer'] ) ){
             // set failure url
-            $this->failure_url = esc_url_raw(
-                add_query_arg( $this->failure_args, esc_url( $this->values['_wp_http_referer'] ) )
+            $this->failure_url = esc_url(
+                add_query_arg( $this->failure_args, $this->values['_wp_http_referer'] )
             );
 
-        }else{
-            $this->failure_url = "";
         }
-
 
         //Non authenticated action for CQFS form via. action value `cqfs_response`
         add_action( 'admin_post_nopriv_cqfs_response', [$this, 'cqfs_form_submission'] );//php req
@@ -77,6 +72,10 @@ class Cqfs_Submission {
 
     }
 
+
+    /**
+     * Performs cqfs login with modal form
+     */
     public function cqfs_login(){
         
         //bail early if found suspecious with nonce verification.
@@ -158,8 +157,6 @@ class Cqfs_Submission {
      */
 	public function cqfs_form_submission(){
 
-        // var_dump($this->values);//main $_post
-
         $cqfsID = '';
         if( isset($this->values['_cqfs_id']) ){
             $cqfsID = esc_attr($this->values['_cqfs_id']);
@@ -203,7 +200,6 @@ class Cqfs_Submission {
             $userAnswers = $this->values['cqfs'];
         }
         
-        // var_dump($userAnswers);
         $answersArr = [];
 
         if($userAnswers){
@@ -247,8 +243,6 @@ class Cqfs_Submission {
             }
     
         }
-        // var_dump($numCorrects);
-
         
         /**
          * Final preparation
@@ -269,7 +263,6 @@ class Cqfs_Submission {
         //7. pass-fail message as remarks
         $remarks = $percentage >= $cqfs_build['pass_percent'] ? $cqfs_build['pass_msg'] : $cqfs_build['fail_msg'];
         
-        // var_dump($ansStatus);
         //now insert into post array
         $post_array = array(
             'post_title'    => '',
@@ -349,8 +342,6 @@ class Cqfs_Submission {
 
         }
 
-        // var_dump($duplicate_email);
-
         /****************************************
          * prepare redirection array
          ****************************************/
@@ -406,8 +397,6 @@ class Cqfs_Submission {
             $redirect_args['_cqfs_id'] = urlencode($cqfsID);
             $redirect_args['_cqfs_duplicate'] = urlencode(rest_sanitize_boolean($duplicate_email));
         }
-        
-        // var_dump($redirect_args);//urlencode array
 
         //send JSON response for ajax mode
         if( !$cqfs_entry_id && $this->ajax ){
@@ -417,7 +406,6 @@ class Cqfs_Submission {
 
         }else if( $this->ajax ){
             //prepare args
-            // $redirect_args[] = $post_array;
             $entry = util::cqfs_entry_obj($cqfs_entry_id);
             wp_send_json_success( $entry );
 
@@ -432,7 +420,7 @@ class Cqfs_Submission {
              * Redirect to the result page and exit
              */
             wp_safe_redirect(
-                esc_url_raw(
+                esc_url(
                     add_query_arg( $redirect_args, $result_page_url ? $result_page_url : home_url('/') )
                 )
             );

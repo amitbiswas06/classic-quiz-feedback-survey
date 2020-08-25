@@ -80,7 +80,6 @@
     }
     .cqfs-admin .sidebar{
         width: 30%;
-        background: #ffffff;
     }
 }
 
@@ -573,4 +572,12 @@ li#toplevel_page_cqfs-post-types ul li:last-child{
 
 .cqfs-submission .cqfs-loader{
     margin: 0 10px;
+}
+
+/* sidebar */
+
+.cqfs-admin .sidebar-content{
+    margin: 20px;
+    padding: 20px;
+    background: #ffffff;
 }

@@ -47,8 +47,7 @@ class Scripts {
 		$action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
 		
 		// get current admin screen, or null
-		$screen = get_current_screen(); 
-		// var_dump($screen);
+		$screen = get_current_screen();
 
 		// verify admin screen object
 		if ( is_object( $screen ) ) {

@@ -5,7 +5,7 @@ Plugin URI: https://github.com/amitbiswas06/classic-quiz-feedback-survey
 Description: It's a classic plugin for quiz app, feedback or survey.
 Version: 1.0.0
 Author: Amit Biswas
-Author URI: https://templateartist.com
+Author URI: https://templateartist.com/
 License: GPLv2 and later
 Text Domain: cqfs
 Domain Path: /languages/
@@ -47,8 +47,6 @@ class CQFS {
 	 * @var string Minimum PHP version required to run the plugin.
 	 */
 	const MINIMUM_PHP_VERSION = '7.3.0';
-
-	// define( 'MY_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 
 	/**
 	 * Instance
@@ -95,10 +93,10 @@ class CQFS {
 		add_action( 'init', [ $this, 'i18n' ] );
 		add_action( 'plugins_loaded', [ $this, 'init' ] );
 
-		//register custom post type
+		// register custom post type
 		require CQFS_PATH . 'inc/cpt.php';
 
-		//add custom post type capabilities to admin
+		// add custom post type capabilities to admin
 		require CQFS_PATH . 'inc/roles.php';
 
 		// create a cqfs result page on plugin activation
@@ -164,31 +162,31 @@ class CQFS {
 			return;
 		}
 
-		//admin menu pages
+		// admin menu pages
 		require CQFS_PATH . 'admin/menu-pages.php';
 
-		//cqfs_question metaboxes
+		// cqfs_question metaboxes
 		require CQFS_PATH . 'admin/meta-boxes/metabox-question.php';
 
-		//cqfs_build metaboxes
+		// cqfs_build metaboxes
 		require CQFS_PATH . 'admin/meta-boxes/metabox-build.php';
 
-		//cqfs_entry metaboxes
+		// cqfs_entry metaboxes
 		require CQFS_PATH . 'admin/meta-boxes/metabox-entry.php';
 
-		//admin columns
+		// admin columns
 		require CQFS_PATH . 'inc/admin-columns.php';
 
-		//admin scripts
+		// admin scripts
 		require CQFS_PATH . 'admin/admin-scripts.php';
 
-		//utility class object
+		// utility class object
 		require CQFS_PATH . 'inc/utilities.php';
 
-		//build shortcode
+		// build shortcode
 		require CQFS_PATH . 'inc/shortcode.php';
 
-		//enqueue scripts to front
+		// enqueue scripts to front
 		add_action('wp_enqueue_scripts', [$this, 'cqfs_enqueue_scripts']);
 
 		// add login form for CQFS use
@@ -244,8 +242,6 @@ class CQFS {
 			array( 
 				'ajaxurl'		=> esc_url( admin_url( 'admin-ajax.php' ) ),
 				'login_status'	=> is_user_logged_in(),
-				'form_handle'	=> esc_attr( get_option('_cqfs_form_handle') ),
-				'allow_guest'	=> esc_attr( get_option('_cqfs_allow_all') ),
 			)
 		);
 

@@ -1,7 +1,7 @@
 <?php
 /**
- * Form handle class for CQFS admin settings pages
- * Handled by `admin-post.php`
+ * Form handle class for CQFS admin pages
+ * Handled by `admin-post.php` and optionally ajax
  * @since 1.0.0
  */
 
@@ -60,31 +60,31 @@ class FormHandle {
         ];
 
         // set failure url
-        $this->failure_url = esc_url_raw(
+        $this->failure_url = esc_url(
             add_query_arg( $this->failure_args, admin_url('admin.php') )
         );
 
         // set success url
-        $this->success_url = esc_url_raw(
+        $this->success_url = esc_url(
             add_query_arg( $this->success_args, admin_url('admin.php') )
         );
 
         // failure url cqfs_entry
-        $this->failure_url_entry = esc_url_raw(
+        $this->failure_url_entry = esc_url(
             add_query_arg( array(
                 'cqfs-email-to-user' => urlencode('failure'),
             ), isset($this->values['_wp_http_referer']) ? $this->values['_wp_http_referer'] : admin_url() )
         );
 
         // success url cqfs_entry
-        $this->success_url_entry = esc_url_raw(
+        $this->success_url_entry = esc_url(
             add_query_arg( array(
                 'cqfs-email-to-user' => urlencode('success'),
             ), isset($this->values['_wp_http_referer']) ? $this->values['_wp_http_referer'] : admin_url() )
         );
 
         //hooks goes here
-        //Authenticated action for the CQFS form. action value `cqfs_response`
+        //Authenticated action for the CQFS form. action value `cqfs_mail_settings_action`
         add_action( 'admin_post_cqfs_mail_settings_action', [$this, 'cqfs_mail_settings_action'] );//php req
     
         // action for the cqfs entry edit page, send email to user
@@ -99,6 +99,7 @@ class FormHandle {
 
 
     /**
+     * CQFS admin settings, mail settings form
      * Submission to `admin-post.php`
      * Validate and return
      */
@@ -188,8 +189,11 @@ class FormHandle {
     }
 
 
+    /**
+     * Send duplicate email to user for the entry type quiz
+     */
     public function cqfs_entry_email_to_user(){
-        // var_dump($this->values);
+        
         // check nonce
 		if ( !isset( $this->values['_cqfs_entry_nonce'] ) || !wp_verify_nonce( $this->values['_cqfs_entry_nonce'], self::ENTRY_EMAIL_NONCE )){
             
@@ -248,7 +252,7 @@ class FormHandle {
         
             $title = Util::cqfs_build_obj($build_id)['title'];
             $title .= sprintf(
-                __('[Duplicate #%s]','cqfs'),
+                esc_html__('[Duplicate #%s]','cqfs'),
                 esc_attr($entry_id)
             );
 
@@ -263,7 +267,7 @@ class FormHandle {
                     //success return json for ajax
                     wp_send_json_success([
                         'message'   => sprintf(
-                            __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
+                            '<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>',
                             esc_html__('Mail successfully sent.','cqfs')
                         ),
                     ]);
@@ -280,7 +284,7 @@ class FormHandle {
                     //failure return json
                     wp_send_json_error([
                         'message'   => sprintf(
-                            __('<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>','cqfs'),
+                            '<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>',
                             esc_html__('Mail not send. Please try again.','cqfs')
                         ),
                     ]);
@@ -299,8 +303,12 @@ class FormHandle {
     }
 
 
+    /**
+     * Recreate result page if it do no exist
+     * from cqfs settings page
+     */
     public function recreate_result_page(){
-        // var_dump($this->values);
+        
         // check nonce
 		if ( !isset( $this->values['_cqfs_recreate_resultpage_nonce'] ) || !wp_verify_nonce( $this->values['_cqfs_recreate_resultpage_nonce'], self::RECREATE_RESULT )){
             
@@ -363,7 +371,7 @@ class FormHandle {
                 //success return json for ajax
                 wp_send_json_success([
                     'message'   => sprintf(
-                        __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
+                        '<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>',
                         esc_html__('Result page created successfully.','cqfs')
                     ),
                 ]);
@@ -378,7 +386,7 @@ class FormHandle {
                 //failure return json
                 wp_send_json_error([
                     'message'   => sprintf(
-                        __('<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>','cqfs'),
+                        '<div class="cqfs-return-msg failure"><p><span class="cqfs-icon failure-icon"></span>%s</p></div>',
                         esc_html__('Cannot create result page. Please refresh and check.','cqfs')
                     ),
                 ]);
