@@ -51,7 +51,7 @@ class Cqfs_Submission {
         $this->failure_url = "";
         if( isset( $this->values['_wp_http_referer'] ) && !empty( $this->values['_wp_http_referer'] ) ){
             // set failure url
-            $this->failure_url = esc_url(
+            $this->failure_url = esc_url_raw(
                 add_query_arg( $this->failure_args, $this->values['_wp_http_referer'] )
             );
 
@@ -175,7 +175,6 @@ class Cqfs_Submission {
             }else{
                 //safe redirect for php mode on failure
                 wp_safe_redirect( $this->failure_url );
-                // var_dump($this->failure_args);
             }
             
 			exit();
@@ -420,7 +419,7 @@ class Cqfs_Submission {
              * Redirect to the result page and exit
              */
             wp_safe_redirect(
-                esc_url(
+                esc_url_raw(
                     add_query_arg( $redirect_args, $result_page_url ? $result_page_url : home_url('/') )
                 )
             );

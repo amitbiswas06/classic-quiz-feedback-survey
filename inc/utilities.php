@@ -258,8 +258,8 @@ class Utilities{
      */
     public static function cqfs_display_uname( $username ){
         return sprintf(
-            '<h3 class="cqfs-uname">%s</h3>',
-            esc_html__('Hello ', 'cqfs') . esc_html($username)
+            __( wp_kses('<h3 class="cqfs-uname">Hello %s</h3>', 'post'),'cqfs'),
+            esc_html($username)
         );
     }
 
@@ -302,7 +302,7 @@ class Utilities{
 
             if( is_user_logged_in() ){
                 printf(
-                    __('<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>','cqfs'),
+                    '<div class="cqfs-return-msg success"><p><span class="cqfs-icon success-icon"></span>%s</p></div>',
                     esc_html__('You are now logged in.','cqfs')
                 );
             }
@@ -311,7 +311,7 @@ class Utilities{
             if( !is_user_logged_in() ){
 
                 printf(
-                    __('<a class="cqfs-modal-link" href="#">%s</a>', 'cqfs'),
+                    '<a class="cqfs-modal-link" href="#">%s</a>',
                     esc_html__('Login and submit', 'cqfs')
                 );
 
@@ -458,7 +458,7 @@ class Utilities{
 
 				//set only for cqfs_entry edit screen
 				if( $screen->post_type === 'cqfs_entry' && isset($post_id) && isset($action) && $action === 'edit' ){
-                    // var_dump($post_id);
+                    
                     $user_email = self::cqfs_entry_obj($post_id)['email'];
                     $build_id = self::cqfs_entry_obj($post_id)['form_id'];
                     ?>
@@ -472,7 +472,7 @@ class Utilities{
                                 <form name="cqfs-email-user-form" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
                                     <?php 
                                     printf(
-                                        __('<p>Send result &#40;copy&#41; to <b>%s</b>&#63;</p>','cqfs'),
+                                        __( wp_kses('<p>Send result &#40;copy&#41; to <b>%s</b>&#63;</p>', 'post'),'cqfs'),
                                         sanitize_email($user_email)
                                     );
                                     ?>
@@ -572,7 +572,7 @@ class Utilities{
                 $queries['_cqfs_entry_id'] = esc_attr($entry_id);
             }
 
-            $result_page_url = add_query_arg( $queries, esc_url( $result_url ) );
+            $result_page_url = esc_url( add_query_arg( $queries, $result_url ) );
 
         }
 
@@ -598,7 +598,7 @@ class Utilities{
         $result_page_url = self::cqfs_result_page_url( $entry_obj['email'], $cqfs_entry_id );
 
         $hello_user = sprintf(
-            __('Hello %s,'),
+            __('Hello %s,', 'cqfs'),
             esc_html( $entry_obj['user_title'] )
         );
         $logo_id = get_theme_mod( 'custom_logo' );

@@ -60,24 +60,24 @@ class FormHandle {
         ];
 
         // set failure url
-        $this->failure_url = esc_url(
+        $this->failure_url = esc_url_raw(
             add_query_arg( $this->failure_args, admin_url('admin.php') )
         );
 
         // set success url
-        $this->success_url = esc_url(
+        $this->success_url = esc_url_raw(
             add_query_arg( $this->success_args, admin_url('admin.php') )
         );
 
         // failure url cqfs_entry
-        $this->failure_url_entry = esc_url(
+        $this->failure_url_entry = esc_url_raw(
             add_query_arg( array(
                 'cqfs-email-to-user' => urlencode('failure'),
             ), isset($this->values['_wp_http_referer']) ? $this->values['_wp_http_referer'] : admin_url() )
         );
 
         // success url cqfs_entry
-        $this->success_url_entry = esc_url(
+        $this->success_url_entry = esc_url_raw(
             add_query_arg( array(
                 'cqfs-email-to-user' => urlencode('success'),
             ), isset($this->values['_wp_http_referer']) ? $this->values['_wp_http_referer'] : admin_url() )

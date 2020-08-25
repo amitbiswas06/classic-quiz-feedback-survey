@@ -350,6 +350,8 @@ class MenuPages {
 
                 </div>
                 
+                <?php submit_button(); ?>
+
             </form>
         </div>
         <?php
