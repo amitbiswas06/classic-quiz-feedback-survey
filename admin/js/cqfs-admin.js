@@ -4,6 +4,9 @@
  */
     "use strict";
 
+    // global submit check
+    let isSubmit = false;
+
     /**
      * Fadein function
      * 
@@ -21,6 +24,11 @@
 
     }
 
+    /**
+     * Fadeout function
+     * 
+     * @param {node} el 
+     */
     function fadeOut(el){
 
         el.style.opacity = 0;
@@ -56,9 +64,6 @@
 
     }
 
-    // global submit check
-    let isSubmit = false;
-
     /**
      * Check text input value with the conditional logic
      * for cqfs_question only
@@ -91,7 +96,6 @@
         return check;
     }
 
-    
     /**
      * Check numbers only from 1-100
      * 
@@ -114,7 +118,6 @@
 
     }
 
-
     /**
      * Creates and return error div html
      * 
@@ -129,7 +132,6 @@
 
         return err_div;
     }
-
 
     /**
      * Stores and returns form data as a encoded string
@@ -171,7 +173,6 @@
         const correctAnsField = document.querySelector('#cqfs-correct-answers');
         const ansType = document.querySelector('#cqfs-answer-type');
         const answers = document.querySelector('#cqfs-answers');
-        const answersArr = answers.value.split('\n');
         
         // form submit and validations
         form.addEventListener('submit', e => {
@@ -179,6 +180,7 @@
             // set the global variable `isSubmit` to true
             isSubmit = true;
 
+            const answersArr = answers.value.split('\n');
             const errDiv = document.querySelectorAll('.selection-error-label');
             const errClassDiv = document.querySelectorAll('.cqfs-selection-error');
             const check = text_value_numbers( correctAnsField.value, ansType.value, answersArr.length );
@@ -237,7 +239,6 @@
         
 
     }
-
 
     /**
      * run only for cqfs_build
@@ -313,7 +314,6 @@
 
         });
 
-
         // event listner for window object `beforeunload`
         const initForm = storeFormData( form );
         window.addEventListener("beforeunload", function (e) {
@@ -335,7 +335,6 @@
         });
 
     }
-
 
     /**
      * run only for cqfs_entry
@@ -384,7 +383,6 @@
                 email_metabox.setAttribute("style", "display: none;");
             }
 
-
             /**
              * Email to user
              */
@@ -393,7 +391,6 @@
             const closeBtn = document.querySelector('.cqfs-close');
             const alertMsg = document.querySelector('.cqfs-alert-message');
             const email_to_form = document.querySelector('form[name="cqfs-email-user-form"]');
-            // console.log(email_to_form)
 
             // run only if form is available
             if(email_to_Modal){
@@ -430,8 +427,8 @@
                     postData( cqfs_admin_obj.ajax_url, formData )
                     .then(response => response.json() )
                     .then( obj => {
+
                         // return obj;
-                        // console.log(obj);
                         if( obj.success ){
                             e.target.remove();
                             alertMsg.classList.remove('display-none');
@@ -500,13 +497,11 @@
         
     }// endif `cqfs_entry`
 
-
     /**
      * run only for cqfs settings page in admin
      * base `toplevel_page_cqfs-settings` from $screen in meta-boxes.php
      */
     if( cqfs_admin_obj.base === 'toplevel_page_cqfs-settings' ){
-        // alert('I am at settings page')
 
         // mail settings form
         const form_mail_settings = document.querySelector('form[name=cqfs-mail-settings]');
@@ -543,7 +538,7 @@
                         container.innerHTML = obj.data.message;
                     }
     
-                } )
+                })
                 .catch( err => console.log(err) );
 
             });
@@ -575,8 +570,6 @@
 
         });
 
-
-    }
-    
+    }    
 
 })();

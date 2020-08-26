@@ -43,6 +43,11 @@ function fadeIn(el){
 
 }
 
+/**
+ * Fadeout function
+ * 
+ * @param {node} el 
+ */
 function fadeOut(el){
 
     el.style.opacity = 0;
@@ -145,12 +150,10 @@ function unique_build( cqfs_NodeArray ){
         for( let k = 1; k < all_dup.length; k++ ){
             all_dup[k].remove();
         }
-        // console.log(all_dup);
 
         uniq.push(all_dup[0]);
     }
 
-    // console.log(uniq);
     return uniq;
 
 }
@@ -285,22 +288,6 @@ async function postData( url = '', data ) {
 
 }
 
-
-async function checkLoginStatus( url = '', data ) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        headers: {
-            'Accept': 'application/json'
-        },
-        body: data
-    });
-
-    return response;
-
-}
-
-
 /**
  * Display results on ajax submit for the quiz
  * 
@@ -357,13 +344,16 @@ function formSubmitEvent(e, cqfs){
     //processing overlay div
     const processingDiv = cqfs.querySelector('.cqfs--processing');
 
+    // loading animation div
     const loader = cqfs.querySelector('.cqfs-loader');
+
+    // submit button
     const submitBtn = cqfs.querySelector('.cqfs--submit');
 
-    // ajax submit
+    // ajax submission mode
     const ajax = cqfs.getAttribute("data-cqfs-ajax");
 
-    // guest form
+    // guest mode status
     const guest = cqfs.getAttribute("data-cqfs-guest");
 
     //form data for ajax submit
@@ -371,8 +361,8 @@ function formSubmitEvent(e, cqfs){
 
     //validate form inputs
     let inpValidation = form_input_validation(e, cqfs);
-    // let inpValidation = true;
 
+    // logged in class
     const loginClass = cqfs.classList.contains('cqfs-logged-in');
 
     //run for not logged in users
@@ -401,7 +391,6 @@ function formSubmitEvent(e, cqfs){
                     hideMe(processingDiv);
                     e.target.remove();
                     cqfs.insertAdjacentHTML( 'beforeend', afterResponse( obj ));
-                    console.log(obj);
                 } );
                 
             }
@@ -429,7 +418,6 @@ function formSubmitEvent(e, cqfs){
                 hideMe(processingDiv);
                 e.target.remove();
                 cqfs.insertAdjacentHTML( 'beforeend', afterResponse( obj ));
-                console.log(obj);
             } );
             
         }
@@ -444,21 +432,12 @@ function formSubmitEvent(e, cqfs){
  * new code for pagination and requirements
  */
 let Init_Cqfs = function ( cqfs ){
-
-    // ajax submit
-    // const ajax = cqfs.getAttribute("data-cqfs-ajax");
-
-    // // guest form
-    // const guest = cqfs.getAttribute("data-cqfs-guest");
-
-    // console.log(ajax, guest)
     
-    // data
+    // data per page status
     const data_perpage = cqfs.getAttribute("data-cqfs-perpage");
 
-    //check the layout type
+    // data layout type status
     const layoutType = cqfs.getAttribute("data-cqfs-layout");
-    console.log(layoutType + ' ' + cqfs.getAttribute('id'))
 
     // questions, nonce, user form container
     const qstContainer = cqfs.querySelector('.cqfs--questions');
@@ -477,7 +456,6 @@ let Init_Cqfs = function ( cqfs ){
 
     //submit button
     const submit = cqfs.querySelector('.cqfs--submit');
-    // console.log(submit)
 
     //Question Object
     let questions = Array.from( cqfs.querySelectorAll('.question') );
@@ -496,12 +474,10 @@ let Init_Cqfs = function ( cqfs ){
 
             qstContainer.insertBefore(el, userForm);
 
-            // console.log(el)
         });
 
         const qst_page = Array.from(cqfs.querySelectorAll('.cqfs-qst-page'));
         qst_page.push(userForm); // push the user form div into the page
-        // console.log(qst_page);
 
         let count = 0;
         nxt.addEventListener('click', e => {
@@ -530,7 +506,6 @@ let Init_Cqfs = function ( cqfs ){
                 enableMe(submit);
             }
 
-            //console.log(count)
         });
 
         prv.addEventListener('click', e => {
@@ -562,16 +537,13 @@ let Init_Cqfs = function ( cqfs ){
                 enableMe(nxt);
             }
 
-            //console.log(count)
         });
-
 
     }
 
     // form submission
     form.addEventListener('submit', e => formSubmitEvent(e, cqfs) );
 
-    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -584,7 +556,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const userForms = Array.from(document.querySelectorAll('.cqfs-user-form'));
     const cqfsDivs = Array.from(document.querySelectorAll('.cqfs'));
     const cqfsNonce = Array.from( document.querySelectorAll('input[name^=_cqfs_nonce_]') );
-    // console.log(cqfsNonce);
     
     // run if login modal is available
     if( loginModal ){
@@ -623,8 +594,8 @@ document.addEventListener('DOMContentLoaded', () => {
             postData( _cqfs.ajaxurl, formData )
             .then(response => response.json() )
             .then( obj => {
+
                 // return obj;
-                console.log(obj);
                 if( obj.success ){
                     e.target.remove();
                     alertMsg.classList.remove('display-none');
@@ -633,7 +604,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     setTimeout( () => {
                         fadeOut(loginModal);
-                        // console.log(userForms)
                         userForms.map( el => el.innerHTML = obj.data.status );
                         cqfsDivs.map( el => el.classList.add('cqfs-logged-in'));
                         cqfsNonce.map( inp => inp.value = obj.data.nonce);

@@ -63,10 +63,10 @@
     transition: all linear 0.3s;
 }
 .cqfs-error{
-    border: 2px solid red;
+    border: 2px solid #dc3232;
 }
 .error-msg{
-    color: red;
+    color: #dc3232;
 }
 
 /* cqfs object */
@@ -79,7 +79,7 @@
     margin: 30px 0;
 }
 .cqfs-error-msg {
-    color: red;
+    color: #dc3232;
     margin: 15px 0;
     background: white;
     padding: 5px 15px;
@@ -195,7 +195,7 @@
 .cqfs-alert-message.failed span,
 .cqfs-alert-message.failed a
 {
-    color: red;
+    color: #dc3232;
 }
 
 .cqfs-alert-message.success,
@@ -203,7 +203,7 @@
 .cqfs-alert-message.success span,
 .cqfs-alert-message.success a
 {
-    color: green;
+    color: #46b450;
 }
 
 .cqfs-return-msg{
@@ -220,13 +220,13 @@
 .cqfs-return-msg.success {
     padding: 15px;
     background: white;
-    border: 2px solid green;
+    border: 2px solid #46b450;
 }
 
 .cqfs-return-msg.failure {
     padding: 15px;
     background: white;
-    border: 2px solid red;
+    border: 2px solid #dc3232;
 }
 
 .cqfs-return-msg .cqfs-icon {
@@ -241,7 +241,7 @@
     width:25px;
     height:25px;
     padding: 3px;
-    background: green;
+    background: #46b450;
     border-radius: 50%;
     line-height:1;
 }
@@ -254,7 +254,7 @@
     width:25px;
     height:25px;
     padding: 3px;
-    background: red;
+    background: #dc3232;
     border-radius: 50%;
     line-height:1;
 }
