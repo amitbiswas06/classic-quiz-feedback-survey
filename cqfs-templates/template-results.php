@@ -63,7 +63,7 @@ use CQFS\INC\UTIL\Utilities as Util;
                     <div class="cqfs-msg <?php echo esc_attr($entry_obj['result']); ?>">
                         <p class="cqfs-percentage"><?php 
                         printf(
-                            __('%s&#37; correct.', 'cqfs'),
+                            __( wp_kses('%s&#37; correct.', Util::$allowed_in_table), 'cqfs'),
                             esc_html($entry_obj['percentage'])
                         );
                         ?></p>

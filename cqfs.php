@@ -2,7 +2,7 @@
 /*
 Plugin Name: Classic Quiz Feedback Survey
 Plugin URI: https://github.com/amitbiswas06/classic-quiz-feedback-survey
-Description: It's a classic plugin for quiz app, feedback or survey.
+Description: It's a classic plugin for quiz, feedback and survey.
 Version: 1.0.0
 Author: Amit Biswas
 Author URI: https://templateartist.com/
@@ -246,8 +246,8 @@ class CQFS {
 		);
 
 		//for localization of string in JS use in front
-		$cqfs_thank_msg = apply_filters('cqfs_thankyou_message', esc_html__('Thank you for participating.', 'cqfs'));
-		$invalid_result = apply_filters('cqfs_invalid_result', esc_html__('Invalid Result','cqfs'));
+		$cqfs_thank_msg_feedback = apply_filters('cqfs_thankyou_msg_feedback', esc_html__('Thank you for your feedback.', 'cqfs'));
+		$cqfs_thank_msg_survey = apply_filters('cqfs_thankyou_msg_survey', esc_html__('Thank you for your participation in the survey.', 'cqfs'));
 		$you_ans = apply_filters('cqfs_result_you_answered', esc_html__('You answered&#58; ', 'cqfs'));
 		$status = apply_filters('cqfs_result_ans_status', esc_html__('Status&#58; ', 'cqfs'));
 		$note = apply_filters('cqfs_result_ans_note', esc_html__('Note&#58; ', 'cqfs'));
@@ -255,11 +255,12 @@ class CQFS {
 		//localize script for JS strings
 		wp_localize_script( 'cqfs-multi', '_cqfs_lang',
 			array( 
-				'thank_msg'		=> esc_html( $cqfs_thank_msg ),
-				'invalid_result'=> esc_html($invalid_result),
-				'you_ans'		=> esc_html($you_ans),
-				'status'		=> esc_html($status),
-				'note'			=> esc_html($note),
+				'thank_msg_feedback'=> esc_html( $cqfs_thank_msg_feedback ),
+				'thank_msg_survey'	=> esc_html( $cqfs_thank_msg_survey ),
+				'invalid_result'	=> esc_html__('Invalid Result','cqfs'),
+				'you_ans'			=> esc_html($you_ans),
+				'status'			=> esc_html($status),
+				'note'				=> esc_html($note),
 			)
 		);
 

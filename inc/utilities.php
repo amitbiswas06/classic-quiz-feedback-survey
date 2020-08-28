@@ -337,7 +337,7 @@ class Utilities{
                     );
 
                     //email field
-                    $error_email = apply_filters('cqfs_error_uname_msg', esc_html__('Invalid Email','cqfs') );
+                    $error_email = apply_filters('cqfs_error_email_msg', esc_html__('Invalid Email','cqfs') );
                     printf(
                         '<label for="%s">%s</label>
                         <input id="%s" name="_cqfs_email" type="email" placeholder="%s"><div class="error-msg error-email hide">%s</div>',

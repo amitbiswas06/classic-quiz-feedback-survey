@@ -10,8 +10,9 @@ namespace CQFS\INC\SUBMIT;
 
 //use namespace
 use CQFS\INC\UTIL\Utilities as Util;
-use WP_Query; //for custom email check
-
+/* 
+ * use WP_Query; //for custom email check to restrict num of entries
+ */
 class Cqfs_Submission {
 
     // this will store form submit mode
@@ -313,8 +314,10 @@ class Cqfs_Submission {
 
         if( !empty($user_emailID) ){
 
+            
+            /********************************************************* 
             //check whether the email is new = restrict to 1 email 1 entry
-            /* $cqfs_wp_query = new WP_Query( array(
+            $cqfs_wp_query = new WP_Query( array(
                     'post_type'         => 'cqfs_entry',
                     'posts_per_page'    => -1,
                 )
@@ -335,7 +338,8 @@ class Cqfs_Submission {
 
             if( ! $duplicate_email ){
                 $cqfs_entry_id = wp_insert_post( $post_array );
-            } */
+            } 
+            *********************************************************/
             
             $cqfs_entry_id = wp_insert_post( $post_array );
 

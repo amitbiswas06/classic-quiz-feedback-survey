@@ -319,9 +319,12 @@ function afterResponse( obj ){
 
         html += "</div>";
 
-    }else if( obj.success && obj.data.form_type !== 'quiz' ){
-        //run if success and not quiz
-        html = `<div class="cqfs-results"><h4>${_cqfs_lang.thank_msg}</h4></div>`;
+    }else if( obj.success && obj.data.form_type === 'feedback' ){
+        //run if success and if feedback
+        html = `<div class="cqfs-results"><h4>${_cqfs_lang.thank_msg_feedback}</h4></div>`;
+    }else if( obj.success && obj.data.form_type === 'survey' ){
+        //run if success and if survey
+        html = `<div class="cqfs-results"><h4>${_cqfs_lang.thank_msg_survey}</h4></div>`;
     }else{
         //run all other case
         html = `<div class="cqfs-invalid-result">${_cqfs_lang.invalid_result}</div>`;
