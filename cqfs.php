@@ -46,7 +46,7 @@ class CQFS {
 	 *
 	 * @var string Minimum PHP version required to run the plugin.
 	 */
-	const MINIMUM_PHP_VERSION = '7.3.0';
+	const MINIMUM_PHP_VERSION = '7.1.0';
 
 	/**
 	 * Instance
