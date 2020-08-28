@@ -203,11 +203,11 @@ class CqfsShortcode {
                 $submit_txt = apply_filters( 'cqfs_submit_text', esc_html__('Submit','cqfs') );
 
                 if( $layout === 'multi' ) { ?>
-                    <button class="cqfs--next"><?php echo esc_html( $next_txt ); ?></button>
-                    <button class="cqfs--prev disabled" disabled><?php echo esc_html( $prev_txt ); ?></button>
-                    <button class="cqfs--submit disabled" type="submit" disabled><?php echo esc_html( $submit_txt ); ?></button>
+                    <button type="button" class="cqfs--next"><?php echo esc_html( $next_txt ); ?></button>
+                    <button type="button" class="cqfs--prev disabled" disabled><?php echo esc_html( $prev_txt ); ?></button>
+                    <button type="submit" class="cqfs--submit disabled" disabled><?php echo esc_html( $submit_txt ); ?></button>
                 <?php }else{ ?>
-                    <button class="cqfs--submit" type="submit"><?php echo esc_html( $submit_txt ); ?></button>
+                    <button type="submit" class="cqfs--submit"><?php echo esc_html( $submit_txt ); ?></button>
                 <?php } ?>
                 <span class="cqfs-loader inline-block hide transition"></span>
             </div>

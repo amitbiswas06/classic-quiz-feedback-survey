@@ -616,6 +616,10 @@ class Utilities{
             esc_html($build_obj['type'])
         );
         $admin_msg = apply_filters('cqfs_email_admin_msg', $admin_msgs );
+        $admin_msg_from_email = sprintf(
+            __( wp_kses('From: %s', self::$allowed_in_table), 'cqfs'),
+            sanitize_email( $entry_obj['email'] )
+        );
 
         //email additional notes
         $email_notes = wp_kses( get_option('_cqfs_mail_notes'), 'post' );
@@ -656,6 +660,9 @@ class Utilities{
 										<b><?php echo esc_html($admin_msg); ?></b>
 									</td>
 								</tr>
+                                <tr>
+                                    <td><?php echo esc_html($admin_msg_from_email); ?></td>
+                                </tr>
                                 <?php endif; ?>
 
                                 <?php if( !$is_admin && $entry_obj['form_type'] != 'quiz' ) :?>

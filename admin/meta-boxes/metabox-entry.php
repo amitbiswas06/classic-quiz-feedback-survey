@@ -72,8 +72,8 @@ class Entry {
 
 		printf(
 			'<div class="cqfs-metabox">
-				<button id="cqfs-entry-enable" class="button button-primary button-large">%s</button>
-				<button id="cqfs-entry-disable" class="button button-secondary button-large">%s</button>
+				<button type="button" id="cqfs-entry-enable" class="button button-primary button-large">%s</button>
+				<button type="button" id="cqfs-entry-disable" class="button button-secondary button-large">%s</button>
 			</div>',
 			esc_html__('Enable', 'cqfs'),
 			esc_html__('Disable', 'cqfs')
@@ -91,7 +91,7 @@ class Entry {
 		printf(
 			'<div class="cqfs-metabox">
 				<a href="%s" target="_blank" id="cqfs-entry-result-link" class="button button-secondary button-large">%s</a>
-				<button id="cqfs-entry-email-user" class="button button-secondary button-large">%s</button>
+				<button type="button" id="cqfs-entry-email-user" class="button button-secondary button-large">%s</button>
 			</div>',
 			esc_url(Util::cqfs_result_page_url( $user_email, $post->ID) ),
 			esc_html__('View Result', 'cqfs'),
