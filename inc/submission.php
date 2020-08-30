@@ -119,7 +119,10 @@ class Cqfs_Submission {
                 exit();
 
             }else{
+                // Set current user
                 wp_set_current_user($user->ID);
+                // Set auth cookie
+                wp_set_auth_cookie($user->ID);
 
                 if( isset($this->values['ajax_request']) && rest_sanitize_boolean( $this->values['ajax_request'] ) ){
                     wp_send_json_success([
