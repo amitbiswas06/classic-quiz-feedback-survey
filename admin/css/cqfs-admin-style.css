@@ -308,7 +308,7 @@ html[dir="rtl"] input.cqfs-is-prepended.cqfs-is-appended {
 }
 
 /* cpt - cqfs_* */
-.cqfs-field input:read-only {
+.cqfs-field .cqfs-large-input:read-only {
     padding: 5px 15px;
     background: #ffffff;
     font-size: 1.4em;

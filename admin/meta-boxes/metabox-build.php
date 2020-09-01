@@ -68,6 +68,7 @@ class Build {
 			<div class="cqfs-input"><input 
 			type="text" 
 			id="cqfs-build-shortcode" 
+			class="cqfs-large-input" 
 			value='<?php echo '&#91;cqfs id="'. esc_attr($post->ID) .'"&#93;'; ?>'
 			readonly></div>
 			<div class="cqfs-additional-info">
