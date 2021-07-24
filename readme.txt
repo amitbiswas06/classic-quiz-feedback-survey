@@ -3,7 +3,7 @@ Contributors: amitbiswas06
 Donate Link: https://paypal.me/amitbiswas06?locale.x=en_GB
 Tags: cqfs, classic, quiz, quiz form, feedback, feedback form, survey, survey form, questionnaire, multi page quiz
 Requires at least: 5.1
-Tested up to: 5.5
+Tested up to: 5.8
 Requires PHP: 7.1
 Stable tag: 1.0.0
 License: GPLv2 or later
