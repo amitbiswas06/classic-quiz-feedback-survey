@@ -19,7 +19,7 @@ use CQFS\INC\UTIL\Utilities as Util;
     <div class="cqfs-result">
     <?php
     //get parameters
-    $param = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+    $param = filter_input_array(INPUT_GET, FILTER_DEFAULT);
 
     if( isset($param['_cqfs_email']) && 
     isset($param['_cqfs_entry_id']) &&

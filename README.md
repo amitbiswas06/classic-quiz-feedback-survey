@@ -39,3 +39,21 @@ Discover all demos that you can easily create and use in your site.
 This plugin is a free open source program. If you found this useful, please support the plugin to keep it alive.
 
 [Donate via PayPal](https://paypal.me/amitbiswas06?locale.x=en_GB)
+
+**Changelog**
+
+_version 1.0.1_
+**11.05.2023**
+
+- Deprecated filter removed for `filter_input` and `filter_input_array`
+
+_version 1.0.0_
+**Release Date - 1st September 2020**
+
+* The First Release
+
+[View the full changelog](https://github.com/amitbiswas06/classic-quiz-feedback-survey)
+
+== Upgrade Notice ==
+
+No upgrade notice is available. Current version 1.0.0 is stable release.

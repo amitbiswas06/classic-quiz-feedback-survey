@@ -15,7 +15,7 @@ class Question {
     public function __construct() {
         //sanitize the global POST var. XSS ok.
 		//all form inputs and security inputs
-        $this->values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+        $this->values = filter_input_array(INPUT_POST, FILTER_DEFAULT);
         
         //CPT - cqfs_question
 		add_action('add_meta_boxes', [ $this, 'cqfs_question_metaboxes' ]);

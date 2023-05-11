@@ -449,7 +449,7 @@ class Utilities{
         //grab the current post ID
 		$post_id = filter_input(INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT);
         //grab "action=edit" screen
-		$action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
+		$action = filter_input(INPUT_GET, 'action', FILTER_DEFAULT);
         $screen = get_current_screen();
 
         // verify admin screen object

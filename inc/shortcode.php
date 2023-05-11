@@ -64,7 +64,7 @@ class CqfsShortcode {
         );
 
         //get parameters
-        $param = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+        $param = filter_input_array(INPUT_GET, FILTER_DEFAULT);
 
         ob_start(); 
 

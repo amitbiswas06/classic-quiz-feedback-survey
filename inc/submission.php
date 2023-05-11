@@ -31,7 +31,7 @@ class Cqfs_Submission {
 
         //sanitize the global POST var. XSS ok.
         //all form inputs and security inputs
-        $this->values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+        $this->values = filter_input_array(INPUT_POST, FILTER_DEFAULT);
 
         // set the submit mode
         $this->ajax = false;

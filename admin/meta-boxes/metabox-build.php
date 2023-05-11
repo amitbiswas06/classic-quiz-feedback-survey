@@ -16,7 +16,7 @@ class Build {
 
         //sanitize the global POST var. XSS ok.
 		//all form inputs and security inputs
-        $this->values = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+        $this->values = filter_input_array(INPUT_POST, FILTER_DEFAULT);
         
         //CPT - cqfs_build
 		add_action('add_meta_boxes', [ $this, 'cqfs_build_metaboxes' ]);

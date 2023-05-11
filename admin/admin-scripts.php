@@ -44,7 +44,7 @@ class Scripts {
 		$post_id = filter_input(INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT);
 
 		//grab "action=edit" screen
-		$action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
+		$action = filter_input(INPUT_GET, 'action', FILTER_DEFAULT);
 		
 		// get current admin screen, or null
 		$screen = get_current_screen();

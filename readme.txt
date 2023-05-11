@@ -3,9 +3,9 @@ Contributors: amitbiswas06
 Donate Link: https://paypal.me/amitbiswas06?locale.x=en_GB
 Tags: cqfs, classic, quiz, quiz form, feedback, feedback form, survey, survey form, questionnaire, multi page quiz
 Requires at least: 5.1
-Tested up to: 5.8
+Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,10 @@ Report bugs on the [CQFS GitHub repository](https://github.com/amitbiswas06/clas
 
 
 == Changelog ==
+= 1.0.1 =
+11th May 2023
+
+- Deprecated filter removed for filter_input and filter_input_array
 
 = 1.0.0 =
 *Release Date - 1st September 2020*

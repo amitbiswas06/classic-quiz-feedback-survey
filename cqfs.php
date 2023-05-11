@@ -3,7 +3,7 @@
 Plugin Name: Classic Quiz Feedback Survey
 Plugin URI: https://github.com/amitbiswas06/classic-quiz-feedback-survey
 Description: It's a classic plugin for quiz, feedback and survey.
-Version: 1.0.0
+Version: 1.0.1
 Author: Amit Biswas
 Author URI: https://templateartist.com/
 License: GPLv2 and later
@@ -37,7 +37,7 @@ class CQFS {
 	 *
 	 * @var string The plugin version.
 	 */
-	const CQFS_VERSION = '1.0.0';
+	const CQFS_VERSION = '1.0.1';
 
 	/**
 	 * Minimum PHP Version
